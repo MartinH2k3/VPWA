@@ -4,6 +4,8 @@ import MessageField from 'components/MessageField.vue';
 import Sidebar from 'components/Sidebar.vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from 'stores/userStore';
+import MessagePage from 'pages/MessagePage.vue';
+import NotificationWindow from 'components/NotificationWindow.vue';
 
 defineOptions({
   name: 'MainLayout'
@@ -45,6 +47,9 @@ async function logout() {
         <q-toolbar-title>
           Frens
         </q-toolbar-title>
+        <q-btn-dropdown flat icon="notifications">
+          <notification-window/>
+        </q-btn-dropdown>
         <q-btn-dropdown class="inverseColor text-right" :label="userStore.getUsername">
           <div class="row no-wrap q-pa-md">
             <div class="column justify-around">
@@ -80,10 +85,12 @@ async function logout() {
     </q-drawer>
 
     <q-page-container>
-      Hello
+      <message-page/>
     </q-page-container>
     <q-footer>
       <message-field/>
     </q-footer>
   </q-layout>
 </template>
+
+
