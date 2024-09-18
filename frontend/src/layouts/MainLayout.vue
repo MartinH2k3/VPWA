@@ -1,3 +1,34 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+import MessageField from 'components/MessageField.vue';
+import Sidebar from 'components/Sidebar.vue';
+import { useRouter } from 'vue-router';
+import { useUserStore } from 'stores/userStore';
+
+defineOptions({
+  name: 'MainLayout'
+});
+
+const leftDrawerOpen = ref(false);
+
+function toggleLeftDrawer () {
+  leftDrawerOpen.value = !leftDrawerOpen.value;
+}
+
+const router = useRouter();
+const userStore = useUserStore();
+const status = ref('online');
+
+async function logout() {
+  try {
+    // TODO api logout call
+    await router.push('/login');
+  } catch (e) {
+    console.error(e);
+  }
+}
+</script>
+
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
@@ -12,10 +43,31 @@
         />
 
         <q-toolbar-title>
-          Quasar App
+          Frens
         </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
+        <q-btn-dropdown class="inverseColor text-right" :label="userStore.getUsername">
+          <div class="row no-wrap q-pa-md">
+            <div class="column justify-around">
+              <q-btn outline rounded class="q-mr-md" @click="logout">
+                Logout
+              </q-btn>
+              <q-btn
+                outline
+                rounded
+                class="q-mr-md"
+                href="https://www.wikipedia.org/wiki/monkey"
+                target="_blank">
+                Info
+              </q-btn>
+            </div>
+            <q-separator vertical inset class="text-white" />
+            <div class="column justify-around">
+              <q-radio v-model="status" val="online" label="online" @update:model-value="userStore.setStatus('online')"/>
+              <q-radio v-model="status" val="do not disturb" label="away" @update:model-value="userStore.setStatus('online')"/>
+              <q-radio v-model="status" val="offline" label="offline" @update:model-value="userStore.setStatus('online')"/>
+            </div>
+          </div>
+        </q-btn-dropdown>
       </q-toolbar>
     </q-header>
 
@@ -35,19 +87,3 @@
     </q-footer>
   </q-layout>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue';
-import MessageField from 'components/MessageField.vue';
-import Sidebar from 'components/Sidebar.vue';
-
-defineOptions({
-  name: 'MainLayout'
-});
-
-const leftDrawerOpen = ref(false);
-
-function toggleLeftDrawer () {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
-}
-</script>
