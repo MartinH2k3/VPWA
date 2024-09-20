@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router';
 import { useUserStore } from 'stores/userStore';
 import MessagePage from 'pages/MessagePage.vue';
 import NotificationWindow from 'components/NotificationWindow.vue';
+import { api } from 'boot/api';
 
 defineOptions({
   name: 'MainLayout'
@@ -23,7 +24,7 @@ const status = ref('online');
 
 async function logout() {
   try {
-    // TODO api logout call
+    await api.post('/logout');
     await router.push('/login');
   } catch (e) {
     console.error(e);
