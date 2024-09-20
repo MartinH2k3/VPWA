@@ -3,6 +3,7 @@
 import { ref, Ref } from 'vue';
 
 const notifications: Ref<Notification[]> = ref([])
+const scrollTargetRef = ref()
 
 // const $q = useQuasar() // will be used to stop notifications if not $q.appVisible
 interface Channel {
@@ -21,7 +22,7 @@ interface Notification {
 }
 
 async function paginateNotifications(index: number, done: () => void) {
-  // generate 10 random notifications
+  // TODO implement for real, instead of mock function
   for (let i = 0; i < 10; i++) {
     notifications.value.push({
       id: Math.floor(Math.random() * 1000),
@@ -42,7 +43,7 @@ async function paginateNotifications(index: number, done: () => void) {
 </script>
 
 <template>
-  <div ref="scrollTargetRef" style="max-height: 8rem; overflow: auto">
+  <div ref="scrollTargetRef" style="max-height: 150px; overflow: auto">
     <q-infinite-scroll
       :offset="10"
       :scroll-target="scrollTargetRef"
@@ -57,6 +58,9 @@ async function paginateNotifications(index: number, done: () => void) {
           </q-item-section>
         </q-item>
       </q-list>
+      <template #loading>
+        <q-spinner class="row justify-center"/>
+      </template>
     </q-infinite-scroll>
   </div>
 </template>

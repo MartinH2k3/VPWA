@@ -27,7 +27,6 @@ function paginateMessages(index: number, done: () => void) {
     })
   }
   done()
-  messages.value.push
 }
 </script>
 
