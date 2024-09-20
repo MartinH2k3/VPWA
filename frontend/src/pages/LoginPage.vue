@@ -8,6 +8,7 @@ const email = ref('');
 const password = ref('');
 const router = useRouter();
 const userStore = useUserStore();
+const warning = ref('');
 
 async function login() {
   // can't login if already logged in
@@ -19,7 +20,8 @@ async function login() {
       return;
     }
   } catch (e) {
-
+    warning.value = 'Invalid email or password';
+    console.error(e);
   }
 
   try {
@@ -47,6 +49,7 @@ async function login() {
           <div class="text-center q-pt-none">
             Don't have an account yet? <router-link to="/register">Sign Up</router-link>
           </div>
+          <div class="text-center text-negative">{{ warning }}</div>
         </q-form>
       </q-page>
     </q-page-container>

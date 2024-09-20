@@ -17,7 +17,9 @@ async function register() {
     const response = await api.post('/register', {
       username: username.value,
       email: email.value,
-      password: password.value
+      password: password.value,
+      first_name: firstName.value,
+      last_name: lastName.value
     });
     const userData = response.data;
     userStore.setActiveUser(userData); // Set the active user in the store
