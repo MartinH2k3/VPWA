@@ -18,6 +18,7 @@ export default class extends BaseSchema {
       table.increments('id') // Primary Key
 
       table.string('fistname').notNullable()
+      table.string('lastname').notNullable()
       table.string('username').notNullable().unique()
       table.string('email').notNullable().unique()
 

@@ -7,9 +7,9 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
 
-      table.integer('user_id').unsigned().references('users.user_id').onDelete('CASCADE')
-      table.integer('channel_id').unsigned().nullable().references('channels.channel_id').onDelete('SET NULL')
-      table.enum('type', ['message', 'mention', 'invite', 'kick']).notNullable() // Enum for notification type
+      table.integer('user_id').unsigned().references('users.id').onDelete('CASCADE')
+      table.integer('channel_id').unsigned().nullable().references('channels.id').onDelete('SET NULL')
+      table.string('type').notNullable() // Enum for notification type
       table.string('message').notNullable()
       table.boolean('is_read').defaultTo(false)
 

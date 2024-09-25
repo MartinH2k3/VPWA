@@ -7,8 +7,8 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id') // Primary Key
 
-      table.integer('user_id').unsigned().references('users.user_id').onDelete('CASCADE')
-      table.integer('channel_id').unsigned().references('channels.channel_id').onDelete('CASCADE')
+      table.integer('user_id').unsigned().references('users.id').onDelete('CASCADE')
+      table.integer('channel_id').unsigned().references('channels.id').onDelete('CASCADE')
       table.integer('kick_votes').defaultTo(0) // Number of votes for kick
       table.boolean('kicked').defaultTo(false) // Whether the user is kicked
       table.timestamp('joined_at', { useTz: true }).notNullable()

@@ -7,11 +7,9 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
 
-      table.increments('message_id') // Primary Key
-      table.integer('channel_id').unsigned().references('channels.channel_id').onDelete('CASCADE')
-      table.integer('user_id').unsigned().references('users.user_id').onDelete('CASCADE')
+      table.integer('channel_id').unsigned().references('channels.id').onDelete('CASCADE')
+      table.integer('user_id').unsigned().references('users.id').onDelete('CASCADE')
       table.text('content').notNullable()
-      table.timestamp('created_at', { useTz: true }).notNullable()
 
       table.timestamp('created_at')
       table.timestamp('updated_at')
