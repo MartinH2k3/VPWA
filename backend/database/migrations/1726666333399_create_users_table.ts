@@ -1,3 +1,13 @@
+// Table users {
+//   user_id      int        [pk, increment] // Primary Key with auto-increment
+//   fistname     varchar    [not null]
+//   username     varchar    [unique, not null]
+//   email        varchar    [unique, not null]
+//   created_at   datetime   [not null]
+//   last_login   datetime
+// }
+
+
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {
@@ -5,14 +15,14 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id').notNullable()
-      table.string('username', 80).notNullable().unique()
-      table.string('email', 254).notNullable().unique()
-      table.string('password').notNullable()
-      table.string('first_name', 80).notNullable()
-      table.string('last_name', 80).notNullable()
-      table.timestamp('created_at').notNullable()
-      table.timestamp('updated_at').nullable()
+      table.increments('id') // Primary Key
+
+      table.string('fistname').notNullable()
+      table.string('username').notNullable().unique()
+      table.string('email').notNullable().unique()
+
+      table.timestamp('created_at')
+      table.timestamp('updated_at')
     })
   }
 
