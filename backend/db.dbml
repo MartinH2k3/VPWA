@@ -1,0 +1,52 @@
+Table users {
+  user_id      int        [pk, increment] // Primary Key with auto-increment
+  first_name     varchar    [not null]
+  last_name     varchar    [not null]
+  username     varchar    [unique, not null]
+  password     varchar    [not null]
+  email        varchar    [unique, not null]
+  created_at   datetime   [not null]
+  last_login   datetime
+}
+
+Table channels {
+  channel_id   int        [unique, pk, increment] // Primary Key with auto-increment
+  channel_name varchar    [not null]
+  description  text
+  created_at   datetime   [not null]
+}
+
+Table channel_memberships {
+  membership_id int       [pk, increment] // Primary Key with auto-increment
+  user_id       int       [ref: > users.user_id] // Foreign Key reference
+  channel_id    int       [ref: > channels.channel_id] // Foreign Key reference
+  kick_votes     int
+  kicked        bool
+  joined_at     datetime  [not null]
+}
+
+Table messages {
+  message_id    int       [pk, increment] // Primary Key with auto-increment
+  channel_id    int       [ref: > channels.channel_id] // Foreign Key reference
+  user_id       int       [ref: > users.user_id] // Foreign Key reference
+  content       text      [not null]
+  created_at    datetime  [not null]
+}
+
+Table notifications {
+  notification_id int     [pk, increment] // Primary Key with auto-increment
+  user_id         int     [ref: > users.user_id] // Foreign Key reference
+  channel_id      int     [ref: > channels.channel_id, null] // Nullable Foreign Key
+  type            notification_type
+  message         varchar [not null]
+  is_read         boolean [default: false]
+  created_at      datetime [not null]
+}
+
+
+enum notification_type {
+  message
+  mention
+  invite
+  kick
+}
