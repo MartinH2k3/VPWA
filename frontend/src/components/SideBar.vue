@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { useChannelStore } from 'stores/channelStore';
+
 import { computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { useChannelStore } from 'stores/channelStore';
+// import { useRouter } from 'vue-router';
 
 const channelStore = useChannelStore();
 const channels = computed(()=>channelStore.channels);
-const router = useRouter();
+// const router = useRouter();
 
 interface Channel {
   id: number

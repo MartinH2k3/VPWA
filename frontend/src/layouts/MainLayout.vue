@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import MessageField from 'components/MessageField.vue';
-import Sidebar from 'components/Sidebar.vue';
+import SideBar from 'components/SideBar.vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from 'stores/userStore';
 import MessagePage from 'pages/MessagePage.vue';
@@ -82,7 +82,7 @@ async function logout() {
       show-if-above
       bordered
     >
-      <sidebar/>
+      <SideBar/>
     </q-drawer>
 
     <q-page-container>
