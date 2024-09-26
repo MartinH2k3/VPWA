@@ -1,0 +1,42 @@
+# @format
+
+services:
+  adonis-api:
+    image: node:21 # Using Node.js 21 as the base image
+    container_name: adonis-api
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    ports:
+      - "3333:3333" # Expose the AdonisJS server port
+    environment:
+      NODE_ENV: development
+      APP_KEY: ASFIUH#@(FHNESIFU#H(H*RF)) # Replace with your actual app key
+      DB_CONNECTION: pg
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: adonis
+      DB_PASSWORD: secret
+      DB_DATABASE: adonis_db
+    depends_on:
+      - db
+    command: >
+      # sh -c "cd backend && npm install && node ace migration:run && npm run dev"
+
+
+  db:
+    image: postgres:15 # Using PostgreSQL 15
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: adonis_db
+      POSTGRES_USER: adonis
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432" # Expose PostgreSQL port
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+    driver: local
