@@ -1,7 +1,7 @@
-import { RouteRecordRaw, useRouter } from 'vue-router';
+import { RouteRecordRaw } from 'vue-router';
 import { api } from 'boot/api';
 
-const router = useRouter();
+// const router = useRouter();
 
 const routes: RouteRecordRaw[] = [
   {
@@ -15,11 +15,17 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/login',
-    component: () => import('pages/LoginPage.vue'),
+    component: () => import('pages/AuthPage.vue'),
+    props: {
+      type:'login',
+    }
   },
   {
     path: '/register',
-    component: () => import('pages/RegisterPage.vue'),
+    component: () => import('pages/AuthPage.vue'),
+    props:{
+      type:'register',
+    }
   },
 
 
