@@ -1,32 +1,18 @@
-<script lang="ts" setup>
-import { useRouter } from 'vue-router';
-import { useUserStore } from 'stores/userStore';
-import { api } from 'boot/api';
-
-const userStore = useUserStore();
-</script>
-
-
 <template>
-
   <q-layout>
     <q-page-container>
       <q-page class="flex-container width-full w-auto">
         <div class="m-auto text-center">
           <img width="86px" class='mb-5' src="logo.svg">
-          <div class="flex flex-row gap-2 mb-3">
-            <h5 class="m-0 mr-auto font-bold">Login</h5>
-            <router-link to="/register" class="tab-button my-auto"
-              :class="{ 'active': !isLogin }">Register</router-link>
-            <router-link to="/login" class="tab-button my-auto" :class="{ 'active': isLogin }">Login</router-link>
-          </div>
-          <hr class="mb-4">
           <q-form v-if="isLogin" @submit.prevent="login" class="flex flex-column gap-4">
-
             <q-input v-model="email" label="Email" />
             <q-input v-model="password" label="Password" type="password" />
             <q-btn label="Login" type="submit" />
-            <pre class=" text-negative">{{ warning }}</pre>
+            <pre v-if="warning" class=" text-negative">{{ warning }}</pre>
+
+            <div class="text-center q-pt-md">
+              New to the website? <router-link to="/register">Register</router-link>
+            </div>
           </q-form>
           <q-form v-else @submit.prevent="register" class="flex flex-column gap-4">
             <q-input v-model="firstName" label="First Name" />
@@ -35,9 +21,9 @@ const userStore = useUserStore();
             <q-input v-model="email" label="Email" />
             <q-input v-model="password" label="Password" type="password" />
             <q-btn label="Register" type="submit" />
-            <pre style="max-width: 100%;" class=" text-negative">{{ warning }}</pre>
+            <pre v-if="warning" style="max-width: 100%;" class=" text-negative">{{ warning }}</pre>
 
-            <div class="text-center q-pt-none">
+            <div class="text-center q-pt-md">
               Already a user? <router-link to="/login">Log In</router-link>
             </div>
           </q-form>
@@ -50,6 +36,10 @@ const userStore = useUserStore();
 
 
 <script lang="ts">
+import { useRouter } from 'vue-router';
+import { useUserStore } from 'stores/userStore';
+import { api } from 'boot/api';
+
 export default {
   data() {
     return {
@@ -62,6 +52,13 @@ export default {
       lastName: '',
     }
   },
+
+  setup() {
+    const router = useRouter();
+    const userStore = useUserStore();
+    return { router, userStore }
+  },
+
   props: {
     type: String
   },
@@ -79,8 +76,6 @@ export default {
 
   methods: {
     async login() {
-
-
       // can't login if already logged in
       try {
         const sessionResponse = await api.get('/auth');
@@ -89,7 +84,7 @@ export default {
         if (sessionResponse.data.authenticated) {
           console.warn('User is already logged in');
 
-          await this.$router.push('/');
+          await this.router.push('/');
           return;
         }
       } catch (e) {
@@ -104,8 +99,8 @@ export default {
         this.warning = '';
 
         const userData = response.data;
-        userStore.setActiveUser(userData); // Set the active user in the store
-        await this.$router.push('/');
+        this.userStore.setActiveUser(userData); // Set the active user in the store
+        await this.router.push('/');
       } catch (e: any) {
         const errors = e.response.data.errors
         this.warning = '';
@@ -129,8 +124,8 @@ export default {
 
         this.warning = '';
         const userData = response.data;
-        userStore.setActiveUser(userData); // Set the active user in the store
-        await this.$router.push('/');
+        this.userStore.setActiveUser(userData); // Set the active user in the store
+        await this.router.push('/');
       } catch (e: any) {
         const errors = e.response.data?.errors
         console.log(errors);
