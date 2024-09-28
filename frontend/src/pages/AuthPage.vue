@@ -3,7 +3,7 @@
     <q-page-container>
       <q-page class="flex-container width-full w-auto">
         <div class="m-auto text-center">
-          <img width="86px" class='mb-5' src="logo.svg">
+          <img alt="logo" width="86px" class='mb-5' src="logo.svg">
           <q-form v-if="isLogin" @submit.prevent="login" class="flex flex-column gap-4">
             <q-input v-model="email" label="Email" />
             <q-input v-model="password" label="Password" type="password" />
