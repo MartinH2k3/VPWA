@@ -51,7 +51,7 @@ async function logout() {
         <q-btn-dropdown flat icon="notifications">
           <notification-window/>
         </q-btn-dropdown>
-        <q-btn-dropdown class="inverseColor text-right" :label="userStore.getUsername">
+        <q-btn-dropdown class="text-right" :label="userStore.getUsername">
           <div class="row no-wrap q-pa-md">
             <div class="column justify-around">
               <q-btn outline rounded class="q-mr-md" @click="logout">
