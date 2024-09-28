@@ -10,7 +10,7 @@ nav
   display: flex
   justify-content: space-between
   align-items: center
-  padding: 0em 3em
+  padding: 0 3em
   background-color: var(--color-base-background)
   gap: 1.5em
   max-height: var(--navbar-height)
@@ -77,23 +77,23 @@ nav *
 
 @media screen and (max-width: 800px)
   nav
-    padding: 0rem 1em
+    padding: 0 1em
     width: 100%
 
     nav .logo-container
-    padding: 1rem
+      padding: 1rem
 
     nav .menu-container
-    display: flex
-    gap: 1em
+      display: flex
+      gap: 1em
 
     nav .search-container
-    max-width: 100%
-    flex: 1
+      max-width: 100%
+      flex: 1
 
     nav .cart-container,
     nav .account-container
-    flex: 0
+      flex: 0
 
     nav.open
       display: flex
@@ -102,7 +102,7 @@ nav *
       align-content: center
       width: 100%
       max-height: 100vh
-      padding: 1rem 0rem
+      padding: 1rem 0
       gap: 3rem
 
     nav .nav-links,
@@ -125,7 +125,7 @@ nav *
       flex: 0
       font-size: 2rem
       height: auto
-      gap: 0rem
+      gap: 0
 
     nav.open .menu-container
       margin-left: auto
@@ -148,46 +148,45 @@ nav *
     gap: 1em
 
     nav a
-    line-height: 0px
+      line-height: 0
 
     nav .search-container input,
     nav .search-container button
-    position: absolute
-    display: block
-    left: -10rem
-    width: 0%
-    opacity: 0
-    padding-right: 40px
-    z-index: 999
-    transition: all 0.5s
+      position: absolute
+      display: block
+      left: -10rem
+      width: 0
+      opacity: 0
+      padding-right: 40px
+      z-index: 999
+      transition: all 0.5s
 
     nav .search-container label
-    display: block
-    margin: 0px
-    margin-left: auto
-    line-height: 0px
-        /* font-size: unset; */
-    cursor: pointer
+      display: block
+      margin: 0 0 0 auto
+      line-height: 0
+          /* font-size: unset; */
+      cursor: pointer
 
     nav .search-container:focus
-    width: 100%
+      width: 100%
 
     nav .search-container input:focus
-    z-index: 1001
-    width: calc(100% - 4rem)
-    margin-left: 2rem
-    left: 0rem
-    opacity: 1
+      z-index: 1001
+      width: calc(100% - 4rem)
+      margin-left: 2rem
+      left: 0
+      opacity: 1
 
     nav .search-container input:focus+button,
     nav .search-container button:focus
-    z-index: 1001
-    width: auto
-    opacity: 1
-    padding: 1rem
-    left: unset
-    right: 25px
-    transition: all 0.5s
+      z-index: 1001
+      width: auto
+      opacity: 1
+      padding: 1rem
+      left: unset
+      right: 25px
+      transition: all 0.5s
 
     nav.open .nav-links
       gap: 2.5rem
@@ -258,7 +257,7 @@ footer ion-icon
 
 .admin-navbar ul
   padding: 0
-  margin: 0px
+  margin: 0
   list-style-type: none
 
   & li
@@ -271,7 +270,6 @@ footer ion-icon
       color: var(--color-main-dark)
       transition: all 0.5s
       line-height: 1.5
-      text-decoration: none
 
     & li a.active
       background-color: var(--color-main-regular)
@@ -284,14 +282,14 @@ footer ion-icon
 
 .pagination
   display: flex
-  flex: row nowrap
+  //flex: row nowrap
   justify-content: center
   align-items: center
   gap: var(--size-2)
 
   & ol
     display: flex
-    flex: row nowrap
+    //flex: row nowrap
     gap: var(--size-2)
     list-style-type: none
     margin: 0
@@ -331,7 +329,7 @@ footer ion-icon
       min-width: 10em
       padding: 0.5em 0.5em
       background-color: var(--color-base-background)
-      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1)
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)
       z-index: 1000
       list-style: none
       &.show
@@ -345,7 +343,7 @@ footer ion-icon
           transition: background-color 0.3s
           gap: 0.2em
           >*
-            margin: auto 0px
+            margin: auto 0
             &:hover,
             &:focus
               background-color: var(--color-base-background-dark)
@@ -383,7 +381,6 @@ footer ion-icon
       font-size: 1.5rem
 
 .confirm-modal
-  display: none
   position: fixed
   top: 0
   left: 0
@@ -399,7 +396,7 @@ footer ion-icon
     background-color: var(--color-base-background)
     padding: 5rem
     border: 2px solid var(--color-main-regular)
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1)
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)
     min-width: 500px
     max-width: 800px
 
@@ -407,7 +404,7 @@ footer ion-icon
       display: flex
       justify-content: space-between
       align-items: center
-      margin-bottom: 0rem
+      margin-bottom: 0
 
     .confirm-modal-body
       margin-bottom: 1rem
@@ -441,7 +438,7 @@ footer ion-icon
     padding: 1.5rem 1.5rem
     background-color: var(--color-main-white)
     color: var(--color-main-dark)
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2)
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2)
     transition: all 0.5s
     cursor: pointer
     min-width: 200px
@@ -458,12 +455,12 @@ footer ion-icon
       z-index: 1000
       span.close-progress
         position: absolute
-        bottom: 0px
-        left: 0px
+        bottom: 0
+        left: 0
         height: 100%
         background-color: var(--theme-color)
         opacity: 0.5
-        width: 0%
+        width: 0
         transition: width 3s linear
         z-index: 999
         &.success
@@ -490,7 +487,7 @@ footer ion-icon
     min-width: 50px
 
     .form-section-title
-      margin: 0rem
+      margin: 0
 
 .input-wrapper, .q-input
   position: relative
