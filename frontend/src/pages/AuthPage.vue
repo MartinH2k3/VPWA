@@ -102,10 +102,14 @@ export default {
         this.userStore.setActiveUser(userData); // Set the active user in the store
         await this.router.push('/');
       } catch (e: any) {
-        const errors = e.response.data.errors
-        this.warning = '';
-        for (const error of errors) {
-          this.warning += error.message + '\n'
+        try {
+          const errors = e.response.data.errors
+          this.warning = '';
+          for (const error of errors) {
+            this.warning += error.message + '\n'
+          }
+        } catch(e) { // If there is no response
+          this.warning = 'Couldn\'t connect to the server.\nTry checking your internet connection.';
         }
         console.error(e);
       }
