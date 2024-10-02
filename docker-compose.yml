@@ -22,7 +22,20 @@ services:
     depends_on:
       - db
     command: >
-      # sh -c "cd backend && npm install && node ace migration:run && npm run dev"
+      sh -c "cd backend && npm install && node ace migration:run && npm run dev"
+
+
+  quasar:
+    image: node:21
+    container_name: quasar
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    ports:
+      - "9000:9000"
+    command: >
+      sh -c "cd frontend && npm install && npm run dev"
 
 
   db:
