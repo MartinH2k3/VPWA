@@ -21,5 +21,9 @@ yarn-error.log
 .idea
 .vscode
 
+# Lock files
+package-lock.json
+yarn.lock
+
 # Platform specific
 .DS_Store
