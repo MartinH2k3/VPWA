@@ -8,6 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
 
       table.string('channel_name').notNullable()
+      table.boolean('isPrivate').notNullable().defaultTo(false)
       table.text('description').nullable()
 
       table.timestamp('created_at')
