@@ -14,7 +14,7 @@ export default class Channel extends BaseModel {
   declare adminId: number
 
   @column()
-  declare private: boolean
+  declare isPrivate: boolean
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -33,5 +33,5 @@ export default class Channel extends BaseModel {
     pivotRelatedForeignKey: 'user_id',
     pivotColumns: ['kick_votes', 'banned'],
   })
-  declare user: ManyToMany<typeof User>
+  declare members: ManyToMany<typeof User>
 }
