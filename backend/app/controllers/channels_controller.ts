@@ -2,7 +2,7 @@ import { HttpContext } from '@adonisjs/core/http'
 import Channel from '#models/channel'
 
 export default class ChannelsController {
-  async join({ request, auth, response }: HttpContext){
+  async join({ request, auth, response }: HttpContext) {
     const { channelName, isPrivate } = request.only(['channelName', 'isPrivate'])
     const userId = auth.user?.id
     if (!userId) {
@@ -41,4 +41,5 @@ export default class ChannelsController {
       return channel
     }
   }
+
 }

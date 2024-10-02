@@ -68,7 +68,7 @@ module.exports = {
 
   // add your custom rules here
   rules: {
-      "no-unused-vars": 'off',
+    'no-unused-vars': 'off',
 
     'prefer-promise-reject-errors': 'off',
 

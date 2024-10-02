@@ -31,7 +31,31 @@ export default class AuthController {
   }
 
   async logout({ auth }: HttpContext) {
-    await auth.use('web').logout()
-    return { success: true }
+    await auth.check();
+    const user = auth.user;
+    // Find active socket
+    const activeSocket = (global as any).activeSockets.find((socket: ActiveSocket) => socket.user.id === user.id)
+    console.log('Logging out', activeSocket?.user.username);
+
+    activeSocket.updateChannles();
+
+
+    // await auth.use('web').logout()
+    // return { success: true }
+  }
+
+  async authWS({ auth, response }: HttpContext) {
+    const authenticated = await auth.check()
+
+    if (!authenticated) return response.unauthorized({ message: 'Invalid credentials' });
+
+    if (!auth?.user) return response.unauthorized({ message: 'Invalid credentials' });
+
+    // generate a random unique token incorporating the user id and the current time and randomness
+    const token = auth.user.id + Math.random().toString(36).substr(2) + Date.now().toString(36) + Math.random().toString(36).substr(2);
+
+
+    (global as any).activeSockets.push({ user: auth.user, token });
+    return response.ok(token)
   }
 }

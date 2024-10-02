@@ -2,19 +2,22 @@
 
 services:
   adonis-api:
-    image: node:21 # Using Node.js 21 as the base image
+    image: node:21-alpine # Using Node.js 21 as the base image
     container_name: adonis-api
     working_dir: /app
     volumes:
       - ./:/app
       - /app/node_modules
     ports:
-      - "3333:3333" # Expose the AdonisJS server port
+      - 8000:8000 # Expose the AdonisJS server port
+      - 9229:9229
+      - 8080:8080
     environment:
       NODE_ENV: development
       APP_KEY: ASFIUH#@(FHNESIFU#H(H*RF)) # Replace with your actual app key
       DB_CONNECTION: pg
       DB_HOST: db
+      PORT: 8000
       DB_PORT: 5432
       DB_USER: adonis
       DB_PASSWORD: secret
@@ -23,7 +26,6 @@ services:
       - db
     command: >
       sh -c "cd backend && npm install && node ace migration:run && npm run dev"
-
 
   quasar:
     image: node:21

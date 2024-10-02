@@ -1,12 +1,19 @@
-<script setup lang="ts">
+<template>
+  <q-list>
+    <q-item-label header>
+      Channels
+    </q-item-label>
+    <q-item clickable v-for="channel in channels" :key="channel.id" @click="goToChannel(channel)"> <q-item-section>
+        {{ channel.name }}
+      </q-item-section>
+    </q-item>
+  </q-list>
+</template>
 
-import { computed } from 'vue';
+<script lang="ts">
+import { defineComponent, computed } from 'vue';
 import { useChannelStore } from 'stores/channelStore';
 // import { useRouter } from 'vue-router';
-
-const channelStore = useChannelStore();
-const channels = computed(()=>channelStore.channels);
-// const router = useRouter();
 
 interface Channel {
   id: number
@@ -16,31 +23,27 @@ interface Channel {
   highlighted: boolean
 }
 
-function goToChannel(channel: Channel) {
-  //router.push(`/c/${channel.name}`);
-  channelStore.setActiveChannel(channel);
-}
+
+export default defineComponent({
+  name: 'SideBar',
+  data() {
+    return {
+      channelStore: useChannelStore(),
+    };
+  },
+  computed: {
+    channels() {
+      return this.channelStore.channels;
+    }
+  },
+  methods: {
+    goToChannel(channel: Channel) {
+      // this.$router.push(`/c/${channel.name}`);
+      this.channelStore.setActiveChannel(channel);
+    }
+  }
+});
+
 </script>
 
-<template>
-  <q-list>
-    <q-item-label
-      header
-    >
-      Channels
-    </q-item-label>
-    <q-item
-      clickable
-      v-for="channel in channels"
-      :key="channel.id"
-      @click="goToChannel(channel)"
-    > <q-item-section>
-      {{ channel.name }}
-    </q-item-section>
-    </q-item>
-  </q-list>
-</template>
-
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -45,6 +45,7 @@
     "@swc/core": "^1.7.22",
     "@types/luxon": "^3.4.2",
     "@types/node": "^22.5.1",
+    "@types/ws": "^8.5.12",
     "eslint": "^9.9.1",
     "hot-hook": "^0.2.6",
     "pino-pretty": "^11.2.2",
@@ -62,7 +63,8 @@
     "luxon": "^3.5.0",
     "pg": "^8.13.0",
     "reflect-metadata": "^0.2.2",
-    "vine": "^0.1.1"
+    "vine": "^0.1.1",
+    "ws": "^8.18.0"
   },
   "hotHook": {
     "boundaries": [

@@ -24,7 +24,7 @@
             <pre v-if="warning" style="max-width: 100%;" class=" text-negative">{{ warning }}</pre>
 
             <div class="text-center q-pt-md">
-              Already a user? <router-link to="/login">Log In</router-link>
+              Already a user? <router-link class="bold" to="/login">Log In</router-link>
             </div>
           </q-form>
         </div>
@@ -108,7 +108,7 @@ export default {
           for (const error of errors) {
             this.warning += error.message + '\n'
           }
-        } catch(e) { // If there is no response
+        } catch (e) { // If there is no response
           this.warning = 'Couldn\'t connect to the server.\nTry checking your internet connection.';
         }
         console.error(e);

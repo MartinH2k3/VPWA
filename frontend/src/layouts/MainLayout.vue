@@ -1,36 +1,4 @@
-<script setup lang="ts">
-import { ref } from 'vue';
-import MessageField from 'components/MessageField.vue';
-import SideBar from 'components/SideBar.vue';
-import { useRouter } from 'vue-router';
-import { useUserStore } from 'stores/userStore';
-import MessagePage from 'pages/MessagePage.vue';
-import NotificationWindow from 'components/NotificationWindow.vue';
-import { api } from 'boot/api';
 
-defineOptions({
-  name: 'MainLayout'
-});
-
-const leftDrawerOpen = ref(false);
-
-function toggleLeftDrawer () {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
-}
-
-const router = useRouter();
-const userStore = useUserStore();
-const status = ref('online');
-
-async function logout() {
-  try {
-    await api.post('/logout');
-    await router.push('/login');
-  } catch (e) {
-    console.error(e);
-  }
-}
-</script>
 
 <template>
   <q-layout view="lHh Lpr lFf">
@@ -94,4 +62,54 @@ async function logout() {
   </q-layout>
 </template>
 
+<script lang="ts">
+import { ref } from 'vue';
+import MessageField from 'components/MessageField.vue';
+import SideBar from 'components/SideBar.vue';
+import { useRouter } from 'vue-router';
+import { useUserStore } from 'stores/userStore';
+import { useSocketStore } from 'stores/socketStore';
+import MessagePage from 'pages/MessagePage.vue';
+import NotificationWindow from 'components/NotificationWindow.vue';
+import { api } from 'boot/api';
 
+export default {
+  name: 'MainLayout',
+  components: {
+    MessageField,
+    SideBar,
+    MessagePage,
+    NotificationWindow
+  },
+  data() {
+    return {
+      leftDrawerOpen: false,
+      status: 'online'
+    };
+  },
+  setup() {
+    const router = useRouter();
+    const userStore = useUserStore();
+    return { router, userStore };
+  },
+  mounted(){
+    // connect through socket store
+    useSocketStore().connect()
+
+
+  },
+  methods: {
+    toggleLeftDrawer() {
+      this.leftDrawerOpen = !this.leftDrawerOpen;
+    },
+    async logout() {
+      try {
+        await api.post('/logout');
+        await this.router.push('/login');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }
+};
+</script>

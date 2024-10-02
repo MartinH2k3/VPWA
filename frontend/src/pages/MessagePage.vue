@@ -1,5 +1,27 @@
-<script setup lang="ts">
-import { Ref, ref } from 'vue';
+<template>
+  <q-page padding>
+    <q-infinite-scroll :offset="40" @load="paginateMessages" :initial-index="0" reverse>
+      <q-list>
+        <q-item v-for="message in messages.toReversed()" :key="message.id">
+          <q-item-section :class="['msg', message.byMe ? 'myMsg' : '', message.taggedMe ? 'taggedMsg' : '']">
+            <q-item-label>
+              {{ message.byMe ? "You" : message.username }}
+            </q-item-label>
+            <div class="msgText">{{ message.content }}</div>
+          </q-item-section>
+        </q-item>
+      </q-list>
+      <template #loading>
+        <q-spinner class="row justify-center" />
+      </template>
+    </q-infinite-scroll>
+
+
+  </q-page>
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
 
 interface Message {
   id: number;
@@ -9,56 +31,32 @@ interface Message {
   taggedMe: boolean;
 }
 
-const messages: Ref = ref([])
-// cursor based pagination as to not clash with new messages loaded
-const limit = ref(10)
-const cursor = ref()
-
-function paginateMessages(index: number, done: () => void) {
-  // TODO implement for real, instead of mock function
-  // add 10 random messages
-  for (let i = 0; i < 10; i++) {
-    messages.value.push({
-      id: Math.floor(Math.random() * 1000),
-      username: 'user' + Math.floor(Math.random() * 10),
-      content: 'message' + Math.floor(Math.random() * 100),
-      byMe: Math.random() > 0.8,
-      taggedMe: Math.random() > 0.9
-    })
+export default defineComponent({
+  data() {
+    return {
+      messages: [] as Message[],
+      limit: 10,
+      cursor: null as number | null
+    };
+  },
+  methods: {
+    paginateMessages(index: number, done: () => void) {
+      // TODO implement for real, instead of mock function
+      // add 10 random messages
+      for (let i = 0; i < 10; i++) {
+        this.messages.push({
+          id: Math.floor(Math.random() * 1000),
+          username: 'user' + Math.floor(Math.random() * 10),
+          content: 'message' + Math.floor(Math.random() * 100),
+          byMe: Math.random() > 0.8,
+          taggedMe: Math.random() > 0.9
+        });
+      }
+      done();
+    }
   }
-  done()
-}
+});
 </script>
-
-<template>
-  <q-page padding>
-    <q-infinite-scroll
-      :offset="40"
-      @load="paginateMessages"
-      :initial-index="0"
-      reverse
-    >
-      <q-list>
-        <q-item
-          v-for="message in messages.toReversed()"
-          :key="message.id"
-        >
-          <q-item-section :class="['msg', message.byMe?'myMsg':'', message.taggedMe?'taggedMsg':'']">
-            <q-item-label>
-              {{ message.byMe?"You":message.username }}
-            </q-item-label>
-            <div class="msgText">{{ message.content }}</div>
-          </q-item-section>
-        </q-item>
-      </q-list>
-      <template #loading>
-        <q-spinner class="row justify-center"/>
-      </template>
-    </q-infinite-scroll>
-
-
-  </q-page>
-</template>
 
 <style scoped lang="scss">
 .msg {
@@ -70,7 +68,7 @@ function paginateMessages(index: number, done: () => void) {
   align-items: flex-end;
 }
 
-.taggedMsg{
+.taggedMsg {
   border-left: 2px solid;
   border-image: linear-gradient(180deg, #610099, #002599) 1;
 }
