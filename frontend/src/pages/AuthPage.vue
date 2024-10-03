@@ -131,14 +131,14 @@ export default {
         this.userStore.setActiveUser(userData); // Set the active user in the store
         await this.router.push('/');
       } catch (e: any) {
-        const errors = e.response.data?.errors
-        console.log(errors);
-
-        this.warning = '';
-        for (const error of errors) {
-          this.warning += error.message + '\n'
-        }
-        console.log(this.warning);
+        // const errors = e.response.data?.errors??e.response.data?.message
+        // console.log(errors);
+        // this.warning = '';
+        // for (const error of errors) {
+        //   this.warning += error.message + '\n'
+        // }
+        // console.log(this.warning);
+        this.warning = e.response.data.message;
 
       }
     }
