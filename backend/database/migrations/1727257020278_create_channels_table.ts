@@ -7,7 +7,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
 
-      table.string('channel_name').notNullable()
+      table.string('name').notNullable()
       table.boolean('isPrivate').notNullable().defaultTo(false)
       table.text('description').nullable()
 
