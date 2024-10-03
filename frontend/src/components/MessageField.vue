@@ -69,11 +69,16 @@ export default {
 
           case 'list':
             //TODO get all users in channel
-            const users = ['user1', 'user2', 'user3'];
+            const users = {
+              'user1': 'online',
+              'user2': 'away',
+              'user3': 'offline'};
             this.messageStore.addMessage({
               id: 0,
               username: 'system',
-              content: 'Users in channel: ' + users.join(', '),
+              content: 'Users in channel: ' + Object.entries(users)
+                .map(([username, status]) => `${username} (${status})`)
+                .join(', '), // display users and their status
               byMe: false,
               taggedMe: false,
             });
