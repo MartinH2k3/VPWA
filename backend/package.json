@@ -59,11 +59,9 @@
     "@adonisjs/cors": "^2.2.1",
     "@adonisjs/lucid": "^21.2.0",
     "@adonisjs/session": "^7.4.2",
-    "@vinejs/vine": "^2.1.0",
     "luxon": "^3.5.0",
     "pg": "^8.13.0",
     "reflect-metadata": "^0.2.2",
-    "vine": "^0.1.1",
     "ws": "^8.18.0"
   },
   "hotHook": {
