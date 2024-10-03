@@ -1,5 +1,3 @@
-
-
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
@@ -63,7 +61,6 @@
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
 import MessageField from 'components/MessageField.vue';
 import SideBar from 'components/SideBar.vue';
 import { useRouter } from 'vue-router';
@@ -113,3 +110,16 @@ export default {
   }
 };
 </script>
+
+<style scoped lang="scss">
+.q-footer {
+  position: fixed;
+  padding: 0 3rem 1rem 3rem;
+}
+
+@media (max-width: 600px) {
+  .q-footer {
+    padding: 0 0.5rem 1rem 0.5rem;
+  }
+}
+</style>

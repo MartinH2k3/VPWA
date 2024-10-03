@@ -40,19 +40,8 @@ export default class AuthController {
   }
 
   async logout({ auth }: HttpContext) {
-    await auth.check()
-    const user = auth!.user
-    if (!user) return { success: false }
-    // Find active socket
-    const activeSocket = (global as any).activeSockets.find(
-      (socket: ActiveSocket) => socket.user.id === user.id
-    )
-    console.log('Logging out', activeSocket?.user.username)
-
-    activeSocket.updateChannles()
-
-    // await auth.use('web').logout()
-    // return { success: true }
+    await auth.use('web').logout()
+    return { success: true }
   }
 
   async authWS({ auth, response }: HttpContext) {
