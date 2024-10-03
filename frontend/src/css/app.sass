@@ -28,11 +28,9 @@
     --color-system-warning: #E8B130
     --color-system-info: #1D7CC9
 
-    --color-text: #3E3E3E
+    --color-text: #000000
     --color-subtext: #9A9A9A
     --color-paragraph: #292929
-
-    --navbar-height: #{$navbar-height}
 
     --size-0: #{map.get($sizes, 0)}
     --size-1: #{map.get($sizes, 1)}
@@ -69,13 +67,11 @@ body
     background-color: white
 
 main
-    margin-top: var(--navbar-height)
     width: 100%
     height: auto
     overflow: visible
     padding: 0
     box-sizing: border-box
-    min-height: calc(100vh - var(--navbar-height))
 
 main.admin
     display: flex
