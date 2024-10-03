@@ -9,7 +9,13 @@ export default class extends BaseSchema {
 
       table.string('name').notNullable()
       table.boolean('isPrivate').notNullable().defaultTo(false)
-      table.text('description').nullable()
+      table
+        .integer('admin_id') // FK to the users table for the admin
+        .unsigned()
+        .references('id')
+        .inTable('users')
+        .onDelete('CASCADE')
+        .notNullable()
 
       table.timestamp('created_at')
       table.timestamp('updated_at')
