@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-interface Channel {
+export interface Channel {
   id: number
   name: string
   adminId: number

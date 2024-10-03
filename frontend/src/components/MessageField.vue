@@ -7,11 +7,13 @@
 
 <script lang="ts">
 import { useRouter } from 'vue-router';
+import { useMessageStore } from 'stores/messageStore';
 
 export default {
   setup() {
     const router = useRouter();
-    return { router };
+    const messageStore = useMessageStore();
+    return { router, messageStore };
   },
   data() {
     return {
@@ -65,6 +67,17 @@ export default {
             // TODO: api call to kick user from channel
             break;
 
+          case 'list':
+            //TODO get all users in channel
+            const users = ['user1', 'user2', 'user3'];
+            this.messageStore.addMessage({
+              id: 0,
+              username: 'system',
+              content: 'Users in channel: ' + users.join(', '),
+              byMe: false,
+              taggedMe: false,
+            });
+            break;
           default:
             // Inform user that command is unknown
             console.log('Unknown command');

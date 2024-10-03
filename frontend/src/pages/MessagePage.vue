@@ -2,19 +2,38 @@
   <q-page padding>
     <q-infinite-scroll :offset="40" @load="paginateMessages" :initial-index="0" reverse>
       <q-list>
-        <q-item v-for="message in messages.toReversed()" :key="message.id">
-          <q-item-section :class="['msg', message.byMe ? 'myMsg' : '', message.taggedMe ? 'taggedMsg' : '']">
-            <q-item-label>
-              {{ message.byMe ? "You" : message.username }}
-            </q-item-label>
-            <div class="msgText">{{ message.content }}</div>
-          </q-item-section>
-        </q-item>
+          <q-chat-message
+            v-for="message in messages.toReversed()" :key="message.id"
+            :name="message.byMe ? 'Me' : message.username"
+            :text="[message.content]"
+            v-bind="{ sent: message.byMe }"
+          >
+          </q-chat-message>
+          <q-chat-message
+            v-for="typingUser in currentlyTyping"
+            :key="typingUser"
+            :name="typingUser"
+            class="THIS"
+          >
+            <q-spinner-dots
+              size="2rem"
+              @mouseover="inspectUser(typingUser, $event)"
+              @mouseleave="stopInspecting"
+            />
+          </q-chat-message>
       </q-list>
+      <div
+        v-if="inspectedMessage"
+        class="floating-message"
+        :style="{ top: `${cursorY}px`, left: `${cursorX}px` }"
+      >
+        {{ inspectedMessage }}
+      </div>
       <template #loading>
         <q-spinner class="row justify-center" />
       </template>
     </q-infinite-scroll>
+
 
 
   </q-page>
@@ -23,6 +42,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { useUserStore } from 'stores/userStore';
+import { useMessageStore } from 'stores/messageStore';
 
 interface Message {
   id: number;
@@ -35,33 +55,54 @@ interface Message {
 export default defineComponent({
   setup() {
     const userStore = useUserStore();
-    return { userStore };
+    const messageStore = useMessageStore();
+    return { messageStore, userStore };
   },
   data() {
     return {
-      messages: [] as Message[],
+      currentlyTyping: ['bob', 'alice'] as string[],
       limit: 10,
-      cursor: null as number | null
+      cursor: null as number | null, // cursor for pagination
+      inspectedMessage: null as string | null,
+      cursorX: 0, // cursor as in mouse cursor
+      cursorY: 0,
     };
+  },
+  computed: {
+    messages(): Message[] {
+      return this.messageStore.messages;
+    },
   },
   methods: {
     paginateMessages(index: number, done: () => void) {
       // TODO implement for real, instead of mock function
-      // add 10 random messages
       for (let i = 0; i < 10; i++) {
         const byMe = Math.random() > 0.8;
         const taggedMe = Math.random() > 0.5 && !byMe;
-        console.log(taggedMe);
         this.messages.push({
           id: Math.floor(Math.random() * 1000),
           username: 'user' + Math.floor(Math.random() * 10),
           content: 'Hello' + (taggedMe?` @${this.userStore.getUsername}`:''),
-          byMe: Math.random() > 0.8,
+          byMe: byMe,
           taggedMe: taggedMe
         });
       }
       done();
-    }
+    },
+    async inspectUser(username: string, event: MouseEvent) {
+      try { //TODO actually get the message dude is writing from websocket on every update
+        this.cursorX = event.clientX + 10;
+        this.cursorY = event.clientY + 10;
+        this.inspectedMessage = 'Currently typing...';
+      }
+      catch (e) {
+        console.error(e);
+      }
+    },
+    stopInspecting() {
+      // Clear the message when the mouse leaves the element
+      this.inspectedMessage = null;
+    },
   }
 });
 </script>
@@ -92,6 +133,16 @@ export default defineComponent({
 
 .myMsg .msgText {
   background-color: #00259944;
+}
+
+.floating-message {
+  position: fixed;
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* Ensure it appears above other elements */
+  pointer-events: none; /* Prevent interaction with the message */
 }
 
 @media (max-width: 600px) {
