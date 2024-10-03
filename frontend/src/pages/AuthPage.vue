@@ -21,10 +21,10 @@
             <q-input v-model="email" label="Email" />
             <q-input v-model="password" label="Password" type="password" />
             <q-btn label="Register" type="submit" />
-            <pre v-if="warning" style="max-width: 100%;" class=" text-negative">{{ warning }}</pre>
+            <pre v-if="warning" class=" text-negative">{{ warning }}</pre>
 
-            <div class="text-center q-pt-md">
-              Already a user? <router-link class="bold" to="/login">Log In</router-link>
+            <div class="text-center">
+              Already a user? <router-link to="/login">Log In</router-link>
             </div>
           </q-form>
         </div>

@@ -205,17 +205,15 @@ p {
 /* Links
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 a {
-    color: var(--color-main-regular);
-    text-decoration: none;
     min-width: fit-content;
     white-space: nowrap;
+    text-decoration: none;
 }
 
 a:hover {
-    color: var(--color-text);
+
     text-decoration: underline;
 }
-
 
 /* Buttons
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
@@ -403,7 +401,7 @@ select {
     /* The 6px vertically centers text on FF, ignored by Webkit */
     background-color: var(--color-base-background-dark);
     border: none;
-    border-radius: 0px;
+    border-radius: 0;
     box-shadow: none;
     box-sizing: border-box;
     transition: all 0.2s;
@@ -644,12 +642,12 @@ ul ol,
 ol ol,
 ol ul {
     /* margin: 1.5rem 0 1.5rem 3rem; */
-    margin: 0rem;
+    margin: 0;
     font-size: 90%;
 }
 
 li {
-    margin-bottom: 0rem;
+    margin-bottom: 0;
 }
 
 /* Tables
@@ -773,8 +771,8 @@ tfoot {
 /* Misc
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 hr {
-    margin-top: 0rem;
-    margin-bottom: 0rem;
+    margin-top: 0;
+    margin-bottom: 0;
     border-width: 0;
     border-top: 2px solid var(--color-main-light);
     width: 100%;
