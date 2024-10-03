@@ -22,6 +22,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { useUserStore } from 'stores/userStore';
 
 interface Message {
   id: number;
@@ -32,6 +33,10 @@ interface Message {
 }
 
 export default defineComponent({
+  setup() {
+    const userStore = useUserStore();
+    return { userStore };
+  },
   data() {
     return {
       messages: [] as Message[],
@@ -44,12 +49,15 @@ export default defineComponent({
       // TODO implement for real, instead of mock function
       // add 10 random messages
       for (let i = 0; i < 10; i++) {
+        const byMe = Math.random() > 0.8;
+        const taggedMe = Math.random() > 0.5 && !byMe;
+        console.log(taggedMe);
         this.messages.push({
           id: Math.floor(Math.random() * 1000),
           username: 'user' + Math.floor(Math.random() * 10),
-          content: 'message' + Math.floor(Math.random() * 100),
+          content: 'Hello' + (taggedMe?` @${this.userStore.getUsername}`:''),
           byMe: Math.random() > 0.8,
-          taggedMe: Math.random() > 0.9
+          taggedMe: taggedMe
         });
       }
       done();
