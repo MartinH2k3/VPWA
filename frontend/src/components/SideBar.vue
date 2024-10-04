@@ -9,7 +9,7 @@
       v-for="channel in channels"
       :key="channel.id"
       @click="goToChannel(channel)"
-      :class="{highlighted: channel.id===activeChannel.id}"
+      :class="{active: channel.id===activeChannel.id, highlighted: channel.highlighted}"
     >
       <q-item-section>
         {{ channel.name }}
@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
+import { defineComponent } from 'vue';
 import { useChannelStore, Channel } from 'stores/channelStore';
 import { useRouter } from 'vue-router';
 
@@ -56,7 +56,11 @@ export default defineComponent({
 
 <style scoped lang="sass">
 @import 'src/css/quasar.variables'
-.highlighted
+.active
   background-color: $primary
+  color: white
+
+.highlighted
+  background-color: $secondary
   color: white
 </style>
