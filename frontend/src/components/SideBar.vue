@@ -50,10 +50,3 @@ export default defineComponent({
 });
 
 </script>
-
-<style scoped lang="sass">
-@import 'src/css/quasar.variables'
-.q-item:hover
-  background-color: $accent
-  cursor: pointer
-</style>
