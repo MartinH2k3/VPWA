@@ -8,7 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
 
       table.string('name').notNullable()
-      table.boolean('isPrivate').notNullable().defaultTo(false)
+      table.boolean('is_private').notNullable().defaultTo(false)
       table
         .integer('admin_id') // FK to the users table for the admin
         .unsigned()
