@@ -7,8 +7,8 @@
             :name="message.byMe ? 'Me' : message.username"
             :text="[message.content]"
             :sent = "message.byMe"
-            :bg-color="getMessageBackground(message)"
-            :text-color="message.byMe ? 'white' : ''"
+            :bg-color="message.byMe||message.taggedMe ? 'primary' : 'grey'"
+            :text-color="message.byMe||message.taggedMe ? 'white' : ''"
           /><!--default color if not by me-->
           <q-chat-message
             v-for="typingUser in currentlyTyping"
@@ -111,11 +111,6 @@ export default defineComponent({
         "Your heart's been aching, but you're too shy to say it (to say it)",
         "Don't tell me you're too blind to see"]
       return lines[Math.floor(Math.random() * lines.length)];
-    },
-    getMessageBackground(message){
-      if (message.byMe) return 'primary';
-      else if (message.taggedMe) return 'secondary';
-      else return 'grey';
     },
     async inspectUser(username: string, event: MouseEvent) {
       try { //TODO actually get the message dude is writing from websocket on every update

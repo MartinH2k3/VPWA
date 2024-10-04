@@ -23,14 +23,13 @@
               <q-btn outline rounded class="q-mr-md" @click="logout">
                 Logout
               </q-btn>
-              <q-btn
-                outline
-                rounded
-                class="q-mr-md"
-                href="https://www.wikipedia.org/wiki/monkey"
-                target="_blank">
-                Info
-              </q-btn>
+              <q-toggle
+                v-model="onlyMentions"
+                checked-icon="check"
+                unchecked-icon="clear"
+                label="Only mentions"
+                left-label
+              />
             </div>
             <q-separator vertical inset class="text-white" />
             <div class="column justify-around">
@@ -81,7 +80,8 @@ export default {
   data() {
     return {
       leftDrawerOpen: false,
-      status: 'online'
+      status: 'online',
+      onlyMentions: false,
     };
   },
   setup() {
