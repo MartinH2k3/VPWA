@@ -87,7 +87,7 @@ export const useChannelStore = defineStore('channel', {
     },
     async inviteUser(username: string) {
       try {
-        await api.post(`/c/${this.activeChannel.name}/invite`, { username })
+        await api.post(`/c/${this.activeChannel.name}/cancel`, { username })
       } catch (e) {
         console.error(e);
       }

@@ -57,7 +57,7 @@ export default {
             await this.channelStore.inviteUser(username);
             break;
 
-          case 'leave':
+          case 'cancel':
             channelName = args[0];
             await this.channelStore.leaveChannel(); //works for active channel so no params
             await this.router.push('/');

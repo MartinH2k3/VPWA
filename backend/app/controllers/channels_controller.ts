@@ -146,7 +146,7 @@ export default class ChannelsController {
     }
   }
 
-  async invite({ params, request, auth, response }: HttpContext) {
+  async cancel({ params, request, auth, response }: HttpContext) {
     const { channelName } = params
     const { username } = request.only(['username'])
     const userId = auth.user!.id
