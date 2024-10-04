@@ -92,7 +92,6 @@ export const useChannelStore = defineStore('channel', {
     },
     // better to remove the channel from the store, than to fetch all channels again
     removeChannel(channelName: string) {
-      console.log('Kicked from krep', channelName)
       const index = this.channels.findIndex(c => c.name === channelName)
       if (index !== -1) {
         this.channels.splice(index, 1)

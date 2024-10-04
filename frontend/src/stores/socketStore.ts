@@ -58,8 +58,7 @@ const useSocketStore = defineStore('socket', {
             channelStore.addChannel(data.message);
             break;
           case 'removeChannel':
-            console.log('Removing channel', data.message.name);
-            //channelStore.removeChannel(data.message.name);
+            channelStore.removeChannel(data.message.name);
             break;
         }
       };

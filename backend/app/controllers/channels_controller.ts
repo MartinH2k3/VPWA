@@ -153,7 +153,7 @@ export default class ChannelsController {
   }
 
   async test({ auth }: HttpContext) {
-    const userId = 7
+    const userId = 1
     const activeSocket = (global as any).activeSockets.find(
       (socket: ActiveSocket) => socket.user.id === userId
     )
