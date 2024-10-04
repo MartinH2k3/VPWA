@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'boot/api';
+import { useChannelStore } from 'stores/channelStore';
 
 interface SocketState {
   socket: WebSocket | null;
@@ -24,10 +25,9 @@ const useSocketStore = defineStore('socket', {
 
       // MAke a request to authWS
       let token: string | null = null;
-
+      const channelStore = useChannelStore();
       try {
         const response = await api.get('/authWS');
-        console.log('Response', response);
         token = response.data;
       } catch (error) {
         console.error('Error', error);
@@ -44,13 +44,24 @@ const useSocketStore = defineStore('socket', {
       this.socket.onopen = () => {
         this.isConnected = true;
         console.log('Connected to', URL);
-
         this.sendMessage('auth', { token });
       };
 
       this.socket.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        console.log('New message', message);
+        console.log("Received message", event);
+        const data = JSON.parse(event.data);
+        switch (data.category) {
+          case 'newMessage':
+            // TODO implement
+            break;
+          case 'addChannel':
+            channelStore.addChannel(data.message);
+            break;
+          case 'removeChannel':
+            console.log('Removing channel', data.message.name);
+            //channelStore.removeChannel(data.message.name);
+            break;
+        }
       };
 
       this.socket.onclose = () => {

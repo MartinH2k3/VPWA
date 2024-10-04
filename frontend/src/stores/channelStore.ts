@@ -6,7 +6,6 @@ export interface Channel {
   name: string
   adminId: number
   private: boolean
-  highlighted: boolean
 }
 
 export const useChannelStore = defineStore('channel', {
@@ -18,35 +17,30 @@ export const useChannelStore = defineStore('channel', {
         name: 'general',
         adminId: 1,
         private: false,
-        highlighted: false
       },
       {
         id: 2,
         name: 'random',
         adminId: 2,
         private: false,
-        highlighted: false
       },
       {
         id: 3,
         name: 'secret',
         adminId: 3,
         private: true,
-        highlighted: false
       },
       {
         id: 4,
         name: 'private',
         adminId: 4,
         private: true,
-        highlighted: false
       },
       {
         id: 5,
         name: 'highlighted',
         adminId: 5,
         private: false,
-        highlighted: true
       }
     ] as Channel[],
     // channel user is currently viewing
@@ -78,7 +72,7 @@ export const useChannelStore = defineStore('channel', {
       try {
         await api.post(`/c/${this.activeChannel.name}/leave`)
         // remove channel based on name from store
-        this.removeChannel(this.channels.find(c => c.name === channelName))
+        this.removeChannel(this.activeChannel.name)
       } catch (e) {
         console.error(e);
       }
@@ -93,9 +87,19 @@ export const useChannelStore = defineStore('channel', {
     setActiveChannel(channel: Channel) {
       this.activeChannel = channel
     },
+    addChannel(channel: Channel) {
+      this.channels.unshift(channel)
+    },
     // better to remove the channel from the store, than to fetch all channels again
-    removeChannel(channel: Channel | undefined){
-      this.channels.splice(this.channels.indexOf(channel), 1)
+    removeChannel(channelName: string) {
+      console.log('Kicked from krep', channelName)
+      const index = this.channels.findIndex(c => c.name === channelName)
+      if (index !== -1) {
+        this.channels.splice(index, 1)
+      }
+    },
+    async test() {
+      await api.post('/ws')
     }
   },
 });

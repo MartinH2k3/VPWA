@@ -20,17 +20,8 @@
 
 <script lang="ts">
 import { defineComponent, computed } from 'vue';
-import { useChannelStore } from 'stores/channelStore';
+import { useChannelStore, Channel } from 'stores/channelStore';
 import { useRouter } from 'vue-router';
-
-interface Channel {
-  id: number
-  name: string
-  adminId: number
-  private: boolean
-  highlighted: boolean
-}
-
 
 export default defineComponent({
   name: 'SideBar',

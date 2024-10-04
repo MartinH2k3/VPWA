@@ -11,7 +11,7 @@ const wss = new WebSocketServer({ server })
 export interface ActiveSocket {
   user: User
   token: string
-  send: (message: any) => void
+  getMessage: (message: any, channel: Channel) => void //TODO type Message
   addChannel: (channel: Channel) => void
   removeChannel: (channel: Channel) => void
   sendNotification: (notification: any) => void //TODO type Notification
@@ -49,19 +49,19 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
         user = activeSocket.user
 
         activeSocket.send = () => {
-          ws.send(JSON.stringify({ event: 'updateChannels', message: 'Channels updated' }))
+          ws.send(JSON.stringify({ category: 'newMessage', message: 'blah blah blah' }))
         }
 
         activeSocket.addChannel = (channel: Channel) => {
-          ws.send(JSON.stringify({ event: 'addChannel', message: channel }))
+          ws.send(JSON.stringify({ category: 'addChannel', message: channel }))
         }
 
         activeSocket.removeChannel = (channel: Channel) => {
-          ws.send(JSON.stringify({ event: 'removeChannel', message: channel }))
+          ws.send(JSON.stringify({ category: 'removeChannel', message: channel }))
         }
 
         activeSocket.sendNotification = (notification: any) => {
-          ws.send(JSON.stringify({ event: 'notification', message: notification }))
+          ws.send(JSON.stringify({ category: 'notification', message: notification }))
         }
         break
 

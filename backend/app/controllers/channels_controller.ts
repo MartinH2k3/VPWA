@@ -17,7 +17,6 @@ export default class ChannelsController {
       if (existingChannel.isPrivate) {
         return response.forbidden({ message: 'This channel is private and cannot be joined.' })
       }
-
       const isAlreadyMember = await existingChannel
         .related('members')
         .query()
@@ -51,9 +50,11 @@ export default class ChannelsController {
   async leave({ params, auth, response }: HttpContext) {
     const { channelName } = params
     const userId = auth.user!.id
-    console.log(userId)
     try {
       const channel = await Channel.findBy('name', channelName)
+      if (!channel) {
+        return response.notFound({ message: 'No active channel' })
+      }
       if (channel?.adminId === userId) {
         // get all channel members
         const members = await channel.related('members').query()
@@ -68,6 +69,14 @@ export default class ChannelsController {
         }
         channel?.delete()
         return response.ok(`Successfully deleted the channel ${channel?.name}`)
+      }
+      const pivotRow = await channel
+        .related('members')
+        .pivotQuery()
+        .where('user_id', userId)
+        .first()
+      if (pivotRow?.kicked) {
+        return response.badRequest({ message: 'You are banned from the channel' })
       }
       await channel?.related('members').detach([userId])
       const activeSocket = (global as any).activeSockets.find(
@@ -140,6 +149,21 @@ export default class ChannelsController {
     } catch (e) {
       console.log(e)
       return response.badRequest(e)
+    }
+  }
+
+  async test({ auth }: HttpContext) {
+    const userId = 7
+    const activeSocket = (global as any).activeSockets.find(
+      (socket: ActiveSocket) => socket.user.id === userId
+    )
+    if (activeSocket) {
+      activeSocket.addChannel({
+        id: Math.random() * Number.MAX_SAFE_INTEGER,
+        name: 'test',
+        adminId: auth.user!.id,
+        private: false,
+      })
     }
   }
 }
