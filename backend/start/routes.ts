@@ -24,4 +24,6 @@ router
   .use(middleware.checkLoggedIn())
 router.post('/logout', [AuthController, 'logout'])
 router.get('/authWS', [AuthController, 'authWS'])
-router.post('/c/join', [ChannelsController, 'join'])
+router.post('/c/join', [ChannelsController, 'join']).use(middleware.auth())
+router.post('c/:channelName/leave', [ChannelsController, 'leave']).use(middleware.auth())
+router.post('/c/:channelName/kick', [ChannelsController, 'kick']).use(middleware.auth())

@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { api } from 'boot/api';
 
 export interface Channel {
   id: number
@@ -62,15 +63,39 @@ export const useChannelStore = defineStore('channel', {
       // TODO implement the fetchChannels functionality
     },
     async joinChannel(channelName: string, isPrivate: boolean) {
-      // TODO implement the join channel functionality
+      try {
+        const channel = (await api.post('/c/join', {
+          channelName,
+          private: isPrivate
+        })).data
+        this.activeChannel = channel
+        this.channels.unshift(channel)
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async leaveChannel() {
+      try {
+        await api.post(`/c/${this.activeChannel.name}/leave`)
+        // remove channel based on name from store
+        this.removeChannel(this.channels.find(c => c.name === channelName))
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async kickUser(username: string) {
+      try {
+        await api.post(`/c/${this.activeChannel.name}/kick`, { username })
+      } catch (e) {
+        console.error(e);
+      }
     },
     setActiveChannel(channel: Channel) {
-      // TODO implement the setActiveChannel functionality; one of the channels from channels is set as active channel
       this.activeChannel = channel
     },
     // better to remove the channel from the store, than to fetch all channels again
-    removeChannel(channelId: number){
-      // TODO implement the removeChannel functionality
+    removeChannel(channel: Channel | undefined){
+      this.channels.splice(this.channels.indexOf(channel), 1)
     }
   },
 });
