@@ -54,6 +54,12 @@ const useSocketStore = defineStore('socket', {
           case 'newMessage':
             // TODO implement
             break;
+          case 'notification':
+            // TODO implement
+            break;
+          case 'messageDraft':
+            // TODO implement
+            break;
           case 'addChannel':
             channelStore.addChannel(data.message);
             break;
@@ -73,6 +79,7 @@ const useSocketStore = defineStore('socket', {
         this.isConnected = false;
       };
     },
+    //TODO add comments
     disconnect() {
       if (this.socket) {
         this.socket.close();
@@ -87,6 +94,7 @@ const useSocketStore = defineStore('socket', {
         this.socket.send(JSON.stringify(payload));
       }
     },
+    //TODO add comments
     onMessage(callback: (message: any) => void) {
       if (this.socket) {
         this.socket.onmessage = (event) => {

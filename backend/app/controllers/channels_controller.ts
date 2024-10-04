@@ -37,12 +37,6 @@ export default class ChannelsController {
 
       // Auto-join the admin to the channel
       await channel.related('members').attach([userId])
-      // const activeSocket = (global as any).activeSockets.find(
-      //   (socket: ActiveSocket) => socket.user.id === userId
-      // )
-      // if (activeSocket) {
-      //   activeSocket.methods.addChannel(channel)
-      // }
       return response.ok(channel)
     }
   }
@@ -146,6 +140,75 @@ export default class ChannelsController {
         )
         return response.ok({ message: `Kick votes for ${username} have been incremented` })
       }
+    } catch (e) {
+      console.log(e)
+      return response.badRequest(e)
+    }
+  }
+
+  async invite({ params, request, auth, response }: HttpContext) {
+    const { channelName } = params
+    const { username } = request.only(['username'])
+    const userId = auth.user!.id
+
+    if (!userId) {
+      return response.unauthorized({ message: 'User must be authenticated' })
+    }
+
+    try {
+      const invitedUser = await User.findBy('username', username)
+      const channel = await Channel.findBy('name', channelName)
+
+      if (!invitedUser || !channel) {
+        return response.notFound({ message: 'Invalid request' })
+      }
+
+      const pivotRow = await channel
+        .related('members')
+        .pivotQuery()
+        .where('user_id', invitedUser.id)
+        .first()
+      if (pivotRow) {
+        if (pivotRow.kicked && channel.adminId === userId) {
+          // Unban the user
+          await channel.related('members').sync(
+            {
+              [invitedUser.id]: {
+                kicked: false,
+              },
+            },
+            false
+          )
+
+          // adding channel to user's active channels
+          const activeSocket = (global as any).activeSockets.find(
+            (socket: ActiveSocket) => socket.user.id === invitedUser.id
+          )
+          if (activeSocket) {
+            activeSocket.addChannel(channel)
+          }
+
+          return response.ok({ message: `${username} has been unbanned from the channel` })
+        }
+        return response.badRequest({ message: 'User is already a member of the channel' })
+      }
+
+      if (channel.isPrivate && channel.adminId !== userId) {
+        return response.forbidden({ message: 'You are not allowed to invite to this channel' })
+      }
+
+      // TODO notify the user that got invited
+      await channel.related('members').attach([invitedUser.id])
+
+      // adding channel to user's active channels
+      const activeSocket = (global as any).activeSockets.find(
+        (socket: ActiveSocket) => socket.user.id === invitedUser.id
+      )
+      if (activeSocket) {
+        activeSocket.addChannel(channel)
+      }
+
+      return response.ok({ message: `${username} has been invited to the channel` })
     } catch (e) {
       console.log(e)
       return response.badRequest(e)

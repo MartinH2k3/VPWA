@@ -6,6 +6,7 @@ export interface Channel {
   name: string
   adminId: number
   private: boolean
+  highlighted?: boolean
 }
 
 export const useChannelStore = defineStore('channel', {
@@ -84,10 +85,18 @@ export const useChannelStore = defineStore('channel', {
         console.error(e);
       }
     },
+    async inviteUser(username: string) {
+      try {
+        await api.post(`/c/${this.activeChannel.name}/invite`, { username })
+      } catch (e) {
+        console.error(e);
+      }
+    },
     setActiveChannel(channel: Channel) {
       this.activeChannel = channel
     },
     addChannel(channel: Channel) {
+      channel.highlighted = true
       this.channels.unshift(channel)
     },
     // better to remove the channel from the store, than to fetch all channels again

@@ -53,8 +53,8 @@ export default {
             break;
 
           case 'invite':
-            // username = args[0];
-            // TODO: api call to invite user
+            username = args[0];
+            await this.channelStore.inviteUser(username);
             break;
 
           case 'leave':
