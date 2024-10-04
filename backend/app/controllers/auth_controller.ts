@@ -1,6 +1,6 @@
 import User from '#models/user'
 import { HttpContext } from '@adonisjs/core/http'
-import { ActiveSocket } from '#start/ws'
+//import { ActiveSocket } from '#start/ws'
 
 export default class AuthController {
   async register({ request, auth, response }: HttpContext) {
