@@ -31,7 +31,7 @@ export default class Channel extends BaseModel {
     pivotForeignKey: 'channel_id',
     relatedKey: 'id',
     pivotRelatedForeignKey: 'user_id',
-    pivotColumns: ['kick_votes', 'banned'],
+    pivotColumns: ['kick_votes', 'kicked'],
   })
   declare members: ManyToMany<typeof User>
 }
