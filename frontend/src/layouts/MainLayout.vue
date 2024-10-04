@@ -54,7 +54,7 @@
     <q-page-container>
       <message-page/>
     </q-page-container>
-    <q-footer>
+    <q-footer class="bg-white">
       <message-field/>
     </q-footer>
   </q-layout>
