@@ -21,7 +21,7 @@ router
     router.post('/register', [AuthController, 'register'])
     router.post('/login', [AuthController, 'login'])
   })
-  .use(middleware.auth())
+  .use(middleware.checkLoggedIn())
 router.post('/logout', [AuthController, 'logout'])
 router.get('/authWS', [AuthController, 'authWS'])
 router.post('/c/join', [ChannelsController, 'join'])
