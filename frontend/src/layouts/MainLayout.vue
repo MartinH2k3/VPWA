@@ -29,6 +29,7 @@
                 unchecked-icon="clear"
                 label="Only mentions"
                 left-label
+                @click="channelStore.test(); console.log('tested')"
               />
             </div>
             <q-separator vertical inset class="text-white" />
@@ -68,6 +69,7 @@ import { useSocketStore } from 'stores/socketStore';
 import MessagePage from 'pages/MessagePage.vue';
 import NotificationWindow from 'components/NotificationWindow.vue';
 import { api } from 'boot/api';
+import { useChannelStore } from 'stores/channelStore';
 
 export default {
   name: 'MainLayout',
@@ -88,7 +90,8 @@ export default {
     const router = useRouter();
     const userStore = useUserStore();
     const socketStore = useSocketStore();
-    return { router, userStore, socketStore };
+    const channelStore = useChannelStore();
+    return { router, userStore, socketStore, channelStore };
   },
   mounted(){
     // connect through socket store
