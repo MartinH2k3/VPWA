@@ -66,6 +66,7 @@ export const useChannelStore = defineStore('channel', {
     },
     setActiveChannel(channel: Channel) {
       // TODO implement the setActiveChannel functionality; one of the channels from channels is set as active channel
+      this.activeChannel = channel
     },
     // better to remove the channel from the store, than to fetch all channels again
     removeChannel(channelId: number){

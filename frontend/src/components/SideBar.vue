@@ -4,7 +4,14 @@
       Channels
     </q-item-label>
     <hr style="width:90%; opacity:0.5">
-    <q-item clickable v-for="channel in channels" :key="channel.id" @click="goToChannel(channel)"> <q-item-section>
+    <q-item
+      clickable
+      v-for="channel in channels"
+      :key="channel.id"
+      @click="goToChannel(channel)"
+      :class="{highlighted: channel.id===activeChannel.id}"
+    >
+      <q-item-section>
         {{ channel.name }}
       </q-item-section>
     </q-item>
@@ -39,14 +46,26 @@ export default defineComponent({
   computed: {
     channels() {
       return this.channelStore.channels;
+    },
+    activeChannel() {
+      return this.channelStore.activeChannel;
     }
   },
   methods: {
     goToChannel(channel: Channel) {
       // this.router.push(`/c/${channel.name}`);
+      console.log('goToChannel', channel);
       this.channelStore.setActiveChannel(channel);
+      console.log('activeChannel', this.channelStore.activeChannel);
     }
   }
 });
 
 </script>
+
+<style scoped lang="sass">
+@import 'src/css/quasar.variables'
+.highlighted
+  background-color: $primary
+  color: white
+</style>

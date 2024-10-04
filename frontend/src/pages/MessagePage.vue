@@ -6,7 +6,9 @@
             v-for="message in messages.toReversed()" :key="message.id"
             :name="message.byMe ? 'Me' : message.username"
             :text="[message.content]"
-            v-bind="{ sent: message.byMe, 'bg-color':getMessageBackground(message) }"
+            :sent = "message.byMe"
+            :bg-color="getMessageBackground(message)"
+            :text-color="message.byMe ? 'white' : ''"
           /><!--default color if not by me-->
           <q-chat-message
             v-for="typingUser in currentlyTyping"
@@ -77,7 +79,7 @@ export default defineComponent({
       // TODO implement for real, instead of mock function
       for (let i = 0; i < 10; i++) {
         const byMe = Math.random() > 0.8;
-        const taggedMe = Math.random() > 0.5 && !byMe;
+        const taggedMe = Math.random() > 0.8 && !byMe;
         this.messages.push({
           id: Math.floor(Math.random() * 1000),
           username: 'user' + Math.floor(Math.random() * 10),
@@ -111,8 +113,8 @@ export default defineComponent({
       return lines[Math.floor(Math.random() * lines.length)];
     },
     getMessageBackground(message){
-      if (message.byMe) return 'secondary';
-      else if (message.taggedMe) return 'accent';
+      if (message.byMe) return 'primary';
+      else if (message.taggedMe) return 'secondary';
       else return 'grey';
     },
     async inspectUser(username: string, event: MouseEvent) {
