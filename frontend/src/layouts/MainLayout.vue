@@ -87,11 +87,12 @@ export default {
   setup() {
     const router = useRouter();
     const userStore = useUserStore();
-    return { router, userStore };
+    const socketStore = useSocketStore();
+    return { router, userStore, socketStore };
   },
   mounted(){
     // connect through socket store
-    useSocketStore().connect()
+    socketStore.connect()
 
 
   },
