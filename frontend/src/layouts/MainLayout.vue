@@ -92,7 +92,7 @@ export default {
   },
   mounted(){
     // connect through socket store
-    socketStore.connect()
+    this.socketStore.connect()
 
 
   },
