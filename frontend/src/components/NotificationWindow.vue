@@ -64,7 +64,3 @@ async function paginateNotifications(index: number, done: () => void) {
     </q-infinite-scroll>
   </div>
 </template>
-
-<style scoped>
-
-</style>

@@ -111,15 +111,14 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
-.q-footer {
-  position: fixed;
-  padding: 0 3rem 1rem 3rem;
-}
+<style scoped lang="sass">
+.q-footer
+  position: fixed
+  padding: 0 3rem 1rem 3rem
 
-@media (max-width: 600px) {
-  .q-footer {
-    padding: 0 0.5rem 1rem 0.5rem;
-  }
-}
+
+@media (max-width: 600px)
+  .q-footer
+    padding: 0 0.5rem 1rem 0.5rem
+
 </style>

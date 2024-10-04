@@ -6,14 +6,12 @@
             v-for="message in messages.toReversed()" :key="message.id"
             :name="message.byMe ? 'Me' : message.username"
             :text="[message.content]"
-            v-bind="{ sent: message.byMe }"
-          >
-          </q-chat-message>
+            v-bind="{ sent: message.byMe, 'bg-color':getMessageBackground(message) }"
+          /><!--default color if not by me-->
           <q-chat-message
             v-for="typingUser in currentlyTyping"
             :key="typingUser"
             :name="typingUser"
-            class="THIS"
           >
             <q-spinner-dots
               size="2rem"
@@ -82,12 +80,39 @@ export default defineComponent({
         this.messages.push({
           id: Math.floor(Math.random() * 1000),
           username: 'user' + Math.floor(Math.random() * 10),
-          content: 'Hello' + (taggedMe?` @${this.userStore.getUsername}`:''),
+          content: (taggedMe?`@${this.userStore.getUsername}  `:'') + this.generateMessage(),
           byMe: byMe,
           taggedMe: taggedMe
         });
       }
       done();
+    },
+    generateMessage() {
+      const lines = ['Never gonna give you up',
+        'Never gonna run around and desert you',
+        'Never gonna say goodbye',
+        "You wouldn't get this from any other guy",
+        'You know the rules and so do I (do I)',
+        "Inside, we both know what's been going on (going on)",
+        "Your heart's been aching, but you're too shy to say it (say it)",
+        "We're no strangers to love",
+        'Never gonna tell a lie and hurt you',
+        'Never gonna let you down',
+        "We've known each other for so long",
+        'Never gonna make you cry',
+        'Gotta make you understand',
+        "And if you ask me how I'm feeling",
+        "A full commitment's what I'm thinking of",
+        "We know the game and we're gonna play it",
+        "I just wanna tell you how I'm feeling",
+        "Your heart's been aching, but you're too shy to say it (to say it)",
+        "Don't tell me you're too blind to see"]
+      return lines[Math.floor(Math.random() * lines.length)];
+    },
+    getMessageBackground(message){
+      if (message.byMe) return 'secondary';
+      else if (message.taggedMe) return 'accent';
+      else return 'grey';
     },
     async inspectUser(username: string, event: MouseEvent) {
       try { //TODO actually get the message dude is writing from websocket on every update

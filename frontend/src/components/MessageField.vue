@@ -96,8 +96,8 @@ export default {
 };
 </script>
 
-<style scoped>
-textarea {
-  padding: 0 12rem;
-}
+<style scoped lang="sass">
+textarea
+  padding: 0 12rem
+
 </style>

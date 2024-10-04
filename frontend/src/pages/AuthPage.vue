@@ -32,17 +32,17 @@
 
 </template>
 
-<style scoped>
-  .custom-form {
-    padding: 1rem;
-    border-radius: 2%;
-    color: black;
-    min-width: 16rem;
-  }
-  .custom-form button {
-    margin: 1rem 0;
-    width: 100%;
-  }
+<style scoped lang="sass">
+  .custom-form
+    padding: 1rem
+    border-radius: 2%
+    color: black
+    min-width: 16rem
+
+  .custom-form button
+    margin: 1rem 0
+    width: 100%
+
 </style>
 
 <script lang="ts">
