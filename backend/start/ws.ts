@@ -75,10 +75,23 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
   })
 
   ws.on('close', () => {
-    console.log('Disconnected')
+    //remove user from activeSockets
+    const index = (global as any).activeSockets.findIndex(
+      (socket: ActiveSocket) => socket.user.id === user?.id
+    )
+    if (index !== -1) {
+      ;(global as any).activeSockets.splice(index, 1)
+    }
+    console.log('Disconnected', user?.username)
   })
 
   ws.on('error', (error) => {
+    const index = (global as any).activeSockets.findIndex(
+      (socket: ActiveSocket) => socket.user.id === user?.id
+    )
+    if (index !== -1) {
+      ;(global as any).activeSockets.splice(index, 1)
+    }
     console.error('WebSocket error:', error)
   })
 })
