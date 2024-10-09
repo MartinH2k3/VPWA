@@ -9,13 +9,15 @@
 import { useRouter } from 'vue-router';
 import { useMessageStore } from 'stores/messageStore';
 import { useChannelStore } from 'stores/channelStore';
+import {useUserStore} from "stores/userStore";
 
 export default {
   setup() {
     const router = useRouter();
     const messageStore = useMessageStore();
     const channelStore = useChannelStore();
-    return { channelStore, router, messageStore };
+    const userStore = useUserStore();
+    return { channelStore, router, messageStore, userStore };
   },
   data() {
     return {
@@ -31,6 +33,15 @@ export default {
       // Handle message when it's not a command (i.e., doesn't start with "/")
       if (this.message[0] !== '/' && this.channelStore.activeChannel) {
         // TODO: api call to send message
+        this.messageStore.addMessage(
+          {
+            id: this.userStore.user.id,
+            username: this.userStore.user.username,
+            content: this.message,
+            byMe: true,
+            taggedMe: false,
+          }
+        )
       }
 
       // Handle message commands
