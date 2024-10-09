@@ -12,38 +12,7 @@ export interface Channel {
 export const useChannelStore = defineStore('channel', {
   state: () => ({
     // list of joined channels
-    channels: [
-      {
-        id: 1,
-        name: 'general',
-        adminId: 1,
-        private: false,
-      },
-      {
-        id: 2,
-        name: 'random',
-        adminId: 2,
-        private: false,
-      },
-      {
-        id: 3,
-        name: 'secret',
-        adminId: 3,
-        private: true,
-      },
-      {
-        id: 4,
-        name: 'private',
-        adminId: 4,
-        private: true,
-      },
-      {
-        id: 5,
-        name: 'highlighted',
-        adminId: 5,
-        private: false,
-      }
-    ] as Channel[],
+    channels: [] as Channel[],
     // channel user is currently viewing
     activeChannel: {} as Channel
   }),
