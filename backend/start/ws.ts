@@ -8,28 +8,20 @@ import { WebSocketServer } from 'ws'
 const server = createServer()
 const wss = new WebSocketServer({ server })
 
-
-
-
-interface ActiveSocket {
-  user: User;
-  token: string;
-  methods: {
-    send: (message: any) => void;
-    addChannel: (channel: Channel) => void;
-    removeChannel: (channel: Channel) => void;
-    sendNotification: (notification: any) => void; //TODO type Notification
-
-  }
-
+export interface ActiveSocket {
+  user: User
+  token: string
+  getMessage: (message: any, channel: Channel) => void //TODO type Message
+  addChannel: (channel: Channel) => void
+  removeChannel: (channel: Channel) => void
+  sendNotification: (notification: any) => void //TODO type Notification
 }
 
-
-(global as any).activeSockets = [] as ActiveSocket[];
+;(global as any).activeSockets = [] as ActiveSocket[]
 
 interface SocketData {
-  event: string;
-  message: any;
+  event: string
+  message: any
 }
 
 wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
@@ -39,16 +31,16 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
   // function updateChannels() {
 
   ws.on('message', (data: WebSocket.Data) => {
-    console.log('New message', data.toString())
     const parsedData: SocketData = JSON.parse(data.toString())
     const event = parsedData.event
     const message = parsedData.message
 
-
     switch (event) {
       case 'auth':
         // Find token in activeSockets
-        const activeSocket = (global as any).activeSockets.find((socket: ActiveSocket) => socket.token === message.token)
+        const activeSocket = (global as any).activeSockets.find(
+          (socket: ActiveSocket) => socket.token === message.token
+        )
         if (!activeSocket) {
           console.error('Invalid token')
           return
@@ -56,29 +48,50 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
         console.log('Authenticated', activeSocket.user.username)
         user = activeSocket.user
 
-        activeSocket.send = (param: any) => {
-
-          ws.send(JSON.stringify({ event: 'updateChannels', message: 'Channels updated' }))
+        activeSocket.send = () => {
+          ws.send(JSON.stringify({ category: 'newMessage', message: 'blah blah blah' }))
         }
 
+        activeSocket.addChannel = (channel: Channel) => {
+          ws.send(JSON.stringify({ category: 'addChannel', message: channel }))
+        }
 
-        break;
+        activeSocket.removeChannel = (channel: Channel) => {
+          ws.send(JSON.stringify({ category: 'removeChannel', message: channel }))
+        }
+
+        activeSocket.sendNotification = (notification: any) => {
+          ws.send(JSON.stringify({ category: 'notification', message: notification }))
+        }
+        break
 
       default:
-        console.log(user?.username, event, message);
+        console.log(user?.username, event, message)
         // Send ack reply
         ws.send(JSON.stringify({ event: 'ack', message: 'Message received' }))
 
-        break;
+        break
     }
-
   })
 
   ws.on('close', () => {
-    console.log('Disconnected')
+    //remove user from activeSockets
+    const index = (global as any).activeSockets.findIndex(
+      (socket: ActiveSocket) => socket.user.id === user?.id
+    )
+    if (index !== -1) {
+      ;(global as any).activeSockets.splice(index, 1)
+    }
+    console.log('Disconnected', user?.username)
   })
 
   ws.on('error', (error) => {
+    const index = (global as any).activeSockets.findIndex(
+      (socket: ActiveSocket) => socket.user.id === user?.id
+    )
+    if (index !== -1) {
+      ;(global as any).activeSockets.splice(index, 1)
+    }
     console.error('WebSocket error:', error)
   })
 })

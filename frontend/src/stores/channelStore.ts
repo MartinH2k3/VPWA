@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia';
+import { api } from 'boot/api';
 
-interface Channel {
+export interface Channel {
   id: number
   name: string
   adminId: number
   private: boolean
-  highlighted: boolean
+  highlighted?: boolean
 }
 
 export const useChannelStore = defineStore('channel', {
@@ -17,35 +18,30 @@ export const useChannelStore = defineStore('channel', {
         name: 'general',
         adminId: 1,
         private: false,
-        highlighted: false
       },
       {
         id: 2,
         name: 'random',
         adminId: 2,
         private: false,
-        highlighted: false
       },
       {
         id: 3,
         name: 'secret',
         adminId: 3,
         private: true,
-        highlighted: false
       },
       {
         id: 4,
         name: 'private',
         adminId: 4,
         private: true,
-        highlighted: false
       },
       {
         id: 5,
         name: 'highlighted',
         adminId: 5,
         private: false,
-        highlighted: true
       }
     ] as Channel[],
     // channel user is currently viewing
@@ -62,14 +58,56 @@ export const useChannelStore = defineStore('channel', {
       // TODO implement the fetchChannels functionality
     },
     async joinChannel(channelName: string, isPrivate: boolean) {
-      // TODO implement the join channel functionality
+      try {
+        const channel = (await api.post('/c/join', {
+          channelName,
+          private: isPrivate
+        })).data
+        this.activeChannel = channel
+        this.channels.unshift(channel)
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async leaveChannel() {
+      try {
+        await api.post(`/c/${this.activeChannel.name}/leave`)
+        // remove channel based on name from store
+        this.removeChannel(this.activeChannel.name)
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async kickUser(username: string) {
+      try {
+        await api.post(`/c/${this.activeChannel.name}/kick`, { username })
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async inviteUser(username: string) {
+      try {
+        await api.post(`/c/${this.activeChannel.name}/cancel`, { username })
+      } catch (e) {
+        console.error(e);
+      }
     },
     setActiveChannel(channel: Channel) {
-      // TODO implement the setActiveChannel functionality; one of the channels from channels is set as active channel
+      this.activeChannel = channel
+    },
+    addChannel(channel: Channel) {
+      channel.highlighted = true
+      this.channels.unshift(channel)
     },
     // better to remove the channel from the store, than to fetch all channels again
-    removeChannel(channelId: number){
-      // TODO implement the removeChannel functionality
+    removeChannel(channelName: string) {
+      const index = this.channels.findIndex(c => c.name === channelName)
+      if (index !== -1) {
+        this.channels.splice(index, 1)
+      }
+    },
+    async test() {
+      await api.post('/ws')
     }
   },
 });

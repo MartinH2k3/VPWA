@@ -1,5 +1,3 @@
-
-
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
@@ -25,14 +23,14 @@
               <q-btn outline rounded class="q-mr-md" @click="logout">
                 Logout
               </q-btn>
-              <q-btn
-                outline
-                rounded
-                class="q-mr-md"
-                href="https://www.wikipedia.org/wiki/monkey"
-                target="_blank">
-                Info
-              </q-btn>
+              <q-toggle
+                v-model="onlyMentions"
+                checked-icon="check"
+                unchecked-icon="clear"
+                label="Only mentions"
+                left-label
+                @click="channelStore.test(); console.log('tested')"
+              />
             </div>
             <q-separator vertical inset class="text-white" />
             <div class="column justify-around">
@@ -56,14 +54,13 @@
     <q-page-container>
       <message-page/>
     </q-page-container>
-    <q-footer>
+    <q-footer class="bg-white">
       <message-field/>
     </q-footer>
   </q-layout>
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
 import MessageField from 'components/MessageField.vue';
 import SideBar from 'components/SideBar.vue';
 import { useRouter } from 'vue-router';
@@ -72,6 +69,7 @@ import { useSocketStore } from 'stores/socketStore';
 import MessagePage from 'pages/MessagePage.vue';
 import NotificationWindow from 'components/NotificationWindow.vue';
 import { api } from 'boot/api';
+import { useChannelStore } from 'stores/channelStore';
 
 export default {
   name: 'MainLayout',
@@ -84,17 +82,20 @@ export default {
   data() {
     return {
       leftDrawerOpen: false,
-      status: 'online'
+      status: 'online',
+      onlyMentions: false,
     };
   },
   setup() {
     const router = useRouter();
     const userStore = useUserStore();
-    return { router, userStore };
+    const socketStore = useSocketStore();
+    const channelStore = useChannelStore();
+    return { router, userStore, socketStore, channelStore };
   },
   mounted(){
     // connect through socket store
-    useSocketStore().connect()
+    this.socketStore.connect()
 
 
   },
@@ -113,3 +114,15 @@ export default {
   }
 };
 </script>
+
+<style scoped lang="sass">
+.q-footer
+  position: fixed
+  padding: 0 3rem 1rem 3rem
+
+
+@media (max-width: 600px)
+  .q-footer
+    padding: 0 0.5rem 1rem 0.5rem
+
+</style>

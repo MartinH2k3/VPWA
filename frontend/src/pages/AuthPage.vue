@@ -1,39 +1,48 @@
 <template>
   <q-layout>
     <q-page-container>
-      <q-page class="flex-container width-full w-auto">
-        <div class="m-auto text-center">
-          <img alt="logo" width="86px" class='mb-5' src="logo.svg">
-          <q-form v-if="isLogin" @submit.prevent="login" class="flex flex-column gap-4">
+      <q-page class="column flex-center text-center">
+          <img alt="logo" width="86px" class='q-mb-sm' src="logo.svg">
+          <q-form v-if="isLogin" @submit.prevent="login" class="custom-form">
             <q-input v-model="email" label="Email" />
             <q-input v-model="password" label="Password" type="password" />
             <q-btn label="Login" type="submit" />
-            <pre v-if="warning" class=" text-negative">{{ warning }}</pre>
+            <pre v-if="warning" class="text-negative">{{ warning }}</pre>
 
             <div class="text-center q-pt-md">
               New to the website? <router-link to="/register">Register</router-link>
             </div>
           </q-form>
-          <q-form v-else @submit.prevent="register" class="flex flex-column gap-4">
+          <q-form v-else @submit.prevent="register" class="custom-form">
             <q-input v-model="firstName" label="First Name" />
             <q-input v-model="lastName" label="Last Name" />
             <q-input v-model="username" label="Username" />
             <q-input v-model="email" label="Email" />
             <q-input v-model="password" label="Password" type="password" />
             <q-btn label="Register" type="submit" />
-            <pre v-if="warning" style="max-width: 100%;" class=" text-negative">{{ warning }}</pre>
+            <pre v-if="warning" class=" text-negative">{{ warning }}</pre>
 
-            <div class="text-center q-pt-md">
-              Already a user? <router-link class="bold" to="/login">Log In</router-link>
+            <div class="text-center">
+              Already a user? <router-link to="/login">Log In</router-link>
             </div>
           </q-form>
-        </div>
       </q-page>
     </q-page-container>
   </q-layout>
 
 </template>
 
+<style scoped lang="sass">
+.custom-form
+  padding: 1rem
+  border-radius: 2%
+  color: black
+  min-width: 16rem
+
+.custom-form button
+  margin: 1rem 0
+  width: 100%
+</style>
 
 <script lang="ts">
 import { useRouter } from 'vue-router';
@@ -131,14 +140,14 @@ export default {
         this.userStore.setActiveUser(userData); // Set the active user in the store
         await this.router.push('/');
       } catch (e: any) {
-        const errors = e.response.data?.errors
-        console.log(errors);
-
-        this.warning = '';
-        for (const error of errors) {
-          this.warning += error.message + '\n'
-        }
-        console.log(this.warning);
+        // const errors = e.response.data?.errors??e.response.data?.message
+        // console.log(errors);
+        // this.warning = '';
+        // for (const error of errors) {
+        //   this.warning += error.message + '\n'
+        // }
+        // console.log(this.warning);
+        this.warning = e.response.data.message;
 
       }
     }

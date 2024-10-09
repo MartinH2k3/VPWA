@@ -42,7 +42,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
     pivotForeignKey: 'user_id',
     relatedKey: 'id',
     pivotRelatedForeignKey: 'channel_id',
-    pivotColumns: ['kick_votes', 'banned'],
+    pivotColumns: ['kick_votes', 'kicked'],
   })
   declare channel: ManyToMany<typeof Channel>
 }

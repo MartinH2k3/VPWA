@@ -3,7 +3,15 @@
     <q-item-label header>
       Channels
     </q-item-label>
-    <q-item clickable v-for="channel in channels" :key="channel.id" @click="goToChannel(channel)"> <q-item-section>
+    <hr style="width:90%; opacity:0.5">
+    <q-item
+      clickable
+      v-for="channel in channels"
+      :key="channel.id"
+      @click="goToChannel(channel)"
+      :class="{active: channel.id===activeChannel.id, highlighted: channel.highlighted}"
+    >
+      <q-item-section>
         {{ channel.name }}
       </q-item-section>
     </q-item>
@@ -11,21 +19,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
-import { useChannelStore } from 'stores/channelStore';
-// import { useRouter } from 'vue-router';
-
-interface Channel {
-  id: number
-  name: string
-  adminId: number
-  private: boolean
-  highlighted: boolean
-}
-
+import { defineComponent } from 'vue';
+import { useChannelStore, Channel } from 'stores/channelStore';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'SideBar',
+  setup() {
+    const router = useRouter();
+    return {router};
+  },
   data() {
     return {
       channelStore: useChannelStore(),
@@ -34,16 +37,30 @@ export default defineComponent({
   computed: {
     channels() {
       return this.channelStore.channels;
+    },
+    activeChannel() {
+      return this.channelStore.activeChannel;
     }
   },
   methods: {
     goToChannel(channel: Channel) {
-      // this.$router.push(`/c/${channel.name}`);
+      // this.router.push(`/c/${channel.name}`);
+      console.log('goToChannel', channel);
       this.channelStore.setActiveChannel(channel);
+      console.log('activeChannel', this.channelStore.activeChannel);
     }
   }
 });
 
 </script>
 
-<style scoped></style>
+<style scoped lang="sass">
+@import 'src/css/quasar.variables'
+.active
+  background-color: $primary
+  color: white
+
+.highlighted
+  background-color: $secondary
+  color: white
+</style>
