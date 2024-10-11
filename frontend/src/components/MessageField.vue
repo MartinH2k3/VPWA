@@ -9,8 +9,8 @@
 import { useRouter } from 'vue-router';
 import { useMessageStore } from 'stores/messageStore';
 import { useChannelStore } from 'stores/channelStore';
-import {useUserStore} from "stores/userStore";
-import {useQuasar} from "quasar";
+import {useUserStore} from 'stores/userStore';
+import {useQuasar} from 'quasar';
 
 export default {
   setup() {
