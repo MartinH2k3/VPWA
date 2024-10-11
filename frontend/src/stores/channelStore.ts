@@ -46,20 +46,18 @@ export const useChannelStore = defineStore('channel', {
       // TODO implement the fetchChannels functionality
     },
     async joinChannel(channelName: string, isPrivate: boolean) {
-
-      // Generate a test channel
-      this.addChannel({
-        id: Math.random() * Number.MAX_SAFE_INTEGER,
-        name: channelName,
-        adminId: 1,
-        private: false,
-      })
-      return;
       try {
-        const channel = (await api.post('/c/join', {
-          channelName,
-          private: isPrivate
-        })).data
+        // Generate a test channel for now
+        const channel = {
+          id: Math.random() * Number.MAX_SAFE_INTEGER,
+          name: channelName,
+          adminId: 1,
+          private: false,
+        }
+        // const channel = (await api.post('/c/join', {
+        //   channelName,
+        //   private: isPrivate
+        // })).data
         this.activeChannel = channel
         this.channels.unshift(channel)
       } catch (e) {
@@ -92,7 +90,7 @@ export const useChannelStore = defineStore('channel', {
     setActiveChannel(channel: Channel) {
       this.activeChannel = channel
     },
-    addChannel(channel: Channel) {
+    getInvited(channel: Channel) {
       channel.highlighted = true
       this.channels.unshift(channel)
     },
