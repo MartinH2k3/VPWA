@@ -14,11 +14,11 @@
             </div>
           </q-form>
           <q-form v-else @submit.prevent="register" class="custom-form">
-            <q-input v-model="firstName" label="First Name" />
-            <q-input v-model="lastName" label="Last Name" />
-            <q-input v-model="username" label="Username" />
-            <q-input v-model="email" label="Email" />
-            <q-input v-model="password" label="Password" type="password" />
+            <q-input v-model="firstName" label="First Name" :rules="[val => !!val || 'First Name is required']"/>
+            <q-input v-model="lastName" label="Last Name" :rules="[val => !!val || 'Last Name is required']"/>
+            <q-input v-model="username" label="Username" :rules="[val => val.length >= 3 || 'Username must be at least 3 characters']"/>
+            <q-input v-model="email" label="Email" type="email" :rules="[val => /.+@.+\..+/.test(val) || 'Please enter a valid email address']"/>
+            <q-input v-model="password" label="Password" type="password" :rules="[val => val.length >= 8 || 'Password must be at least 8 characters']"/>
             <q-btn label="Register" type="submit" />
             <pre v-if="warning" class=" text-negative">{{ warning }}</pre>
 
@@ -124,7 +124,6 @@ export default {
       }
     },
     async register() {
-
       try {
         const response = await api.post('/register', {
           username: this.username,
@@ -140,15 +139,16 @@ export default {
         this.userStore.setActiveUser(userData); // Set the active user in the store
         await this.router.push('/');
       } catch (e: any) {
-        // const errors = e.response.data?.errors??e.response.data?.message
-        // console.log(errors);
-        // this.warning = '';
-        // for (const error of errors) {
-        //   this.warning += error.message + '\n'
-        // }
-        // console.log(this.warning);
-        this.warning = e.response.data.message;
-
+        try {
+          const errors = e.response.data.errors
+          this.warning = '';
+          for (const error of errors) {
+            this.warning += error.message + '\n'
+          }
+        } catch (e) { // If there is no response
+          this.warning = 'Couldn\'t connect to the server.\nTry checking your internet connection.';
+        }
+        console.error(e);
       }
     }
   }
