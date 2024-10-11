@@ -45,9 +45,7 @@ export default defineComponent({
   methods: {
     goToChannel(channel: Channel) {
       // this.router.push(`/c/${channel.name}`);
-      console.log('goToChannel', channel);
       this.channelStore.setActiveChannel(channel);
-      console.log('activeChannel', this.channelStore.activeChannel);
     }
   }
 });
