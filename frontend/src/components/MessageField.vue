@@ -70,10 +70,9 @@ export default {
             username = args[0];
             await this.channelStore.inviteUser(username);
             break;
-
+          case 'quit': //fallback for now, since for now they are the same
           case 'cancel':
-            channelName = args[0];
-            this.$q.notify(`You have left ${channelName}`)
+            this.$q.notify(`You have left ${this.channelStore.activeChannel.name}`)
             await this.channelStore.leaveChannel(); //works for active channel so no params
             await this.router.push('/');
             break;
