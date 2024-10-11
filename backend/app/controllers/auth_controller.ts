@@ -10,6 +10,7 @@ export default class AuthController {
       await auth.use('web').login(user)
       return user
     } catch (e) {
+      // It doesn't seem it comes to this catch, because adonis seems to handle it automatically
       switch (e.code) {
         case '23505': // Postgres error codes
           // format for e.detail is "Key (key)=(value) already exists."
@@ -33,6 +34,7 @@ export default class AuthController {
     await auth.use('web').login(user)
     // if incorrect credentials, return http status 401
     if (!user) {
+      // It doesn't seem it comes to this catch, because adonis seems to handle it automatically
       return response.unauthorized({ message: 'Invalid credentials' })
     }
     // return username
