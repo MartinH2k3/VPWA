@@ -12,7 +12,26 @@ export interface Channel {
 export const useChannelStore = defineStore('channel', {
   state: () => ({
     // list of joined channels
-    channels: [] as Channel[],
+    channels: [
+      {
+        id: 1,
+        name: 'general',
+        adminId: 1,
+        private: false,
+      },
+      {
+        id: 2,
+        name: 'random',
+        adminId: 1,
+        private: false,
+      },
+      {
+        id: 3,
+        name: 'secret',
+        adminId: 1,
+        private: true,
+      }
+    ] as Channel[],
     // channel user is currently viewing
     activeChannel: {} as Channel
   }),
@@ -49,7 +68,7 @@ export const useChannelStore = defineStore('channel', {
     },
     async leaveChannel() {
       try {
-        await api.post(`/c/${this.activeChannel.name}/leave`)
+        // await api.post(`/c/${this.activeChannel.name}/leave`)
         // remove channel based on name from store
         this.removeChannel(this.activeChannel.name)
       } catch (e) {
@@ -83,9 +102,6 @@ export const useChannelStore = defineStore('channel', {
       if (index !== -1) {
         this.channels.splice(index, 1)
       }
-    },
-    async test() {
-      await api.post('/ws')
     }
   },
 });
