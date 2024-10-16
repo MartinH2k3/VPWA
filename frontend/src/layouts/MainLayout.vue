@@ -2,20 +2,13 @@
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
 
         <q-toolbar-title>
           Frens
         </q-toolbar-title>
         <q-btn-dropdown flat icon="notifications">
-          <notification-window/>
+          <!-- <notification-window /> -->
         </q-btn-dropdown>
         <q-btn-dropdown class="text-right" :label="userStore.getUsername">
           <div class="row no-wrap q-pa-md">
@@ -23,39 +16,32 @@
               <q-btn outline rounded class="q-mr-md" @click="logout">
                 Logout
               </q-btn>
-              <q-toggle
-                v-model="onlyMentions"
-                checked-icon="check"
-                unchecked-icon="clear"
-                label="Only mentions"
-                left-label
-                @click="channelStore.test(); console.log('tested')"
-              />
+              <q-toggle v-model="onlyMentions" checked-icon="check" unchecked-icon="clear" label="Only mentions"
+                left-label />
             </div>
             <q-separator vertical inset class="text-white" />
             <div class="column justify-around">
-              <q-radio v-model="status" val="online" label="online" @update:model-value="userStore.setStatus('online')"/>
-              <q-radio v-model="status" val="do not disturb" label="away" @update:model-value="userStore.setStatus('online')"/>
-              <q-radio v-model="status" val="offline" label="offline" @update:model-value="userStore.setStatus('online')"/>
+              <q-radio v-model="status" val="online" label="online"
+                @update:model-value="userStore.setStatus('online')" />
+              <q-radio v-model="status" val="do not disturb" label="away"
+                @update:model-value="userStore.setStatus('online')" />
+              <q-radio v-model="status" val="offline" label="offline"
+                @update:model-value="userStore.setStatus('online')" />
             </div>
           </div>
         </q-btn-dropdown>
       </q-toolbar>
     </q-header>
 
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-    >
-      <SideBar/>
+    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
+      <SideBar />
     </q-drawer>
 
     <q-page-container>
-      <message-page/>
+      <message-page />
     </q-page-container>
     <q-footer class="bg-white">
-      <message-field/>
+      <message-field />
     </q-footer>
   </q-layout>
 </template>
@@ -67,7 +53,7 @@ import { useRouter } from 'vue-router';
 import { useUserStore } from 'stores/userStore';
 import { useSocketStore } from 'stores/socketStore';
 import MessagePage from 'pages/MessagePage.vue';
-import NotificationWindow from 'components/NotificationWindow.vue';
+// import NotificationWindow from 'components/NotificationWindow.vue';
 import { api } from 'boot/api';
 import { useChannelStore } from 'stores/channelStore';
 
@@ -77,7 +63,7 @@ export default {
     MessageField,
     SideBar,
     MessagePage,
-    NotificationWindow
+    // NotificationWindow
   },
   data() {
     return {
@@ -93,10 +79,10 @@ export default {
     const channelStore = useChannelStore();
     return { router, userStore, socketStore, channelStore };
   },
-  mounted(){
+  mounted() {
     // connect through socket store
     this.socketStore.connect()
-
+    this.channelStore.setActiveChannel(this.channelStore.channels[0])
 
   },
   methods: {

@@ -2,32 +2,15 @@
   <q-page padding>
     <q-infinite-scroll :offset="40" @load="paginateMessages" :initial-index="0" reverse>
       <q-list>
-          <q-chat-message
-            v-for="message in messages.toReversed()" :key="message.id"
-            :name="message.byMe ? 'Me' : message.username"
-            :text="[message.content]"
-            :sent = "message.byMe"
-            :bg-color="message.byMe||message.taggedMe ? 'primary' : 'grey'"
-            :text-color="message.byMe||message.taggedMe ? 'white' : ''"
-          /><!--default color if not by me-->
-          <q-chat-message
-            v-for="typingUser in currentlyTyping"
-            :key="typingUser"
-            :name="typingUser"
-            bg-color="grey"
-          >
-            <q-spinner-dots
-              size="2rem"
-              @mouseover="inspectUser(typingUser, $event)"
-              @mouseleave="stopInspecting"
-            />
-          </q-chat-message>
+        <q-chat-message v-for="message in messages.toReversed()" :key="message.id + '-' + activeChannel"
+          :name="message.byMe ? 'Me' : message.username" :text="[message.content]" :sent="message.byMe"
+          :bg-color="message.byMe || message.taggedMe ? 'primary' : 'grey'"
+          :text-color="message.byMe || message.taggedMe ? 'white' : ''" /><!--default color if not by me-->
+        <q-chat-message v-for="typingUser in currentlyTyping" :key="typingUser" :name="typingUser" bg-color="grey">
+          <q-spinner-dots size="2rem" @mouseover="inspectUser(typingUser, $event)" @mouseleave="stopInspecting" />
+        </q-chat-message>
       </q-list>
-      <div
-        v-if="inspectedMessage"
-        class="floating-message"
-        :style="{ top: `${cursorY}px`, left: `${cursorX}px` }"
-      >
+      <div v-if="inspectedMessage" class="floating-message" :style="{ top: `${cursorY}px`, left: `${cursorX}px` }">
         {{ inspectedMessage }}
       </div>
       <template #loading>
@@ -43,6 +26,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { useUserStore } from 'stores/userStore';
+import { useChannelStore } from 'stores/channelStore';
 import { useMessageStore } from 'stores/messageStore';
 
 interface Message {
@@ -56,8 +40,9 @@ interface Message {
 export default defineComponent({
   setup() {
     const userStore = useUserStore();
+    const channelStore = useChannelStore();
     const messageStore = useMessageStore();
-    return { messageStore, userStore };
+    return { messageStore, userStore, channelStore };
   },
   data() {
     return {
@@ -71,8 +56,11 @@ export default defineComponent({
   },
   computed: {
     messages(): Message[] {
-      return this.messageStore.messages;
+      return this.messageStore.activeChannelMessages;
     },
+    activeChannel() {
+      return this.channelStore.activeChannel;
+    }
   },
   methods: {
     paginateMessages(index: number, done: () => void) {
@@ -80,10 +68,10 @@ export default defineComponent({
       for (let i = 0; i < 10; i++) {
         const byMe = Math.random() > 0.8;
         const taggedMe = Math.random() > 0.8 && !byMe;
-        this.messages.push({
+        this.messageStore.addMessageToActiveChannel({
           id: Math.floor(Math.random() * 1000),
           username: 'user' + Math.floor(Math.random() * 10),
-          content: (taggedMe?`@${this.userStore.getUsername}  `:'') + this.generateMessage(),
+          content: (taggedMe ? `@${this.userStore.getUsername}  ` : '') + this.generateMessage(),
           byMe: byMe,
           taggedMe: taggedMe
         });

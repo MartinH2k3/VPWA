@@ -89,8 +89,12 @@ export const useChannelStore = defineStore('channel', {
     },
     setActiveChannel(channel: Channel) {
       this.activeChannel = channel
+      setTimeout(() => {
+        // Scroll 'html' to bottom
+        window.scrollTo(0, document.body.scrollHeight)
+      }, 0)
     },
-    getInvited(channel: Channel) {
+    addInvitedChannel(channel: Channel) {
       channel.highlighted = true
       this.channels.unshift(channel)
     },

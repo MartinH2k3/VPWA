@@ -35,7 +35,7 @@ export default {
       // Handle message when it's not a command (i.e., doesn't start with "/")
       if (this.message[0] !== '/' && this.channelStore.activeChannel) {
         // TODO: api call to send message
-        this.messageStore.addMessage(
+        this.messageStore.addMessageToActiveChannel(
           {
             id: this.userStore.user.id,
             username: this.userStore.user.username,
@@ -89,7 +89,9 @@ export default {
               'user2': 'away',
               'user3': 'offline'
             };
-            this.messageStore.addMessage({
+            console.log('Adding users to message store');
+
+            this.messageStore.addMessageToActiveChannel({
               id: 0,
               username: 'system',
               content: 'Users in channel: ' + Object.entries(users)
