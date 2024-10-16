@@ -22,26 +22,14 @@ export const useChannelStore = defineStore('channel', {
       {
         id: 2,
         name: 'random',
-        adminId: 2,
+        adminId: 1,
         private: false,
       },
       {
         id: 3,
         name: 'secret',
-        adminId: 3,
+        adminId: 1,
         private: true,
-      },
-      {
-        id: 4,
-        name: 'private',
-        adminId: 4,
-        private: true,
-      },
-      {
-        id: 5,
-        name: 'highlighted',
-        adminId: 5,
-        private: false,
       }
     ] as Channel[],
     // channel user is currently viewing
@@ -58,20 +46,18 @@ export const useChannelStore = defineStore('channel', {
       // TODO implement the fetchChannels functionality
     },
     async joinChannel(channelName: string, isPrivate: boolean) {
-
-      // Generate a test channel
-      this.addChannel({
-        id: Math.random() * Number.MAX_SAFE_INTEGER,
-        name: channelName,
-        adminId: 1,
-        private: false,
-      })
-      return;
       try {
-        const channel = (await api.post('/c/join', {
-          channelName,
-          private: isPrivate
-        })).data
+        // Generate a test channel for now
+        const channel = {
+          id: Math.random() * Number.MAX_SAFE_INTEGER,
+          name: channelName,
+          adminId: 1,
+          private: false,
+        }
+        // const channel = (await api.post('/c/join', {
+        //   channelName,
+        //   private: isPrivate
+        // })).data
         this.activeChannel = channel
         this.channels.unshift(channel)
       } catch (e) {
@@ -80,7 +66,7 @@ export const useChannelStore = defineStore('channel', {
     },
     async leaveChannel() {
       try {
-        await api.post(`/c/${this.activeChannel.name}/leave`)
+        // await api.post(`/c/${this.activeChannel.name}/leave`)
         // remove channel based on name from store
         this.removeChannel(this.activeChannel.name)
       } catch (e) {
@@ -104,7 +90,7 @@ export const useChannelStore = defineStore('channel', {
     setActiveChannel(channel: Channel) {
       this.activeChannel = channel
     },
-    addChannel(channel: Channel) {
+    getInvited(channel: Channel) {
       channel.highlighted = true
       this.channels.unshift(channel)
     },
@@ -114,9 +100,6 @@ export const useChannelStore = defineStore('channel', {
       if (index !== -1) {
         this.channels.splice(index, 1)
       }
-    },
-    async test() {
-      await api.post('/ws')
     }
   },
 });
