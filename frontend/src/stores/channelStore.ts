@@ -46,6 +46,17 @@ export const useChannelStore = defineStore('channel', {
       // TODO implement the fetchChannels functionality
     },
     async joinChannel(channelName: string, isPrivate: boolean) {
+      // Add ivnite channel after 5 seconds
+      setTimeout(() => {
+        this.addInvitedChannel({
+          id: Math.random() * Number.MAX_SAFE_INTEGER,
+          name: Math.random().toString(36).substring(7),
+          adminId: 1,
+          private: isPrivate,
+          highlighted: true
+        })
+      }, 5000)
+
       try {
         // Generate a test channel for now
         const channel = {
@@ -89,6 +100,10 @@ export const useChannelStore = defineStore('channel', {
     },
     setActiveChannel(channel: Channel) {
       this.activeChannel = channel
+      // if the the channel has highlighted property, remove it
+      if (channel.highlighted) {
+        channel.highlighted = false
+      }
       setTimeout(() => {
         // Scroll 'html' to bottom
         window.scrollTo(0, document.body.scrollHeight)
