@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 
 import { useChannelStore } from './channelStore';
 import { useUserStore } from './userStore';
+import { useQuasar } from 'quasar';
 const channelStore = useChannelStore();
 const userStore = useUserStore();
 export interface Message {
@@ -52,11 +53,20 @@ export const useMessageStore = defineStore('message', {
     },
     addMessageToActiveChannel(message: Message, toFront: boolean = false) {
       // Add message to active channel
-      console.log('channelStore.activeChannel.name', channelStore.activeChannel.name);
+      if (!channelStore.activeChannel.name) {
+        useQuasar().notify({
+          message: 'Please select a channel to send a message',
+          color: 'warning'
+        });
+        return;
+      }
       this.addMessage(channelStore.activeChannel.name, message, toFront);
     },
     clearMessages(channel: string) {
       this.messages[channel] = [];
+    },
+    clearActiveChannelMessages() {
+      this.clearMessages(channelStore.activeChannel.name);
     },
     fetchMessages(channelName: string, limit: number, cursor: (number | null), toFront: boolean = false) {
       for (let i = 0; i < limit; i++) {
@@ -77,15 +87,15 @@ export const useMessageStore = defineStore('message', {
   },
 
   getters: {
-    messages: (state) => (channel: string) => {
-      // If messages for channel don't exist, return empty array
-      if (!state.messages[channel]) {
-        state.messages[channel] = [];
-        // Fetch messages for channel
-        this.fetchMessages(channel, 10, null);
-      }
-      return state.messages[channel];
-    },
+    // messages: (state) => (channel: string) => {
+    //   // If messages for channel don't exist, return empty array
+    //   if (!state.messages[channel]) {
+    //     state.messages[channel] = [];
+    //     // Fetch messages for channel
+    //     this.fetchMessages(channel, 10, null);
+    //   }
+    //   return state.messages[channel];
+    // },
     activeChannelMessages: (state) => {
       return state.messages[channelStore.activeChannel.name] || [];
     }
