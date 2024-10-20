@@ -2,7 +2,7 @@
   <q-page padding>
     <q-infinite-scroll :offset="40" @load="paginateMessages" :initial-index="0" reverse>
       <q-list>
-        <q-chat-message v-for="message in messages.toReversed()" :key="message.id + '-' + activeChannel.name"
+        <q-chat-message v-for="message in messages.toReversed()" :key="message.id"
           :name="message.byMe ? 'Me' : message.username" :text="[message.content]" :sent="message.byMe"
           :bg-color="message.byMe || message.taggedMe ? 'primary' : 'grey'"
           :text-color="message.byMe || message.taggedMe ? 'white' : ''" /><!--default color if not by me-->
@@ -40,13 +40,12 @@ interface Message {
 export default defineComponent({
   setup() {
     const userStore = useUserStore();
-    const channelStore = useChannelStore();
     const messageStore = useMessageStore();
+    const channelStore = useChannelStore();
     return { messageStore, userStore, channelStore };
   },
   data() {
     return {
-      currentlyTyping: ['bob', 'alice'] as string[],
       limit: 10,
       cursor: null as (number | null), // cursor for pagination
       inspectedMessage: null as string | null,
@@ -58,29 +57,30 @@ export default defineComponent({
     messages(): Message[] {
       return this.messageStore.activeChannelMessages;
     },
-    activeChannel() {
-      return this.channelStore.activeChannel;
-    }
+    currentlyTyping() {
+      if (!this.channelStore.activeChannel.name) {
+        return [];
+      }
+      return ['bob', 'alice'] as string[]
+    },
   },
   watch: {
     messages() {
       console.log('messages updated');
 
-    }
+    },
   },
   methods: {
     paginateMessages(index: number, done: () => void) {
       this.messageStore.fetchActiveChannelMessages(this.limit, this.cursor);
-
-      // Force refresh of the list
-      setTimeout(done, 100);
+      done();
     },
 
     async inspectUser(username: string, event: MouseEvent) {
       try { //TODO actually get the message dude is writing from websocket on every update
         this.cursorX = event.clientX + 10;
         this.cursorY = event.clientY + 10;
-        this.inspectedMessage = 'Currently typing...';
+        this.inspectedMessage = "I'm currently typing. This is a thing I am currently typing. Never gonna giv";
       }
       catch (e) {
         console.error(e);
@@ -95,28 +95,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="sass">
-.msg
-  padding: 0.3rem 0.8rem
-  align-items: flex-start
-
-.myMsg
-  align-items: flex-end
-
-.taggedMsg
-  border-left: 2px solid
-  border-image: linear-gradient(180deg, #610099, #002599) 1
-
-.msgText
-  max-width: 60%
-  padding: 0.5rem 1rem
-  margin-top: 0.25rem
-  border-radius: 1rem
-  overflow-wrap: break-word
-  background-color: #61009944
-
-.myMsg .msgText
-  background-color: #00259944
-
 .floating-message
   position: fixed
   background-color: #f1f1f1

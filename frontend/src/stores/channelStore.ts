@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'boot/api';
+import { useQuasar } from 'quasar';
 
 export interface Channel {
   id: number
@@ -84,10 +85,14 @@ export const useChannelStore = defineStore('channel', {
       }
     },
     async leaveChannel() {
+      if (!this.activeChannel.name) {
+        console.error('No active channel to leave');
+      }
       try {
         // await api.post(`/c/${this.activeChannel.name}/leave`)
         // remove channel based on name from store
         this.removeChannel(this.activeChannel.name)
+        this.activeChannel = {}
       } catch (e) {
         console.error(e);
       }

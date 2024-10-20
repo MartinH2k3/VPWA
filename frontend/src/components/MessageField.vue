@@ -58,7 +58,8 @@ export default {
             content: this.message,
             byMe: true,
             taggedMe: false,
-          }
+          },
+          true
         )
       }
 
@@ -69,8 +70,8 @@ export default {
         const args = splitMessage.slice(1);
         let username;
         let channelName: string;
-        if (!this.channelStore.activeChannel && command !== 'join') {
-          console.error('No channel to send message to');
+        if (!this.channelStore.activeChannel.name && command !== 'join') {
+          this.$q.notify('You are currently not in a channel');
           return;
         }
 
@@ -99,7 +100,7 @@ export default {
           case 'quit': //fallback for now, since for now they are the same
           case 'cancel':
             this.$q.notify(`You have left ${this.channelStore.activeChannel.name}`)
-            this.messageStore.clearMessages(this.channelStore.activeChannel.name);
+            this.messageStore.clearActiveChannelMessages();
             await this.channelStore.leaveChannel(); //works for active channel so no params
             await this.router.push('/');
             break;
@@ -126,7 +127,8 @@ export default {
                 .join(', '), // display users and their status
               byMe: false,
               taggedMe: false,
-            });
+            },
+            true);
             break;
           default:
             // Inform user that command is unknown

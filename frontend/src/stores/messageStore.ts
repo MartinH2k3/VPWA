@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 
 import { useChannelStore } from './channelStore';
 import { useUserStore } from './userStore';
+import { useQuasar } from 'quasar';
 const channelStore = useChannelStore();
 const userStore = useUserStore();
 export interface Message {
@@ -40,53 +41,67 @@ export const useMessageStore = defineStore('message', {
     messages: {} as Record<string, Message[]>,
   }),
   actions: {
-    addMessage(channel: string, message: Message) {
-      if (!this.messages[channel]) {
-        this.messages[channel] = [];
+    addMessage(channelName: string, message: Message, toFront: boolean) {
+      if (!this.messages[channelName]) {
+        this.messages[channelName] = [];
       }
-      this.messages[channel].unshift(message);
-
+      if (toFront) {
+        this.messages[channelName].unshift(message);
+      } else {
+        this.messages[channelName].push(message);
+      }
     },
-    addMessageToActiveChannel(message: Message) {
+    addMessageToActiveChannel(message: Message, toFront: boolean = false) {
       // Add message to active channel
-      console.log('channelStore.activeChannel.name', channelStore.activeChannel.name);
-      this.addMessage(channelStore.activeChannel.name, message);
+      if (!channelStore.activeChannel.name) {
+        useQuasar().notify({
+          message: 'Please select a channel to send a message',
+          color: 'warning'
+        });
+        return;
+      }
+      this.addMessage(channelStore.activeChannel.name, message, toFront);
     },
     clearMessages(channel: string) {
       this.messages[channel] = [];
       delete this.messages[channel];
     },
-    fetchMessages(channel: string, limit: number, cursor: (number | null)) {
+    clearActiveChannelMessages() {
+      this.clearMessages(channelStore.activeChannel.name);
+    },
+    fetchMessages(channelName: string, limit: number, cursor: (number | null), toFront: boolean = false) {
       for (let i = 0; i < limit; i++) {
         const byMe = Math.random() > 0.8;
         const taggedMe = Math.random() > 0.8 && !byMe;
-        this.addMessageToActiveChannel({
+        this.addMessage(channelName,{
           id: Math.floor(Math.random() * 1000),
           username: 'user' + Math.floor(Math.random() * 10),
           content: (taggedMe ? `@${userStore.getUsername}  ` : '') + generateMessage(),
           byMe: byMe,
           taggedMe: taggedMe
-        });
+        }, toFront);
       }
     },
     fetchActiveChannelMessages(limit: number, cursor: (number | null)) {
+      if (!channelStore.activeChannel.name) {
+        return;
+      }
       this.fetchMessages(channelStore.activeChannel.name, limit, cursor);
     },
   },
 
   getters: {
-    messages: (state) => (channel: string) => {
-      // If messages for channel don't exist, return empty array
-      if (!state.messages[channel]) {
-        state.messages[channel] = [];
-        // Fetch messages for channel
-        useMessageStore().fetchMessages(channel, 10, null);
-      }
-      return state.messages[channel];
-    },
+    // messages: (state) => (channel: string) => {
+    //   // If messages for channel don't exist, return empty array
+    //   if (!state.messages[channel]) {
+    //     state.messages[channel] = [];
+    //     // Fetch messages for channel
+    //     this.fetchMessages(channel, 10, null);
+    //   }
+    //   return state.messages[channel];
+    // },
     activeChannelMessages: (state) => {
-      console.log('channelStore.activeChannel.name', channelStore.activeChannel.name);
-      return useMessageStore().messages(channelStore.activeChannel.name);
+      return state.messages[channelStore.activeChannel.name] || [];
     }
   },
 

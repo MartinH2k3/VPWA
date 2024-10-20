@@ -4,8 +4,8 @@
       <q-page class="column flex-center text-center">
         <img alt="logo" width="86px" class='q-mb-sm' src="logo.svg">
         <q-form v-if="isLogin" @submit.prevent="login" class="custom-form">
-          <q-input v-model="email" label="Email" />
-          <q-input v-model="password" label="Password" type="password" />
+          <q-input v-model="email" label="Email" :rules="[val => /.+@.+\..+/.test(val) || 'Please enter a valid email address']"/>
+          <q-input v-model="password" label="Password" type="password" :rules="[val => !!val || 'Password is required']"/>
           <q-btn label="Login" type="submit" />
           <pre v-if="warning" class="text-negative">{{ warning }}</pre>
 

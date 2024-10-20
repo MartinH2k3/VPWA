@@ -7,9 +7,6 @@
         <q-toolbar-title>
           Frens
         </q-toolbar-title>
-        <q-btn-dropdown flat icon="notifications">
-          <!-- <notification-window /> -->
-        </q-btn-dropdown>
         <q-btn-dropdown class="text-right" :label="userStore.getUsername">
           <div class="row no-wrap q-pa-md">
             <div class="column justify-around">
