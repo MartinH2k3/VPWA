@@ -2,7 +2,7 @@
   <q-page padding>
     <q-infinite-scroll :offset="40" @load="paginateMessages" :initial-index="0" reverse>
       <q-list>
-        <q-chat-message v-for="message in messages.toReversed()" :key="message.id + '-' + activeChannel.name"
+        <q-chat-message v-for="message in messages.toReversed()" :key="message.id"
           :name="message.byMe ? 'Me' : message.username" :text="[message.content]" :sent="message.byMe"
           :bg-color="message.byMe || message.taggedMe ? 'primary' : 'grey'"
           :text-color="message.byMe || message.taggedMe ? 'white' : ''" /><!--default color if not by me-->
@@ -40,9 +40,8 @@ interface Message {
 export default defineComponent({
   setup() {
     const userStore = useUserStore();
-    const channelStore = useChannelStore();
     const messageStore = useMessageStore();
-    return { messageStore, userStore, channelStore };
+    return { messageStore, userStore };
   },
   data() {
     return {
@@ -58,9 +57,6 @@ export default defineComponent({
     messages(): Message[] {
       return this.messageStore.activeChannelMessages;
     },
-    activeChannel() {
-      return this.channelStore.activeChannel;
-    }
   },
   watch: {
     messages() {
@@ -78,7 +74,7 @@ export default defineComponent({
       try { //TODO actually get the message dude is writing from websocket on every update
         this.cursorX = event.clientX + 10;
         this.cursorY = event.clientY + 10;
-        this.inspectedMessage = 'Currently typing...';
+        this.inspectedMessage = "I'm currently typing. This is a thing I am currently typing. Never gonna giv";
       }
       catch (e) {
         console.error(e);
