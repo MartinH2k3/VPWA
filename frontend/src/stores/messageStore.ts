@@ -77,18 +77,18 @@ export const useMessageStore = defineStore('message', {
   },
 
   getters: {
-    messages: (state) => (channel: string) => {
-      // If messages for channel don't exist, return empty array
-      if (!state.messages[channel]) {
-        state.messages[channel] = [];
-        // Fetch messages for channel
-        useMessageStore().fetchMessages(channel, 10, null);
-      }
-      return state.messages[channel];
-    },
+    // no idea what this is for so I'm commenting it out, since it causes problems
+    // messages: (state) => (channel: string) => {
+    //   // If messages for channel don't exist, return empty array
+    //   if (!state.messages[channel]) {
+    //     state.messages[channel] = [];
+    //     // Fetch messages for channel
+    //     useMessageStore().fetchMessages(channel, 10, null);
+    //   }
+    //   return state.messages[channel];
+    // },
     activeChannelMessages: (state) => {
-      console.log('channelStore.activeChannel.name', channelStore.activeChannel.name);
-      return useMessageStore().messages(channelStore.activeChannel.name);
+      return state.messages[channelStore.activeChannel.name] || [];
     }
   },
 

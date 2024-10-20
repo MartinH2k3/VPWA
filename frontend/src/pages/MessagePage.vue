@@ -71,9 +71,7 @@ export default defineComponent({
   methods: {
     paginateMessages(index: number, done: () => void) {
       this.messageStore.fetchActiveChannelMessages(this.limit, this.cursor);
-
-      // Force refresh of the list
-      setTimeout(done, 50);
+      done();
     },
 
     async inspectUser(username: string, event: MouseEvent) {
