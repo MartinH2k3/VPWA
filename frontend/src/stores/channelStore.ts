@@ -40,9 +40,10 @@ export const useChannelStore = defineStore('channel', {
     },
     async leaveChannel() {
       try {
-        await api.post(`/c/${this.activeChannel.name}/leave`)
+        await api.post(`/c/${this.activeChannel.name}/cancel`)
         // remove channel based on name from store
         this.removeChannel(this.activeChannel.name)
+        this.activeChannel = {}
       } catch (e) {
         console.error(e);
       }
