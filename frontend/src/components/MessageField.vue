@@ -99,6 +99,7 @@ export default {
             break;
           case 'quit': //fallback for now, since for now they are the same
           case 'cancel':
+          case 'leave':
             this.$q.notify(`You have left ${this.channelStore.activeChannel.name}`)
             this.messageStore.clearActiveChannelMessages();
             await this.channelStore.leaveActiveChannel(); //works for active channel so no params
