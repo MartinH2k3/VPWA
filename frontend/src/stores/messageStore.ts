@@ -40,32 +40,35 @@ export const useMessageStore = defineStore('message', {
     messages: {} as Record<string, Message[]>,
   }),
   actions: {
-    addMessage(channel: string, message: Message) {
-      if (!this.messages[channel]) {
-        this.messages[channel] = [];
+    addMessage(channelName: string, message: Message, toFront: boolean) {
+      if (!this.messages[channelName]) {
+        this.messages[channelName] = [];
       }
-      this.messages[channel].unshift(message);
-
+      if (toFront) {
+        this.messages[channelName].unshift(message);
+      } else {
+        this.messages[channelName].push(message);
+      }
     },
-    addMessageToActiveChannel(message: Message) {
+    addMessageToActiveChannel(message: Message, toFront: boolean = false) {
       // Add message to active channel
       console.log('channelStore.activeChannel.name', channelStore.activeChannel.name);
-      this.addMessage(channelStore.activeChannel.name, message);
+      this.addMessage(channelStore.activeChannel.name, message, toFront);
     },
     clearMessages(channel: string) {
       this.messages[channel] = [];
     },
-    fetchMessages(channel: string, limit: number, cursor: (number | null)) {
+    fetchMessages(channelName: string, limit: number, cursor: (number | null), toFront: boolean = false) {
       for (let i = 0; i < limit; i++) {
         const byMe = Math.random() > 0.8;
         const taggedMe = Math.random() > 0.8 && !byMe;
-        this.addMessageToActiveChannel({
+        this.addMessage(channelName,{
           id: Math.floor(Math.random() * 1000),
           username: 'user' + Math.floor(Math.random() * 10),
           content: (taggedMe ? `@${userStore.getUsername}  ` : '') + generateMessage(),
           byMe: byMe,
           taggedMe: taggedMe
-        });
+        }, toFront);
       }
     },
     fetchActiveChannelMessages(limit: number, cursor: (number | null)) {

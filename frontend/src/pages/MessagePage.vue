@@ -73,7 +73,7 @@ export default defineComponent({
       this.messageStore.fetchActiveChannelMessages(this.limit, this.cursor);
 
       // Force refresh of the list
-      setTimeout(done, 100);
+      setTimeout(done, 50);
     },
 
     async inspectUser(username: string, event: MouseEvent) {
@@ -95,28 +95,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="sass">
-.msg
-  padding: 0.3rem 0.8rem
-  align-items: flex-start
-
-.myMsg
-  align-items: flex-end
-
-.taggedMsg
-  border-left: 2px solid
-  border-image: linear-gradient(180deg, #610099, #002599) 1
-
-.msgText
-  max-width: 60%
-  padding: 0.5rem 1rem
-  margin-top: 0.25rem
-  border-radius: 1rem
-  overflow-wrap: break-word
-  background-color: #61009944
-
-.myMsg .msgText
-  background-color: #00259944
-
 .floating-message
   position: fixed
   background-color: #f1f1f1

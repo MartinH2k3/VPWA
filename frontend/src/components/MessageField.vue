@@ -99,7 +99,8 @@ export default {
                 .join(', '), // display users and their status
               byMe: false,
               taggedMe: false,
-            });
+            },
+            true);
             break;
           default:
             // Inform user that command is unknown
