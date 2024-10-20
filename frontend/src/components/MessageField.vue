@@ -42,7 +42,8 @@ export default {
             content: this.message,
             byMe: true,
             taggedMe: false,
-          }
+          },
+          true
         )
       }
 
