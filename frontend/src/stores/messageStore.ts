@@ -82,6 +82,9 @@ export const useMessageStore = defineStore('message', {
       }
     },
     fetchActiveChannelMessages(limit: number, cursor: (number | null)) {
+      if (!channelStore.activeChannel.name) {
+        return;
+      }
       this.fetchMessages(channelStore.activeChannel.name, limit, cursor);
     },
   },

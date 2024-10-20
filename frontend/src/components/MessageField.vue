@@ -54,8 +54,8 @@ export default {
         const args = splitMessage.slice(1);
         let username;
         let channelName;
-        if (!this.channelStore.activeChannel && command !== 'join') {
-          console.error('No channel to send message to');
+        if (!this.channelStore.activeChannel.name && command !== 'join') {
+          this.$q.notify('You are currently not in a channel');
           return;
         }
 
@@ -74,6 +74,7 @@ export default {
           case 'quit': //fallback for now, since for now they are the same
           case 'cancel':
             this.$q.notify(`You have left ${this.channelStore.activeChannel.name}`)
+            this.messageStore.clearActiveChannelMessages();
             await this.channelStore.leaveChannel(); //works for active channel so no params
             await this.router.push('/');
             break;
