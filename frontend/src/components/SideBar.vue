@@ -11,27 +11,19 @@
       @click="goToChannel(channel)"
       :class="{active: channel.id===activeChannel.id, highlighted: channel.highlighted}"
     >
-      <q-item-section >
-        <q-item class="row flex-row flex-nowrap" >
-        <span class="q-mr-auto flex items-center">{{ channel.name }}</span>
-        <q-button-dropdown @click.stop>
+      <div class="row flex-row flex-nowrap" style="width: 100%;">
+        <span class="q-mr-auto flex items-center">
+          {{ channel.name }}</span>
           <q-btn
-            flat
-            round
-            dense
-            icon="more_vert"
-            class="q-ml-sm"
+        flat
+        round
+        dense
+        icon="close"
+        class="q-ml-sm"
+        @click="leaveChannel(channel.name)"
+        />
 
-          />
-          <q-menu anchor="bottom right" self="bottom left">
-            <q-item clickable @click.exact.prevent.stop="leaveChannel(channel.name)">
-              <q-item-section >Leave</q-item-section>
-            </q-item>
-          </q-menu>
-        </q-button-dropdown>
-      </q-item>
-
-      </q-item-section>
+      </div>
     </q-item>
   </q-list>
 </template>
@@ -69,6 +61,11 @@ export default defineComponent({
     },
 
     async leaveChannel(channelName: string) {
+
+      // Make a confirm alert
+      let confirm : boolean =  window.confirm('Do you really wanna leave ' + channelName + '?');
+      if(!confirm) return;
+
       await this.channelStore.leaveChannel(channelName);
       // Notify
       this.$q.notify({
