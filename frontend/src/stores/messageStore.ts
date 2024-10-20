@@ -54,6 +54,7 @@ export const useMessageStore = defineStore('message', {
     },
     clearMessages(channel: string) {
       this.messages[channel] = [];
+      delete this.messages[channel];
     },
     fetchMessages(channel: string, limit: number, cursor: (number | null)) {
       for (let i = 0; i < limit; i++) {
