@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { useRouter } from 'vue-router';
+import { useChannelStore } from 'stores/channelStore';
 import { useMessageStore } from 'stores/messageStore';
 import { useChannelStore } from 'stores/channelStore';
 import { useUserStore } from 'stores/userStore';
@@ -101,7 +101,7 @@ export default {
           case 'cancel':
             this.$q.notify(`You have left ${this.channelStore.activeChannel.name}`)
             this.messageStore.clearActiveChannelMessages();
-            await this.channelStore.leaveChannel(); //works for active channel so no params
+            await this.channelStore.leaveActiveChannel(); //works for active channel so no params
             await this.router.push('/');
             break;
 
