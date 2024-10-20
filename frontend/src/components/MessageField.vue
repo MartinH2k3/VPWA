@@ -90,18 +90,6 @@ export default {
             }
             this.$q.notify(`You have joined ${channelName}`)
             let isPrivate = args.length > 1 && args[1] === 'private';
-
-             // Add ivnite channel after 5 seconds
-            setTimeout(() => {
-              this.channelStore.addInvitedChannel({
-                id: Math.random() * Number.MAX_SAFE_INTEGER,
-                name: Math.random().toString(36).substring(7),
-                adminId: 1,
-                private: isPrivate,
-                highlighted: true
-              })
-            }, 5000);
-
             await this.channelStore.joinChannel(channelName, isPrivate);
             break;
 
