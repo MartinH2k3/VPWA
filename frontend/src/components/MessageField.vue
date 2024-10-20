@@ -26,6 +26,22 @@ export default {
       message: '', // Define message in data()
     };
   },
+
+  watch: {
+    // Watch for changes in the active channel
+    'channelStore.activeChannel': {
+      handler() {
+        // scroll to bottom of messages
+        this.$nextTick(() => {
+          const messageContainer = document.getElementById('message-container');
+          if (messageContainer) {
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+          }
+        });
+      },
+      immediate: true,
+    },
+  },
   methods: {
     async sendMessage() {
       if (!this.message.trim()) {
