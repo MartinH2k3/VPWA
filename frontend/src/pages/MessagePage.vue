@@ -41,11 +41,11 @@ export default defineComponent({
   setup() {
     const userStore = useUserStore();
     const messageStore = useMessageStore();
-    return { messageStore, userStore };
+    const channelStore = useChannelStore();
+    return { messageStore, userStore, channelStore };
   },
   data() {
     return {
-      currentlyTyping: ['bob', 'alice'] as string[],
       limit: 10,
       cursor: null as (number | null), // cursor for pagination
       inspectedMessage: null as string | null,
@@ -57,12 +57,18 @@ export default defineComponent({
     messages(): Message[] {
       return this.messageStore.activeChannelMessages;
     },
+    currentlyTyping() {
+      if (!this.channelStore.activeChannel.name) {
+        return [];
+      }
+      return ['bob', 'alice'] as string[]
+    },
   },
   watch: {
     messages() {
       console.log('messages updated');
 
-    }
+    },
   },
   methods: {
     paginateMessages(index: number, done: () => void) {
