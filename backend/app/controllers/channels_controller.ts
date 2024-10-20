@@ -58,7 +58,7 @@ export default class ChannelsController {
             (socket: ActiveSocket) => socket.user.id === member.id
           )
           if (activeSocket) {
-            activeSocket.methods.removeChannel(channel)
+            activeSocket.removeChannel(channel)
           }
         }
         channel?.delete()
@@ -77,7 +77,7 @@ export default class ChannelsController {
         (socket: ActiveSocket) => socket.user.id === userId
       )
       if (activeSocket) {
-        activeSocket.methods.removeChannel(channel)
+        activeSocket.removeChannel(channel)
       }
       return response.ok(`Successfully left the channel ${channel?.name}`)
     } catch (e) {
