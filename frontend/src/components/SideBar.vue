@@ -22,12 +22,14 @@
 import { defineComponent } from 'vue';
 import { useChannelStore, Channel } from 'stores/channelStore';
 import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'SideBar',
   setup() {
     const router = useRouter();
-    return {router};
+    const $q = useQuasar();
+    return {router, $q};
   },
   data() {
     return {
@@ -47,6 +49,19 @@ export default defineComponent({
       // this.router.push(`/c/${channel.name}`);
       this.channelStore.setActiveChannel(channel);
     }
+  },
+  mounted() {
+    setInterval(() => {
+      const channelName = Math.random().toString(36).substring(7);
+      this.channelStore.addInvitedChannel({
+        id: Math.random() * Number.MAX_SAFE_INTEGER,
+        name: channelName,
+        adminId: 1,
+        private: false, // or set this to `isPrivate` if available
+        highlighted: true
+      });
+      this.$q.notify({'message':'You have been invited to channel ' + channelName})
+    }, 30000); // every 30 seconds
   }
 });
 
