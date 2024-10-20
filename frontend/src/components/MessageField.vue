@@ -52,7 +52,7 @@ export default {
         const command = splitMessage[0].substring(1);
         const args = splitMessage.slice(1);
         let username;
-        let channelName;
+        let channelName: string;
         if (!this.channelStore.activeChannel && command !== 'join') {
           console.error('No channel to send message to');
           return;
@@ -61,6 +61,16 @@ export default {
         switch (command) {
           case 'join':
             channelName = args[0];
+            // If the channel already exists, print an appropriate message
+            if (this.channelStore.channels.find(channel => channel.name === channelName)) {
+                this.$q.notify({
+                message: `You're already a member of ${channelName}`,
+                color: 'yellow',
+                textColor: 'black',
+                icon: 'warning'
+                });
+              return;
+            }
             this.$q.notify(`You have joined ${channelName}`)
             let isPrivate = args.length > 1 && args[1] === 'private';
             await this.channelStore.joinChannel(channelName, isPrivate);

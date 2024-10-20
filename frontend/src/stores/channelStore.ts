@@ -46,6 +46,14 @@ export const useChannelStore = defineStore('channel', {
       // TODO implement the fetchChannels functionality
     },
     async joinChannel(channelName: string, isPrivate: boolean) {
+
+      // If that channel is already in the list, set it as active channel
+      const channel = this.channels.find(c => c.name === channelName)
+      if (channel) {
+        this.activeChannel = channel
+        return
+      }
+
       // Add ivnite channel after 5 seconds
       setTimeout(() => {
         this.addInvitedChannel({
