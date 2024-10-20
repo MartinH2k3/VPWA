@@ -49,13 +49,15 @@ export const useChannelStore = defineStore('channel', {
     async joinChannel(channelName: string, isPrivate: boolean) {
       // Add ivnite channel after 5 seconds
       setTimeout(() => {
+        const channelName = Math.random().toString(36).substring(7)
         this.addInvitedChannel({
           id: Math.random() * Number.MAX_SAFE_INTEGER,
-          name: Math.random().toString(36).substring(7),
+          name: channelName,
           adminId: 1,
           private: isPrivate,
           highlighted: true
         })
+        useQuasar().notify({'message':'You have been invited to channel ' + channelName})
       }, 5000)
 
       try {
