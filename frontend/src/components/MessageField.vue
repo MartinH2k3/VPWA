@@ -1,7 +1,7 @@
 <template>
   <q-input rounded outlined autogrow v-model="message" @keydown.enter.prevent="sendMessage">
     <!-- just so text doesn't start leftmost of the text field-->
-    <template v-slot:prepend/>
+    <template v-slot:prepend />
   </q-input>
 </template>
 
@@ -9,8 +9,8 @@
 import { useRouter } from 'vue-router';
 import { useMessageStore } from 'stores/messageStore';
 import { useChannelStore } from 'stores/channelStore';
-import {useUserStore} from 'stores/userStore';
-import {useQuasar} from 'quasar';
+import { useUserStore } from 'stores/userStore';
+import { useQuasar } from 'quasar';
 
 export default {
   setup() {
@@ -19,12 +19,28 @@ export default {
     const channelStore = useChannelStore();
     const userStore = useUserStore();
     const $q = useQuasar()
-    return { channelStore, router, messageStore, userStore, $q };
+    return { channelStore, router, messageStore, userStore };
   },
   data() {
     return {
       message: '', // Define message in data()
     };
+  },
+
+  watch: {
+    // Watch for changes in the active channel
+    'channelStore.activeChannel': {
+      handler() {
+        // scroll to bottom of messages
+        this.$nextTick(() => {
+          const messageContainer = document.getElementById('message-container');
+          if (messageContainer) {
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+          }
+        });
+      },
+      immediate: true,
+    },
   },
   methods: {
     async sendMessage() {
@@ -35,14 +51,15 @@ export default {
       // Handle message when it's not a command (i.e., doesn't start with "/")
       if (this.message[0] !== '/' && this.channelStore.activeChannel) {
         // TODO: api call to send message
-        this.messageStore.addMessage(
+        this.messageStore.addMessageToActiveChannel(
           {
             id: this.userStore.user.id,
             username: this.userStore.user.username,
             content: this.message,
             byMe: true,
             taggedMe: false,
-          }
+          },
+          true
         )
       }
 
@@ -52,15 +69,25 @@ export default {
         const command = splitMessage[0].substring(1);
         const args = splitMessage.slice(1);
         let username;
-        let channelName;
-        if (!this.channelStore.activeChannel && command !== 'join') {
-          console.error('No channel to send message to');
+        let channelName: string;
+        if (!this.channelStore.activeChannel.name && command !== 'join') {
+          this.$q.notify('You are currently not in a channel');
           return;
         }
 
         switch (command) {
           case 'join':
             channelName = args[0];
+            // If the channel already exists, print an appropriate message
+            if (this.channelStore.channels.find(channel => channel.name === channelName)) {
+                this.$q.notify({
+                message: `You're already a member of ${channelName}`,
+                color: 'yellow',
+                textColor: 'black',
+                icon: 'warning'
+                });
+              return;
+            }
             this.$q.notify(`You have joined ${channelName}`)
             let isPrivate = args.length > 1 && args[1] === 'private';
             await this.channelStore.joinChannel(channelName, isPrivate);
@@ -70,11 +97,12 @@ export default {
             username = args[0];
             await this.channelStore.inviteUser(username);
             break;
-
+          case 'quit': //fallback for now, since for now they are the same
           case 'cancel':
-            channelName = args[0];
-            this.$q.notify(`You have left ${channelName}`)
-            await this.channelStore.leaveChannel(); //works for active channel so no params
+          case 'leave':
+            this.$q.notify(`You have left ${this.channelStore.activeChannel.name}`)
+            this.messageStore.clearActiveChannelMessages();
+            await this.channelStore.leaveActiveChannel(); //works for active channel so no params
             await this.router.push('/');
             break;
 
@@ -88,8 +116,11 @@ export default {
             const users = {
               'user1': 'online',
               'user2': 'away',
-              'user3': 'offline'};
-            this.messageStore.addMessage({
+              'user3': 'offline'
+            };
+            console.log('Adding users to message store');
+
+            this.messageStore.addMessageToActiveChannel({
               id: 0,
               username: 'system',
               content: 'Users in channel: ' + Object.entries(users)
@@ -97,7 +128,8 @@ export default {
                 .join(', '), // display users and their status
               byMe: false,
               taggedMe: false,
-            });
+            },
+            true);
             break;
           default:
             // Inform user that command is unknown

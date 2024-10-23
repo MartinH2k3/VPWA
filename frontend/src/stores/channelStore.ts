@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { api } from 'boot/api';
+import { useQuasar } from 'quasar';
 
 export interface Channel {
   id: number
@@ -27,23 +28,45 @@ export const useChannelStore = defineStore('channel', {
       // TODO implement the fetchChannels functionality
     },
     async joinChannel(channelName: string, isPrivate: boolean) {
+
+      // If that channel is already in the list, set it as active channel
+      const channel = this.channels.find(c => c.name === channelName)
+      if (channel) {
+        this.activeChannel = channel
+        return
+      }
+
       try {
-        const channel = (await api.post('/c/join', {
-          channelName,
-          private: isPrivate
-        })).data
+        // Generate a test channel for now
+        const channel = {
+          id: Math.random() * Number.MAX_SAFE_INTEGER,
+          name: channelName,
+          adminId: 1,
+          private: false,
+        }
+        // const channel = (await api.post('/c/join', {
+        //   channelName,
+        //   private: isPrivate
+        // })).data
         this.activeChannel = channel
         this.channels.unshift(channel)
       } catch (e) {
         console.error(e);
       }
     },
-    async leaveChannel() {
+    async leaveActiveChannel() {
+      if (!this.activeChannel.name) {
+        console.error('No active channel to leave');
+      }
+      this.leaveChannel(this.activeChannel.name);
+    },
+
+    async leaveChannel(channelName:string) {
       try {
         await api.post(`/c/${this.activeChannel.name}/cancel`)
         // remove channel based on name from store
-        this.removeChannel(this.activeChannel.name)
-        this.activeChannel = {}
+        this.removeChannel(channelName)
+        this.activeChannel = {} as Channel
       } catch (e) {
         console.error(e);
       }
@@ -64,8 +87,16 @@ export const useChannelStore = defineStore('channel', {
     },
     setActiveChannel(channel: Channel) {
       this.activeChannel = channel
+      // if the the channel has highlighted property, remove it
+      if (channel.highlighted) {
+        channel.highlighted = false
+      }
+      setTimeout(() => {
+        // Scroll 'html' to bottom
+        window.scrollTo(0, document.body.scrollHeight)
+      }, 0)
     },
-    addChannel(channel: Channel) {
+    addInvitedChannel(channel: Channel) {
       channel.highlighted = true
       this.channels.unshift(channel)
     },
@@ -75,9 +106,6 @@ export const useChannelStore = defineStore('channel', {
       if (index !== -1) {
         this.channels.splice(index, 1)
       }
-    },
-    async test() {
-      await api.post('/ws')
     }
   },
 });

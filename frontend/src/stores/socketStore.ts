@@ -48,7 +48,7 @@ const useSocketStore = defineStore('socket', {
       };
 
       this.socket.onmessage = (event) => {
-        console.log("Received message", event);
+        console.log('Received message', event);
         const data = JSON.parse(event.data);
         switch (data.category) {
           case 'newMessage':
@@ -61,7 +61,7 @@ const useSocketStore = defineStore('socket', {
             // TODO implement
             break;
           case 'addChannel':
-            channelStore.addChannel(data.message);
+            channelStore.addInvitedChannel(data.message);
             break;
           case 'removeChannel':
             channelStore.removeChannel(data.message.name);

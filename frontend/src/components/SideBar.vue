@@ -11,9 +11,19 @@
       @click="goToChannel(channel)"
       :class="{active: channel.id===activeChannel.id, highlighted: channel.highlighted}"
     >
-      <q-item-section>
-        {{ channel.name }}
-      </q-item-section>
+      <div class="row flex-row flex-nowrap" style="width: 100%;">
+        <span class="q-mr-auto flex items-center">
+          {{ channel.name }}</span>
+          <q-btn
+        flat
+        round
+        dense
+        icon="close"
+        class="q-ml-sm"
+        @click="leaveChannel(channel.name)"
+        />
+
+      </div>
     </q-item>
   </q-list>
 </template>
@@ -22,12 +32,14 @@
 import { defineComponent } from 'vue';
 import { useChannelStore, Channel } from 'stores/channelStore';
 import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'SideBar',
   setup() {
     const router = useRouter();
-    return {router};
+    const $q = useQuasar();
+    return {router, $q};
   },
   data() {
     return {
@@ -45,10 +57,38 @@ export default defineComponent({
   methods: {
     goToChannel(channel: Channel) {
       // this.router.push(`/c/${channel.name}`);
-      console.log('goToChannel', channel);
       this.channelStore.setActiveChannel(channel);
-      console.log('activeChannel', this.channelStore.activeChannel);
+    },
+
+    async leaveChannel(channelName: string) {
+
+      // Make a confirm alert
+      let confirm : boolean =  window.confirm('Do you really wanna leave ' + channelName + '?');
+      if(!confirm) return;
+
+      await this.channelStore.leaveChannel(channelName);
+      // Notify
+      this.$q.notify({
+        message: 'You have left ' + channelName,
+        color: 'negative',
+        position: 'bottom',
+        timeout: 2000
+      });
     }
+
+  },
+  mounted() {
+    setInterval(() => {
+      const channelName = Math.random().toString(36).substring(7);
+      this.channelStore.addInvitedChannel({
+        id: Math.random() * Number.MAX_SAFE_INTEGER,
+        name: channelName,
+        adminId: 1,
+        private: false, // or set this to `isPrivate` if available
+        highlighted: true
+      });
+      this.$q.notify({'message':'You have been invited to channel ' + channelName})
+    }, 30000); // every 30 seconds
   }
 });
 
