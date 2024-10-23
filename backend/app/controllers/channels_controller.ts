@@ -4,6 +4,18 @@ import { ActiveSocket } from '#start/ws'
 import User from '#models/user'
 
 export default class ChannelsController {
+  async index({ auth }: HttpContext) {
+    const userId = auth.user!.id
+    if (!userId) {
+      return []
+    }
+    const channels = await Channel.query().whereHas('members', (query) => {
+      query.where('user_id', userId)
+    }).orderBy('created_at', 'desc');
+
+    return channels
+  }
+
   async join({ request, auth, response }: HttpContext) {
     const { channelName, isPrivate } = request.only(['channelName', 'isPrivate'])
     const userId = auth.user?.id

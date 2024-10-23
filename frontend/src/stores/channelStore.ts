@@ -8,6 +8,7 @@ export interface Channel {
   adminId: number
   private: boolean
   highlighted?: boolean
+  currentlyTyping: string[]
 }
 
 export const useChannelStore = defineStore('channel', {
@@ -25,7 +26,11 @@ export const useChannelStore = defineStore('channel', {
   },
   actions: {
     async fetchChannels() {
-      // TODO implement the fetchChannels functionality
+      try {
+        this.channels = (await api.get('/c')).data
+      } catch (e) {
+        console.error(e);
+      }
     },
     async joinChannel(channelName: string, isPrivate: boolean) {
 
@@ -37,17 +42,10 @@ export const useChannelStore = defineStore('channel', {
       }
 
       try {
-        // Generate a test channel for now
-        const channel = {
-          id: Math.random() * Number.MAX_SAFE_INTEGER,
-          name: channelName,
-          adminId: 1,
-          private: false,
-        }
-        // const channel = (await api.post('/c/join', {
-        //   channelName,
-        //   private: isPrivate
-        // })).data
+        const channel = (await api.post('/c/join', {
+          channelName,
+          private: isPrivate
+        })).data
         this.activeChannel = channel
         this.channels.unshift(channel)
       } catch (e) {
