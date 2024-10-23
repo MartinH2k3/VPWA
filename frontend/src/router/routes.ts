@@ -7,12 +7,11 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    // so it works for testing
-    // beforeEnter: async () => {
-    //   try {
-    //     await api.get('/auth');
-    //   } catch { return '/login' }
-    // },
+    beforeEnter: async () => {
+      try {
+        await api.get('/auth');
+      } catch { return '/login' }
+    },
   },
   {
     path: '/login',

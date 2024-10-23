@@ -89,18 +89,6 @@ export default {
   methods: {
     async login() {
 
-      // Just act as if the user is already logged in
-      this.userStore.setActiveUser({
-        id: 1,
-        username: 'test',
-        email: '',
-        firstName: '',
-        lastName: '',
-      });
-      await this.router.push('/');
-      return;
-
-
       // can't login if already logged in
       try {
         const sessionResponse = await api.get('/auth');
