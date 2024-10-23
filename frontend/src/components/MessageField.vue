@@ -51,16 +51,7 @@ export default {
       // Handle message when it's not a command (i.e., doesn't start with "/")
       if (this.message[0] !== '/' && this.channelStore.activeChannel) {
         // TODO: api call to send message
-        this.messageStore.addMessageToActiveChannel(
-          {
-            id: this.userStore.user.id,
-            username: this.userStore.user.username,
-            content: this.message,
-            byMe: true,
-            taggedMe: false,
-          },
-          true
-        )
+        this.messageStore.sendMessage(this.channelStore.activeChannel.name, this.message);
       }
 
       // Handle message commands
@@ -80,12 +71,12 @@ export default {
             channelName = args[0];
             // If the channel already exists, print an appropriate message
             if (this.channelStore.channels.find(channel => channel.name === channelName)) {
-                this.$q.notify({
+              this.$q.notify({
                 message: `You're already a member of ${channelName}`,
                 color: 'yellow',
                 textColor: 'black',
                 icon: 'warning'
-                });
+              });
               return;
             }
             this.$q.notify(`You have joined ${channelName}`)
@@ -129,7 +120,7 @@ export default {
               byMe: false,
               taggedMe: false,
             },
-            true);
+              true);
             break;
           default:
             // Inform user that command is unknown
