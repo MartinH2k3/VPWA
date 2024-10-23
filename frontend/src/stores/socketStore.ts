@@ -7,10 +7,9 @@ interface SocketState {
   isConnected: boolean;
 }
 
-interface Message {
+interface SocketMessage {
   event: string;
-  cookies: string;
-  message: any;
+  data: any;
 }
 
 const URL = 'ws://127.0.0.1:9594';
@@ -47,26 +46,26 @@ const useSocketStore = defineStore('socket', {
         this.sendMessage('auth', { token });
       };
 
-      this.socket.onmessage = (event) => {
-        console.log('Received message', event);
-        const data = JSON.parse(event.data);
-        switch (data.category) {
-          case 'newMessage':
-            // TODO implement
-            break;
-          case 'notification':
-            // TODO implement
-            break;
-          case 'messageDraft':
-            // TODO implement
-            break;
-          case 'addChannel':
-            channelStore.addInvitedChannel(data.message);
-            break;
-          case 'removeChannel':
-            channelStore.removeChannel(data.message.name);
-            break;
-        }
+      this.socket.onmessage = (message) => {
+        console.log('Received message', message);
+        // const socketMessage: SocketMessage = JSON.parse(message.data);
+        // switch (message.event) {
+        //   case 'newMessage':
+        //     // TODO implement
+        //     break;
+        //   case 'notification':
+        //     // TODO implement
+        //     break;
+        //   case 'messageDraft':
+        //     // TODO implement
+        //     break;
+        //   case 'addChannel':
+        //     channelStore.addInvitedChannel(data.message);
+        //     break;
+        //   case 'removeChannel':
+        //     channelStore.removeChannel(data.message.name);
+        //     break;
+        // }
       };
 
       this.socket.onclose = () => {
@@ -87,10 +86,10 @@ const useSocketStore = defineStore('socket', {
         this.socket = null;
       }
     },
-    sendMessage(event: string, message: any) {
+    sendMessage(event: string, data: any) {
       if (this.socket && this.isConnected) {
         const cookies = document.cookie;
-        const payload: Message = { event, cookies, message };
+        const payload: SocketMessage = { event, data };
         this.socket.send(JSON.stringify(payload));
       }
     },

@@ -71,9 +71,14 @@ export default defineComponent({
     },
   },
   methods: {
-    paginateMessages(index: number, done: () => void) {
-      this.messageStore.fetchActiveChannelMessages(this.limit, this.cursor);
-      done();
+    async paginateMessages(index: number, done: () => void) {
+      if (this.messageStore.fetchingMessages || this.messageStore.activeChannelMessagesInfo?.reachedTop) {
+        setTimeout(() => done(), 1000);
+        return;
+      }
+      await this.messageStore.fetchActiveChannelMessages(this.limit, this.cursor);
+      done()
+      // setTimeout(() => done(), 1000);
     },
 
     async inspectUser(username: string, event: MouseEvent) {
