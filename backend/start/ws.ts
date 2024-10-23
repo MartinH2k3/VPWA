@@ -11,13 +11,9 @@ const wss = new WebSocketServer({ server })
 export interface ActiveSocket {
   user: User
   token: string
-  getMessage: (message: any, channel: Channel) => void //TODO type Message
-  addChannel: (channel: Channel) => void
-  removeChannel: (channel: Channel) => void
-  sendNotification: (notification: any) => void //TODO type Notification
 }
 
-;(global as any).activeSockets = [] as ActiveSocket[]
+; (global as any).activeSockets = [] as ActiveSocket[]
 
 interface SocketData {
   event: string
@@ -47,23 +43,11 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
         }
         console.log('Authenticated', activeSocket.user.username)
         user = activeSocket.user
-
-        activeSocket.send = () => {
-          ws.send(JSON.stringify({ category: 'newMessage', message: 'blah blah blah' }))
-        }
-
-        activeSocket.addChannel = (channel: Channel) => {
-          ws.send(JSON.stringify({ category: 'addChannel', message: channel }))
-        }
-
-        activeSocket.removeChannel = (channel: Channel) => {
-          ws.send(JSON.stringify({ category: 'removeChannel', message: channel }))
-        }
-
-        activeSocket.sendNotification = (notification: any) => {
-          ws.send(JSON.stringify({ category: 'notification', message: notification }))
-        }
         break
+
+      case 'message':
+
+        break;
 
       default:
         console.log(user?.username, event, message)
@@ -80,7 +64,7 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
       (socket: ActiveSocket) => socket.user.id === user?.id
     )
     if (index !== -1) {
-      ;(global as any).activeSockets.splice(index, 1)
+      ; (global as any).activeSockets.splice(index, 1)
     }
     console.log('Disconnected', user?.username)
   })
@@ -90,7 +74,7 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
       (socket: ActiveSocket) => socket.user.id === user?.id
     )
     if (index !== -1) {
-      ;(global as any).activeSockets.splice(index, 1)
+      ; (global as any).activeSockets.splice(index, 1)
     }
     console.error('WebSocket error:', error)
   })
@@ -99,3 +83,6 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
 server.listen(9594, () => {
   console.log('Server is listening on port 9594')
 })
+
+
+
