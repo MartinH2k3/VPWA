@@ -85,8 +85,8 @@ export const useChannelStore = defineStore('channel', {
         console.error(e);
       }
     },
-    setActiveChannel(channel: Channel) {
-      this.activeChannel = channel
+    setActiveChannel(chanelName: string) {
+      const channel = this.activeChannel = this.channels.find(c => c.name === chanelName) || {} as Channel
       // if the the channel has highlighted property, remove it
       if (channel.highlighted) {
         channel.highlighted = false

@@ -79,7 +79,8 @@ export default {
   mounted() {
     // connect through socket store
     this.socketStore.connect()
-    this.channelStore.setActiveChannel(this.channelStore.channels[0])
+    if(this.channelStore.channels.length > 0)
+    this.channelStore.setActiveChannel(this.channelStore.channels[0].name)
 
   },
   methods: {
@@ -88,7 +89,7 @@ export default {
     },
     async logout() {
       try {
-        await api.post('/logout');
+        // await api.post('/logout');
         await this.router.push('/login');
       } catch (e) {
         console.error(e);

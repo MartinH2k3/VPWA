@@ -65,7 +65,7 @@ export default defineComponent({
   methods: {
     goToChannel(channel: Channel) {
       // this.router.push(`/c/${channel.name}`);
-      this.channelStore.setActiveChannel(channel);
+      this.channelStore.setActiveChannel(channel.name);
     },
 
     async leaveChannel(channelName: string) {
@@ -86,17 +86,6 @@ export default defineComponent({
 
   },
   mounted() {
-    setInterval(() => {
-      const channelName = Math.random().toString(36).substring(7);
-      this.channelStore.addInvitedChannel({
-        id: Math.random() * Number.MAX_SAFE_INTEGER,
-        name: channelName,
-        adminId: 1,
-        private: false, // or set this to `isPrivate` if available
-        highlighted: true
-      });
-      this.$q.notify({'message':'You have been invited to channel ' + channelName})
-    }, 30000); // every 30 seconds
   }
 });
 
