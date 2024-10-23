@@ -58,10 +58,10 @@ export default defineComponent({
       return this.messageStore.activeChannelMessages;
     },
     currentlyTyping() {
-      if (!this.channelStore.activeChannel.name) {
+      if (!this.channelStore.activeChannel.currentlyTyping) {
         return [];
       }
-      return ['bob', 'alice'] as string[]
+      return [] as string[]
     },
   },
   watch: {
