@@ -96,6 +96,6 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
   })
 })
 
-server.listen(3334, () => {
-  console.log('Server is listening on port 3334')
+server.listen(9594, () => {
+  console.log('Server is listening on port 9594')
 })

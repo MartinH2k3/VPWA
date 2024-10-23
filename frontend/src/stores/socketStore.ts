@@ -13,7 +13,7 @@ interface Message {
   message: any;
 }
 
-const URL = 'ws://127.0.0.1:3334';
+const URL = 'ws://127.0.0.1:9594';
 
 const useSocketStore = defineStore('socket', {
   state: (): SocketState => ({
