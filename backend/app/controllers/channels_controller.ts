@@ -1,6 +1,7 @@
 import { HttpContext } from '@adonisjs/core/http'
-import Channel from '#models/channel'
 import { ActiveSocket } from '#start/ws'
+import Channel from '#models/channel'
+import Message from '#models/message'
 import User from '#models/user'
 
 export default class ChannelsController {
@@ -225,6 +226,19 @@ export default class ChannelsController {
       console.log(e)
       return response.badRequest(e)
     }
+  }
+
+
+  async messages({ params, request, response }: HttpContext) {
+
+    const { channelName } = params
+    const { limit, cursor } = request.only(['limit', 'cursor'])
+    const channel = await Channel.findBy('name', channelName)
+    if (!channel) {
+      return response.notFound({ message: 'Channel not found' })
+    }
+    const messages = await Message.query().where('channel_id', channel.id).orderBy('created_at', 'desc').limit(limit).offset(cursor)
+    return messages
   }
 
   async test({ auth }: HttpContext) {
