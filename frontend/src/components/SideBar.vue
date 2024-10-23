@@ -85,8 +85,9 @@ export default defineComponent({
     }
 
   },
-  mounted() {
-    this.channelStore.fetchChannels();
+  async mounted() {
+    await this.channelStore.fetchChannels();
+    this.channelStore.setActiveChannel(this.channelStore.channels[0].name);
   }
 });
 
