@@ -4,7 +4,15 @@
       Channels
     </q-item-label>
     <hr style="width:90%; opacity:0.5">
-    <q-item
+
+    <q-item v-if="channels.length === 0">
+      <q-item-section>
+        <q-item-label>
+          No channels available
+        </q-item-label>
+      </q-item-section>
+    </q-item>
+    <q-item v-else
       clickable
       v-for="channel in channels"
       :key="channel.id"
@@ -20,7 +28,7 @@
         dense
         icon="close"
         class="q-ml-sm"
-        @click="leaveChannel(channel.name)"
+        @click="leaveChannel(channel.name )"
         />
 
       </div>
