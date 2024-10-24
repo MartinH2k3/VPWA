@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia';
 import { api } from 'boot/api';
 import { useQuasar } from 'quasar';
+import { useSocketStore } from './socketStore';
 
+let socketStore = useSocketStore()
 
 interface ChannelMember {
   id: number;
@@ -38,6 +40,13 @@ export const useChannelStore = defineStore('channel', {
     clear() {
       this.channels = []
       this.activeChannel = {} as Channel
+    },
+    findUserInChannel(channelName: string, username: string) {
+      const channel = this.channels.find(c => c.name === channelName)
+      if (!channel) {
+        return null
+      }
+      return channel.members.find(m => m.username === username)
     },
     async fetchChannels() {
       try {
@@ -113,6 +122,12 @@ export const useChannelStore = defineStore('channel', {
 
       // Fetch members of the channel
       await this.fetchChannelMembers(chanelName)
+
+      // Set an interval to notify the server that the channel is active only if the websocket is not connected
+      if (socketStore.isAuthenticated) {
+        socketStore.sendMessage('update_active_channel', { channelName: chanelName });
+      }
+
       this.activeChannel = channel
 
 

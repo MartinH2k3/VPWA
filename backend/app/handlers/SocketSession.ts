@@ -2,10 +2,12 @@ import WebSocket from 'ws'
 import Channel from '#models/channel'
 import Message from '#models/message'
 import User from '#models/user'
+import { socketSessions } from '../globals.js';
 export default class SocketSession {
 
   user: User;
   ws: WebSocket;
+  activeChannelName: string | null = null
 
   // constructor
   constructor(ws: WebSocket, user: User) {
@@ -13,11 +15,31 @@ export default class SocketSession {
     this.user = user
   }
 
-  receiveMessage(event: string, data: any) {
+  async receiveMessage(event: string, data: any) {
     switch (event) {
       case 'message':
-        this.createMessage(data.message, data.channelName)
+        if (!data.message || !data.channelName) {
+          console.error('Invalid message')
+          return
+        }
+        await this.createMessage(data.message, data.channelName)
+
+        // Add message to all users in the channel
+        console.log('Sending message to all users in the channel')
+
+        socketSessions.getWithActiveChannel(data.channelName).forEach(session => {
+          if (session == this) return;
+          console.log('Sending message to', session.user.username)
+          session.send('add_message', { message: data.message, channelName: data.channelName, userId: this.user.id })
+        })
         break
+
+      case 'update_active_channel':
+        this.activeChannelName = data.channelName
+        console.log('Updated active channel for', this.user.username, 'to', this.activeChannelName)
+
+        break
+
       case 'get_message':
         this.getMessage(data.message, data.channel)
         break
@@ -59,16 +81,16 @@ export default class SocketSession {
 
   }
   addChannel(channel: Channel) {
-    this.send('addChannel', channel)
+    this.send('add_channel', channel)
   }
   kick(channel: Channel) {
     this.send('kick', channel)
   }
   removeChannel(channel: Channel) {
-    this.send('removeChannel', channel)
+    this.send('remove_channel', channel)
   }
   sendNotification(notification: any) {
-    this.send('sendNotification', notification)
+    this.send('notification', notification)
   }
 
 

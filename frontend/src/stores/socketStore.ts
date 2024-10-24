@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia';
 import { api } from 'boot/api';
 import { useChannelStore } from 'stores/channelStore';
+import { useMessageStore } from 'stores/messageStore';
 
 interface SocketState {
   socket: WebSocket | null;
   isConnected: boolean;
+  isAuthenticated: boolean;
 }
 
 interface SocketMessage {
@@ -18,6 +20,7 @@ const useSocketStore = defineStore('socket', {
   state: (): SocketState => ({
     socket: null,
     isConnected: false,
+    isAuthenticated: false
   }),
   actions: {
     async connect() {
@@ -25,6 +28,7 @@ const useSocketStore = defineStore('socket', {
       // MAke a request to authWS
       let token: string | null = null;
       const channelStore = useChannelStore();
+      const messageStore = useMessageStore();
       try {
         const response = await api.get('/authWS');
         token = response.data;
@@ -57,20 +61,35 @@ const useSocketStore = defineStore('socket', {
             this.disconnect();
             this.connect();
             break;
-          case 'newMessage':
-            // TODO implement
+          case 'add_message':
+            console.log('Adding message to store', socketMessage.data);
+            // Find the user
+            let user = channelStore.findUserInChannel(socketMessage.data.channelName, socketMessage.data.userId);
+            if (!user) {
+              console.error('User not found');
+              return;
+            }
+            let messageData = messageStore.makeMessage(socketMessage.data.user_id, socketMessage.data.message);
+            messageStore.addMessage(socketMessage.data.channelName, messageData, true);
             break;
           case 'notification':
             // TODO implement
             break;
-          case 'messageDraft':
+          case 'message_draft':
             // TODO implement
             break;
-          case 'addChannel':
+          case 'add_channel':
             channelStore.addInvitedChannel(socketMessage.data);
             break;
-          case 'removeChannel':
+          case 'remove_channel':
             channelStore.removeChannel(socketMessage.data.name);
+            break;
+          case 'ack_auth':
+            this.isAuthenticated = true;
+            // If a channel is active, notify the server
+            if (channelStore.activeChannel.name) {
+              this.sendMessage('update_active_channel', { channelName: channelStore.activeChannel.name });
+            }
             break;
         }
       };
@@ -87,6 +106,22 @@ const useSocketStore = defineStore('socket', {
         this.isConnected = false;
       };
     },
+
+    async waitTillConnected() {
+      return new Promise((resolve) => {
+        if (this.isConnected) {
+          resolve(true);
+        } else {
+          const interval = setInterval(() => {
+            if (this.isConnected) {
+              clearInterval(interval);
+              resolve(true);
+            }
+          }, 1000);
+        }
+      });
+    },
+
     //TODO add comments
     disconnect() {
       if (this.socket) {

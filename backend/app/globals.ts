@@ -7,6 +7,9 @@ interface PendingWebSocketAuthentificationRequest {
 }
 
 class SocketSessions extends Array<SocketSession> {
+  getWithActiveChannel(channelName: string) {
+    return this.filter(session => session.activeChannelName === channelName)
+  }
   get(userId: number) {
     return this.find(session => session.user.id === userId)
   }

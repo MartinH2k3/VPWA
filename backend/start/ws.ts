@@ -19,7 +19,6 @@ interface SocketData {
 wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
   console.log('A new connection')
   let socketSession: SocketSession
-  // function updateChannels() {
 
   ws.on('message', (message: WebSocket.Data) => {
     const parsedMessage: SocketData = JSON.parse(message.toString())
@@ -40,6 +39,10 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
       // Remove the request from pendingAuthentificationRequests
       const index = pendingAuthentificationRequests.indexOf(authRequest)
       if (index !== -1) pendingAuthentificationRequests.splice(index, 1)
+
+      socketSessions.push(socketSession)
+
+      socketSession.send('ack_auth', {})
       return
     }
     if (!socketSession?.user) {

@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { api } from 'boot/api';
 
 import { useChannelStore } from './channelStore';
-import { useUserStore } from './userStore';
+import { useUserStore, User } from './userStore';
 import { useSocketStore } from './socketStore';
 import { useQuasar } from 'quasar';
 const channelStore = useChannelStore();
@@ -27,12 +27,29 @@ export const useMessageStore = defineStore('message', {
       this.messages = {};
       this.channelMessagesInfo = {};
     },
+    makeMessage(user: User, message: string): Message {
+      return {
+        id: user.id,
+        username: user.username,
+        content: message,
+        byMe: user.id === userStore.user.id,
+        taggedMe: message.includes(`@${userStore.getUsername}`)
+      }
+    },
     addMessage(channelName: string, message: Message, toFront: boolean) {
       if (!this.messages[channelName]) {
         this.messages[channelName] = [];
       }
       if (toFront) {
+        // If the scroll is at the bottom, scroll to the bottom
+        const htmlEl = window.document.querySelector('html')
+        if (htmlEl && htmlEl.scrollTop + htmlEl.clientHeight >= htmlEl.scrollHeight - 10) {
+          setTimeout(() => {
+            htmlEl.scrollTop = htmlEl.scrollHeight
+          }, 0);
+        }
         this.messages[channelName].unshift(message);
+
       } else {
         this.messages[channelName].push(message);
       }
@@ -61,9 +78,10 @@ export const useMessageStore = defineStore('message', {
       console.log('Sending message', message);
 
       socketStore.sendMessage('message', {
-        channel: channelName,
+        channelName: channelName,
         message: message
       });
+
 
       // Add message to local store
       this.addMessage(channelName, {
