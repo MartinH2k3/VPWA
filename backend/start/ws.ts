@@ -4,29 +4,22 @@ import { IncomingMessage } from 'node:http'
 import { createServer } from 'node:http'
 import WebSocket from 'ws'
 import { WebSocketServer } from 'ws'
-import WebSocketController from '#controllers/web_socket_controller'
+import SocketSession from '../app/handlers/SocketSession.js'
+import { pendingAuthentificationRequests, socketSessions } from '../app/globals.js'
 
 const server = createServer()
 const wss = new WebSocketServer({ server })
-
-export interface ActiveSocket {
-  user: User
-  token: string
-  activeChannelId: number | null
-  send: (event: string, data: any) => void
-}
-
-; (global as any).activeSockets = [] as ActiveSocket[]
 
 interface SocketData {
   event: string
   data: any
 }
 
+
 wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
   console.log('A new connection')
   let user: User | null = null
-  let activeSocket: ActiveSocket
+  let socketSession: SocketSession
   // function updateChannels() {
 
   ws.on('message', (message: WebSocket.Data) => {
@@ -36,62 +29,48 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
 
     if (event == 'auth') {
       // Find token in activeSockets
-      activeSocket = (global as any).activeSockets.find(
-        (socket: ActiveSocket) => socket.token === data.token
+      let authRequest = pendingAuthentificationRequests.find(
+        (request) => request.token === request.token
       )
-      if (!activeSocket) {
+      if (!authRequest) {
         console.error('Invalid token')
         return
       }
-      console.log('Authenticated', activeSocket.user.username)
-      user = activeSocket.user
-      activeSocket.send = function (event: string, data: any) {
-        ws.send(JSON.stringify({ event, data }))
-      }
+      socketSession = new SocketSession(ws, authRequest.user)
+      console.log('Authenticated', socketSession.user.username)
+      // Remove the request from pendingAuthentificationRequests
+      const index = pendingAuthentificationRequests.indexOf(authRequest)
+      if (index !== -1) pendingAuthentificationRequests.splice(index, 1)
+      return
     }
-    if (!user) {
+    if (!socketSession?.user) {
       console.error('User not authenticated')
+      ws.send(JSON.stringify({ event: 'unauthenticated', data: {} }))
       return
     }
 
-    switch (event) {
-
-
-      case 'sendMessage':
-
-        console.log('Received message', data);
-
-        WebSocketController.sendMessage(activeSocket, data.message, data.channel)
-
-        break;
-
-      default:
-        console.log(user?.username, event, message)
-        // Send ack reply
-        ws.send(JSON.stringify({ event: 'ack', data: 'Message received' }))
-
-        break
-    }
+    socketSession.receiveMessage(event, data)
   })
 
   ws.on('close', () => {
     //remove user from activeSockets
-    const index = (global as any).activeSockets.findIndex(
-      (socket: ActiveSocket) => socket.user.id === user?.id
+    const index = pendingAuthentificationRequests.findIndex(
+      (request) => request.user.id === socketSession?.user?.id
     )
     if (index !== -1) {
-      ; (global as any).activeSockets.splice(index, 1)
+      pendingAuthentificationRequests.splice(index, 1)
     }
-    console.log('Disconnected', user?.username)
+    socketSessions.splice(socketSessions.indexOf(socketSession), 1)
+    console.log('Disconnected', socketSession?.user?.username)
   })
 
   ws.on('error', (error) => {
-    const index = (global as any).activeSockets.findIndex(
-      (socket: ActiveSocket) => socket.user.id === user?.id
+    const index = pendingAuthentificationRequests.findIndex(
+      (request) => request.user.id === socketSession?.user?.id
     )
-    if (index !== -1) {
-      ; (global as any).activeSockets.splice(index, 1)
-    }
+    if (index !== -1)
+      pendingAuthentificationRequests.splice(index, 1)
+
     console.error('WebSocket error:', error)
   })
 })

@@ -48,29 +48,38 @@ const useSocketStore = defineStore('socket', {
 
       this.socket.onmessage = (message) => {
         console.log('Received message', message);
-        // const socketMessage: SocketMessage = JSON.parse(message.data);
-        // switch (message.event) {
-        //   case 'newMessage':
-        //     // TODO implement
-        //     break;
-        //   case 'notification':
-        //     // TODO implement
-        //     break;
-        //   case 'messageDraft':
-        //     // TODO implement
-        //     break;
-        //   case 'addChannel':
-        //     channelStore.addInvitedChannel(data.message);
-        //     break;
-        //   case 'removeChannel':
-        //     channelStore.removeChannel(data.message.name);
-        //     break;
-        // }
+        const socketMessage: SocketMessage = JSON.parse(message.data);
+
+        switch (socketMessage.event) {
+          case 'unauthenticated':
+            console.error('Unauthenticated');
+            // close the connection and try to reconnect again
+            this.disconnect();
+            this.connect();
+            break;
+          case 'newMessage':
+            // TODO implement
+            break;
+          case 'notification':
+            // TODO implement
+            break;
+          case 'messageDraft':
+            // TODO implement
+            break;
+          case 'addChannel':
+            channelStore.addInvitedChannel(socketMessage.data);
+            break;
+          case 'removeChannel':
+            channelStore.removeChannel(socketMessage.data.name);
+            break;
+        }
       };
 
       this.socket.onclose = () => {
         this.isConnected = false;
         console.log('Disconnected from', URL);
+        // Reconnect
+        this.connect();
       };
 
       this.socket.onerror = (error) => {

@@ -1,6 +1,9 @@
 import User from '#models/user'
 import { HttpContext } from '@adonisjs/core/http'
+import { pendingAuthentificationRequests } from '../globals.js'
 //import { ActiveSocket } from '#start/ws'
+
+
 
 export default class AuthController {
   async register({ request, auth, response }: HttpContext) {
@@ -60,7 +63,7 @@ export default class AuthController {
       Date.now().toString(36) +
       Math.random().toString(36).substr(2)
 
-    ;(global as any).activeSockets.push({ user: auth.user, token })
+    pendingAuthentificationRequests.push({ user: auth.user, token })
     return response.ok(token)
   }
 }

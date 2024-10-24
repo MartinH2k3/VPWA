@@ -56,7 +56,7 @@ export const useMessageStore = defineStore('message', {
       // Send message to server
       console.log('Sending message', message);
 
-      socketStore.sendMessage('sendMessage', {
+      socketStore.sendMessage('message', {
         channel: channelName,
         message: message
       });
