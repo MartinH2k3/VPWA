@@ -4,8 +4,10 @@
       <q-page class="column flex-center text-center">
         <img alt="logo" width="86px" class='q-mb-sm' src="logo.svg">
         <q-form v-if="isLogin" @submit.prevent="login" class="custom-form">
-          <q-input v-model="email" label="Email" :rules="[val => /.+@.+\..+/.test(val) || 'Please enter a valid email address']"/>
-          <q-input v-model="password" label="Password" type="password" :rules="[val => !!val || 'Password is required']"/>
+          <q-input v-model="email" label="Email"
+            :rules="[val => /.+@.+\..+/.test(val) || 'Please enter a valid email address']" />
+          <q-input v-model="password" label="Password" type="password"
+            :rules="[val => !!val || 'Password is required']" />
           <q-btn label="Login" type="submit" />
           <pre v-if="warning" class="text-negative">{{ warning }}</pre>
 
@@ -50,6 +52,8 @@
 <script lang="ts">
 import { useRouter } from 'vue-router';
 import { useUserStore } from 'stores/userStore';
+import { useChannelStore } from 'stores/channelStore';
+import { useMessageStore } from 'stores/messageStore';
 import { api } from 'boot/api';
 
 export default {
@@ -68,7 +72,9 @@ export default {
   setup() {
     const router = useRouter();
     const userStore = useUserStore();
-    return { router, userStore }
+    const channelStore = useChannelStore();
+    const messageStore = useMessageStore();
+    return { router, userStore, channelStore, messageStore };
   },
 
   props: {
@@ -87,6 +93,12 @@ export default {
   },
 
   methods: {
+
+    clearStore() {
+      this.channelStore.clear();
+      this.messageStore.clear();
+    },
+
     async login() {
 
       // can't login if already logged in
