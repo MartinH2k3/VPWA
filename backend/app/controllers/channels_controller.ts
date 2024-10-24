@@ -84,7 +84,7 @@ export default class ChannelsController {
         return response.badRequest({ message: 'You are banned from the channel' })
       }
       await channel?.related('members').detach([userId])
-      const socketSession = socketSessions.get(member.id)
+      const socketSession = socketSessions.get(userId)
       if (socketSession) {
         socketSession.removeChannel(channel)
       }
@@ -189,7 +189,7 @@ export default class ChannelsController {
           )
 
           // adding channel to user's active channels
-          const socketSession = socketSessions.get(member.id)
+          const socketSession = socketSessions.get(invitedUser.id)
           if (socketSession) {
             socketSession.addChannel(channel)
           }
@@ -207,7 +207,7 @@ export default class ChannelsController {
       await channel.related('members').attach([invitedUser.id])
 
       // adding channel to user's active channels
-      const socketSession = socketSessions.get(member.id)
+      const socketSession = socketSessions.get(invitedUser.id)
       if (socketSession) {
         socketSession.addChannel(channel)
       }
@@ -234,7 +234,7 @@ export default class ChannelsController {
 
   async test({ auth }: HttpContext) {
     const userId = 1
-    const socketSession = socketSessions.get(member.id)
+    const socketSession = socketSessions.get(userId)
     if (socketSession) {
       socketSession.addChannel({
         id: Math.random() * Number.MAX_SAFE_INTEGER,
