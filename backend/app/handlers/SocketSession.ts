@@ -56,16 +56,19 @@ export default class SocketSession {
 
   getMessage(message: any, channel: Channel) {
 
-  } //TODO type Message
+  }
   addChannel(channel: Channel) {
-
+    this.send('addChannel', channel)
+  }
+  kick(channel: Channel) {
+    this.send('kick', channel)
   }
   removeChannel(channel: Channel) {
-
+    this.send('removeChannel', channel)
   }
   sendNotification(notification: any) {
-
-  } //TODO type Notification
+    this.send('sendNotification', notification)
+  }
 
 
   send(event: string, data: any) {

@@ -1,5 +1,5 @@
 import { HttpContext } from '@adonisjs/core/http'
-import { ActiveSocket } from '#start/ws'
+import { socketSessions } from '../globals.js'
 import Channel from '#models/channel'
 import Message from '#models/message'
 import User from '#models/user'
@@ -67,11 +67,9 @@ export default class ChannelsController {
         const members = await channel.related('members').query()
         // for all sockets, remove the channel
         for (const member of members) {
-          const activeSocket = (global as any).activeSockets.find(
-            (socket: ActiveSocket) => socket.user.id === member.id
-          )
-          if (activeSocket) {
-            activeSocket.removeChannel(channel)
+          const socketSession = socketSessions.get(member.id)
+          if (socketSession) {
+            socketSession.removeChannel(channel)
           }
         }
         channel?.delete()
@@ -86,11 +84,9 @@ export default class ChannelsController {
         return response.badRequest({ message: 'You are banned from the channel' })
       }
       await channel?.related('members').detach([userId])
-      const activeSocket = (global as any).activeSockets.find(
-        (socket: ActiveSocket) => socket.user.id === userId
-      )
-      if (activeSocket) {
-        activeSocket.removeChannel(channel)
+      const socketSession = socketSessions.get(member.id)
+      if (socketSession) {
+        socketSession.removeChannel(channel)
       }
       return response.ok(`Successfully left the channel ${channel?.name}`)
     } catch (e) {
@@ -108,23 +104,24 @@ export default class ChannelsController {
     try {
       const kickedUser = await User.findBy('username', username)
       const channel = await Channel.findBy('name', channelName)
-      if (!kickedUser || !channel) {
+      if (!kickedUser || !channel)
         return response.notFound({ message: 'Invalid request' })
-      }
+
       const pivotRow = await channel
         .related('members')
         .pivotQuery()
         .where('user_id', kickedUser.id)
         .first()
-      if (!pivotRow) {
+
+      if (!pivotRow)
         return response.notFound({ message: 'User is not a member of the channel' })
-      }
-      if (channel.adminId === kickedUser.id) {
+
+      if (channel.adminId === kickedUser.id)
         return response.badRequest({ message: 'Admin cannot be kicked' })
-      }
+
+
       const kickVotes = pivotRow.kick_votes
       if (kickVotes >= 2 || channel.adminId === userId) {
-        // TODO notify the user that got kicked
         // Set the user as banned in the pivot table
         await channel.related('members').sync(
           {
@@ -135,11 +132,9 @@ export default class ChannelsController {
           false // true means rewriting pivot table, false means updating
         )
         // TODO notify the user that got kicked
-        const activeSocket = (global as any).activeSockets.find(
-          (socket: ActiveSocket) => socket.user.id === kickedUser.id
-        )
-        if (activeSocket) {
-          activeSocket.removeChannel(channel)
+        const socketSession = socketSessions.get(kickedUser.id)
+        if (socketSession) {
+          socketSession.kick(channel)
         }
         return response.ok({ message: `${username} has been banned from the channel` })
       } else {
@@ -194,11 +189,9 @@ export default class ChannelsController {
           )
 
           // adding channel to user's active channels
-          const activeSocket = (global as any).activeSockets.find(
-            (socket: ActiveSocket) => socket.user.id === invitedUser.id
-          )
-          if (activeSocket) {
-            activeSocket.addChannel(channel)
+          const socketSession = socketSessions.get(member.id)
+          if (socketSession) {
+            socketSession.addChannel(channel)
           }
 
           return response.ok({ message: `${username} has been unbanned from the channel` })
@@ -214,11 +207,9 @@ export default class ChannelsController {
       await channel.related('members').attach([invitedUser.id])
 
       // adding channel to user's active channels
-      const activeSocket = (global as any).activeSockets.find(
-        (socket: ActiveSocket) => socket.user.id === invitedUser.id
-      )
-      if (activeSocket) {
-        activeSocket.addChannel(channel)
+      const socketSession = socketSessions.get(member.id)
+      if (socketSession) {
+        socketSession.addChannel(channel)
       }
 
       return response.ok({ message: `${username} has been invited to the channel` })
@@ -243,11 +234,9 @@ export default class ChannelsController {
 
   async test({ auth }: HttpContext) {
     const userId = 1
-    const activeSocket = (global as any).activeSockets.find(
-      (socket: ActiveSocket) => socket.user.id === userId
-    )
-    if (activeSocket) {
-      activeSocket.addChannel({
+    const socketSession = socketSessions.get(member.id)
+    if (socketSession) {
+      socketSession.addChannel({
         id: Math.random() * Number.MAX_SAFE_INTEGER,
         name: 'test',
         adminId: auth.user!.id,

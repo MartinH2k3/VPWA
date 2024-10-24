@@ -6,8 +6,14 @@ interface PendingWebSocketAuthentificationRequest {
   token: string
 }
 
+class SocketSessions extends Array<SocketSession> {
+  get(userId: number) {
+    return this.find(session => session.user.id === userId)
+  }
+}
+
 let pendingAuthentificationRequests: PendingWebSocketAuthentificationRequest[] = []
-let socketSessions: SocketSession[] = []
+let socketSessions: SocketSessions = new SocketSessions()
 
 
 export { pendingAuthentificationRequests, socketSessions }
