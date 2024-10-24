@@ -18,7 +18,6 @@ interface SocketData {
 
 wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
   console.log('A new connection')
-  let user: User | null = null
   let socketSession: SocketSession
   // function updateChannels() {
 
@@ -53,13 +52,6 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
   })
 
   ws.on('close', () => {
-    //remove user from activeSockets
-    const index = pendingAuthentificationRequests.findIndex(
-      (request) => request.user.id === socketSession?.user?.id
-    )
-    if (index !== -1) {
-      pendingAuthentificationRequests.splice(index, 1)
-    }
     socketSessions.splice(socketSessions.indexOf(socketSession), 1)
     console.log('Disconnected', socketSession?.user?.username)
   })
@@ -70,6 +62,8 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
     )
     if (index !== -1)
       pendingAuthentificationRequests.splice(index, 1)
+
+    socketSessions.splice(socketSessions.indexOf(socketSession), 1)
 
     console.error('WebSocket error:', error)
   })

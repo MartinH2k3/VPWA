@@ -1,3 +1,4 @@
+import WebSocket from 'ws'
 import Channel from '#models/channel'
 import Message from '#models/message'
 import User from '#models/user'
