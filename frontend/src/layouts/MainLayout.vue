@@ -27,19 +27,24 @@
             </div>
           </div>
         </q-btn-dropdown>
+        <q-btn flat dense round icon="user" aria-label="users" @click="toggleRightDrawer" />
       </q-toolbar>
     </q-header>
 
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <SideBar />
     </q-drawer>
-
+    <q-drawer v-model="rightDrawerOpen" show-if-above bordered side="right">
+      <MembersSideBar />
+    </q-drawer>
     <q-page-container>
       <message-page />
     </q-page-container>
     <q-footer class="bg-white">
       <message-field />
     </q-footer>
+
+
   </q-layout>
 </template>
 
@@ -53,6 +58,8 @@ import MessagePage from 'pages/MessagePage.vue';
 // import NotificationWindow from 'components/NotificationWindow.vue';
 import { api } from 'boot/api';
 import { useChannelStore } from 'stores/channelStore';
+import { useMessageStore } from 'stores/messageStore';
+import MembersSideBar from 'src/components/MembersSideBar.vue';
 
 export default {
   name: 'MainLayout',
@@ -60,11 +67,13 @@ export default {
     MessageField,
     SideBar,
     MessagePage,
+    MembersSideBar,
     // NotificationWindow
   },
   data() {
     return {
       leftDrawerOpen: false,
+      rightDrawerOpen: false,
       status: 'online',
       onlyMentions: false,
     };
@@ -74,22 +83,28 @@ export default {
     const userStore = useUserStore();
     const socketStore = useSocketStore();
     const channelStore = useChannelStore();
-    return { router, userStore, socketStore, channelStore };
+    const messageStore = useMessageStore();
+    return { router, userStore, socketStore, channelStore, messageStore };
   },
   mounted() {
     // connect through socket store
     this.socketStore.connect()
-    if(this.channelStore.channels.length > 0)
-    this.channelStore.setActiveChannel(this.channelStore.channels[0].name)
+    if (this.channelStore.channels.length > 0)
+      this.channelStore.setActiveChannel(this.channelStore.channels[0].name)
 
   },
   methods: {
     toggleLeftDrawer() {
       this.leftDrawerOpen = !this.leftDrawerOpen;
     },
+    toggleRightDrawer() {
+      this.rightDrawerOpen = !this.rightDrawerOpen;
+    },
     async logout() {
       try {
-        // await api.post('/logout');
+        await api.post('/logout');
+        this.channelStore.clear();
+        this.messageStore.clear();
         await this.router.push('/login');
       } catch (e) {
         console.error(e);

@@ -2,12 +2,22 @@ import { defineStore } from 'pinia';
 import { api } from 'boot/api';
 import { useQuasar } from 'quasar';
 
+
+interface ChannelMember {
+  id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  status: 'online' | 'offline' | 'do not disturb';
+}
+
 export interface Channel {
   id: number
   name: string
   adminId: number
   private: boolean
-  highlighted?: boolean
+  highlighted?: boolean,
+  members: ChannelMember[],
   currentlyTyping: string[]
 }
 
@@ -25,6 +35,10 @@ export const useChannelStore = defineStore('channel', {
 
   },
   actions: {
+    clear() {
+      this.channels = []
+      this.activeChannel = {} as Channel
+    },
     async fetchChannels() {
       try {
         this.channels = (await api.get('/c')).data
@@ -37,7 +51,7 @@ export const useChannelStore = defineStore('channel', {
       // If that channel is already in the list, set it as active channel
       const channel = this.channels.find(c => c.name === channelName)
       if (channel) {
-        this.activeChannel = channel
+        await this.setActiveChannel(channelName)
         return
       }
 
@@ -59,7 +73,7 @@ export const useChannelStore = defineStore('channel', {
       this.leaveChannel(this.activeChannel.name);
     },
 
-    async leaveChannel(channelName:string) {
+    async leaveChannel(channelName: string) {
       try {
         await api.post(`/c/${this.activeChannel.name}/cancel`)
         // remove channel based on name from store
@@ -83,8 +97,25 @@ export const useChannelStore = defineStore('channel', {
         console.error(e);
       }
     },
-    setActiveChannel(chanelName: string) {
-      const channel = this.activeChannel = this.channels.find(c => c.name === chanelName) || {} as Channel
+    async fetchChannelMembers(channelName: string) {
+      try {
+        const members = (await api.get(`/c/${channelName}/members`)).data
+        const channel = this.channels.find(c => c.name === channelName)
+        if (channel) {
+          channel.members = members
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async setActiveChannel(chanelName: string) {
+      const channel = this.channels.find(c => c.name === chanelName) || {} as Channel
+
+      // Fetch members of the channel
+      await this.fetchChannelMembers(chanelName)
+      this.activeChannel = channel
+
+
       // if the the channel has highlighted property, remove it
       if (channel.highlighted) {
         channel.highlighted = false

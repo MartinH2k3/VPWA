@@ -23,6 +23,10 @@ export const useMessageStore = defineStore('message', {
     fetchingMessages: false,
   }),
   actions: {
+    clear() {
+      this.messages = {};
+      this.channelMessagesInfo = {};
+    },
     addMessage(channelName: string, message: Message, toFront: boolean) {
       if (!this.messages[channelName]) {
         this.messages[channelName] = [];

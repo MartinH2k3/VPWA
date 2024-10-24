@@ -219,6 +219,27 @@ export default class ChannelsController {
     }
   }
 
+  async members({ params, auth, response }: HttpContext) {
+    const { channelName } = params
+    const channel = await Channel.findBy('name', channelName)
+    if (!channel) {
+      return response.notFound({ message: 'Channel not found' })
+    }
+    // make sure the user is a member of the channel
+    const userId = auth.user!.id
+    const isMember = await channel
+      .related('members')
+      .query()
+      .where('user_id', userId)
+      .first()
+    if (!isMember) {
+      return response.forbidden({ message: 'You are not a member of this channel' })
+    }
+
+    const members = await channel.related('members').query()
+    return members
+  }
+
 
   async messages({ params, request, response }: HttpContext) {
 
