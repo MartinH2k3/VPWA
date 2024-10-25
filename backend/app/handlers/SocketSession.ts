@@ -2,11 +2,10 @@ import WebSocket from 'ws'
 import Channel from '#models/channel'
 import Message from '#models/message'
 import User from '#models/user'
-import { socketSessions } from '../globals.js';
+import { socketSessions } from '../globals.js'
 export default class SocketSession {
-
-  user: User;
-  ws: WebSocket;
+  user: User
+  ws: WebSocket
   activeChannelName: string | null = null
 
   // constructor
@@ -22,15 +21,23 @@ export default class SocketSession {
           console.error('Invalid message')
           return
         }
-        await this.createMessage(data.message, data.channelName)
-
+        const message = await this.createMessage(data.message, data.channelName)
+        if (!message) {
+          console.error('Failed to create message')
+          return
+        }
         // Add message to all users in the channel
         console.log('Sending message to all users in the channel')
 
-        socketSessions.getWithActiveChannel(data.channelName).forEach(session => {
-          if (session == this) return;
+        socketSessions.getWithActiveChannel(data.channelName).forEach((session) => {
+          if (session === this) return
           console.log('Sending message to', session.user.username)
-          session.send('add_message', { message: data.message, channelName: data.channelName, userId: this.user.id })
+          session.send('add_message', {
+            messageId: message.id,
+            messageContent: message.content,
+            channelName: data.channelName,
+            username: this.user.username,
+          })
         })
         break
 
@@ -58,7 +65,7 @@ export default class SocketSession {
   }
 
   async createMessage(message: string, channelName: string) {
-    console.log('Received message', message);
+    console.log('Received message', message)
 
     const user = this.user
     if (!user) {
@@ -70,16 +77,14 @@ export default class SocketSession {
       console.error('Channel not found')
       return
     }
-    const newMessage = await Message.create({
+    return await Message.create({
       content: message,
       user_id: user.id,
-      channel_id: channel.id
+      channel_id: channel.id,
     })
   }
 
-  getMessage(message: any, channel: Channel) {
-
-  }
+  getMessage(message: any, channel: Channel) {}
   addChannel(channel: Channel) {
     this.send('add_channel', channel)
   }
@@ -93,9 +98,7 @@ export default class SocketSession {
     this.send('notification', notification)
   }
 
-
   send(event: string, data: any) {
     this.ws.send(JSON.stringify({ event, data }))
   }
-
 }

@@ -24,14 +24,14 @@ export const useMessageStore = defineStore('message', {
       this.messages = {};
       this.channelMessagesInfo = {};
     },
-    makeMessage(user: User, message: string): Message {
+    makeMessage(username: string, messageContent: string, messageId: number): Message {
       const userStore = useUserStore();
       return {
-        id: user.id,
-        username: user.username,
-        content: message,
-        byMe: user.id === userStore.user.id,
-        taggedMe: message.includes(`@${userStore.getUsername}`)
+        id: messageId,
+        username: username,
+        content: messageContent,
+        byMe: username === userStore.user.username,
+        taggedMe: messageContent.includes(`@${userStore.getUsername}`)
       }
     },
     addMessage(channelName: string, message: Message, toFront: boolean) {

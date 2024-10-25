@@ -64,12 +64,7 @@ const useSocketStore = defineStore('socket', {
           case 'add_message':
             console.log('Adding message to store', socketMessage.data);
             // Find the user
-            let user = channelStore.findUserInChannel(socketMessage.data.channelName, socketMessage.data.userId);
-            if (!user) {
-              console.error('User not found');
-              return;
-            }
-            let messageData = messageStore.makeMessage(socketMessage.data.user_id, socketMessage.data.message);
+            let messageData = messageStore.makeMessage(socketMessage.data.username, socketMessage.data.messageContent, socketMessage.data.messageId);
             messageStore.addMessage(socketMessage.data.channelName, messageData, true);
             break;
           case 'notification':
