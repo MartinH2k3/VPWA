@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { api } from 'boot/api';
-import { useQuasar } from 'quasar';
 import { useSocketStore } from './socketStore';
 
 let socketStore = useSocketStore()
@@ -101,7 +100,7 @@ export const useChannelStore = defineStore('channel', {
     },
     async inviteUser(username: string) {
       try {
-        await api.post(`/c/${this.activeChannel.name}/cancel`, { username })
+        await api.post(`/c/${this.activeChannel.name}/invite`, { username })
       } catch (e) {
         console.error(e);
       }
