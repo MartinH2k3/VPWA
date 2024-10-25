@@ -27,7 +27,7 @@
             </div>
           </div>
         </q-btn-dropdown>
-        <q-btn flat dense round icon="user" aria-label="users" @click="toggleRightDrawer" />
+        <q-btn flat dense round icon="group" aria-label="Members" @click="toggleRightDrawer" />
       </q-toolbar>
     </q-header>
 
