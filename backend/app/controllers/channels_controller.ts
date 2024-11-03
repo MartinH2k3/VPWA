@@ -199,7 +199,7 @@ export default class ChannelsController {
             false
           )
 
-          // adding channel to user's active channels
+          // adding channel to user's channels
           const socketSession = socketSessions.get(invitedUser.id)
           if (socketSession) {
             socketSession.addChannel(channel)
@@ -265,15 +265,15 @@ export default class ChannelsController {
   }
 
   async test({ auth }: HttpContext) {
-    const userId = 1
-    const socketSession = socketSessions.get(userId)
-    if (socketSession) {
-      socketSession.addChannel({
-        id: Math.random() * Number.MAX_SAFE_INTEGER,
-        name: 'test',
-        adminId: auth.user!.id,
-        private: false,
-      })
-    }
+    // const userId = 1
+    // const socketSession = socketSessions.get(userId)
+    // if (socketSession) {
+    //   socketSession.addChannel({
+    //     id: Math.random() * Number.MAX_SAFE_INTEGER,
+    //     name: 'test',
+    //     adminId: auth.user!.id,
+    //     private: false,
+    //   })
+    // }
   }
 }
