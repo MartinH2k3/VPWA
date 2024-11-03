@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia'
+import { useSocketStore } from './socketStore'
+
 
 export interface User {
   id: number
@@ -9,6 +11,7 @@ export interface User {
   //...
 }
 
+
 export const useUserStore = defineStore('user', {
   state: () => ({
     user: {
@@ -18,7 +21,9 @@ export const useUserStore = defineStore('user', {
       firstName: 'Bob',
       lastName: 'Bobson',
     } as User,
-    status: 'online' as ('online' | 'offline' | 'do not disturb'),
+    status: 'online' as ('online' | 'offline' | 'away'),
+    socketStore: useSocketStore(),
+
   }),
   actions: {
     setActiveUser(user: User) {
@@ -27,15 +32,18 @@ export const useUserStore = defineStore('user', {
     removeActiveUser() {
       this.user = {} as User
     },
-    setStatus(status: 'online' | 'offline' | 'do not disturb') {
+    setStatus(status: 'online' | 'offline' | 'away') {
+
+      this.socketStore.updateStatus(status);
       this.status = status
     },
   },
   getters: {
-    getUsername: (state) =>{
+    getUsername: (state) => {
       return state.user.username || ''
     },
   },
+
   persist: {
     key: 'userStore',
   }

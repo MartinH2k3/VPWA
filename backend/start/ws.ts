@@ -20,7 +20,7 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
   console.log('A new connection')
   let socketSession: SocketSession
 
-  ws.on('message', (message: WebSocket.Data) => {
+  ws.on('message', async (message: WebSocket.Data) => {
     const parsedMessage: SocketData = JSON.parse(message.toString())
     const event = parsedMessage.event
     const data = parsedMessage.data
@@ -34,7 +34,12 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
         console.error('Invalid token')
         return
       }
-      socketSession = new SocketSession(ws, authRequest.user)
+      const userChannels = await Channel.query()
+        .whereHas('members', (query) => {
+          query.where('user_id', authRequest.user.id).where('kicked', false)
+        })
+
+      socketSession = new SocketSession(ws, authRequest.user, userChannels)
       console.log('Authenticated', socketSession.user.username)
       // Remove the request from pendingAuthentificationRequests
       const index = pendingAuthentificationRequests.indexOf(authRequest)

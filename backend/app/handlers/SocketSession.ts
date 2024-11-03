@@ -7,16 +7,36 @@ export default class SocketSession {
   user: User
   ws: WebSocket
   activeChannelName: string | null = null
+  status: 'online' | 'offline' | 'away' = 'offline'
+  // A variable to represent the channels the user is in
+  channels: string[] = []
 
   // constructor
-  constructor(ws: WebSocket, user: User) {
+  constructor(ws: WebSocket, user: User, channels: Channel[] = []) {
     this.ws = ws
     this.user = user
+    this.channels = channels.map(c => c.name)
+    console.log('New socket session for', user.username, 'with', this.channels, 'channels')
+  }
+
+  addToJoinedChannels(channelName: string) {
+    this.channels.push(channelName)
+  }
+  removeFromJoinedChannels(channelName: string) {
+    const index = this.channels.indexOf(channelName)
+    if (index !== -1) {
+      this.channels.splice(index, 1)
+    }
+  }
+  isInChannel(channelName: string) {
+    return this.channels.includes(channelName)
   }
 
   async receiveMessage(event: string, data: any) {
     switch (event) {
       case 'message':
+        if (!this.isInChannel(data.channelName)) return
+
         if (!data.message || !data.channelName) {
           console.error('Invalid message')
           return
@@ -41,13 +61,25 @@ export default class SocketSession {
         })
         break
 
+      case 'update_status':
+        if (!data.status || !['online', 'offline', 'away'].includes(data.status)) {
+          console.error('Invalid status')
+          return
+        }
+        console.log('Updated status for', this.user.username, 'to', data.status)
+
+        this.status = data.status
+        break
+
       case 'update_active_channel':
+        if (!this.isInChannel(data.channelName)) return
         this.activeChannelName = data.channelName
         console.log('Updated active channel for', this.user.username, 'to', this.activeChannelName)
 
         break
 
       case 'get_message':
+        if (!this.isInChannel(data.channel)) return
         this.getMessage(data.message, data.channel)
         break
       case 'add_channel':
@@ -86,12 +118,14 @@ export default class SocketSession {
 
   getMessage(message: any, channel: Channel) {}
   addChannel(channel: Channel) {
+    this.addToJoinedChannels(channel.name)
     this.send('add_channel', channel)
   }
   kick(channel: Channel) {
     this.send('kick', channel)
   }
   removeChannel(channel: Channel) {
+    this.removeFromJoinedChannels(channel.name)
     this.send('remove_channel', channel)
   }
   sendNotification(notification: any) {

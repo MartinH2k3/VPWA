@@ -29,6 +29,8 @@ const useSocketStore = defineStore('socket', {
       let token: string | null = null;
       const channelStore = useChannelStore();
       const messageStore = useMessageStore();
+      const userStore = useUserStore();
+      const $q = useQuasar();
       try {
         const response = await api.get('/authWS');
         token = response.data;
@@ -101,6 +103,9 @@ const useSocketStore = defineStore('socket', {
             if (channelStore.activeChannel.name) {
               this.sendMessage('update_active_channel', { channelName: channelStore.activeChannel.name });
             }
+            // Send the current status
+            this.updateStatus(userStore.status);
+
             break;
         }
       };
@@ -123,6 +128,10 @@ const useSocketStore = defineStore('socket', {
         if (this.isConnected) {
           resolve(true);
         } else {
+    updateStatus(status: string) {
+      this.sendMessage('update_status', { status });
+    },
+
           const interval = setInterval(() => {
             if (this.isConnected) {
               clearInterval(interval);
