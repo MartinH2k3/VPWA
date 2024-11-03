@@ -20,10 +20,9 @@
             <div class="column justify-around">
               <q-radio v-model="status" val="online" label="online"
                 @update:model-value="userStore.setStatus('online')" />
-              <q-radio v-model="status" val="do not disturb" label="away"
-                @update:model-value="userStore.setStatus('online')" />
+              <q-radio v-model="status" val="away" label="away" @update:model-value="userStore.setStatus('away')" />
               <q-radio v-model="status" val="offline" label="offline"
-                @update:model-value="userStore.setStatus('online')" />
+                @update:model-value="userStore.setStatus('offline')" />
             </div>
           </div>
         </q-btn-dropdown>
