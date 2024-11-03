@@ -116,13 +116,15 @@ export default class SocketSession {
     })
   }
 
-  getMessage(message: any, channel: Channel) {}
+  getMessage(message: any, channel: Channel) { }
   addChannel(channel: Channel) {
     this.addToJoinedChannels(channel.name)
     this.send('add_channel', channel)
   }
-  kick(channel: Channel) {
-    this.send('kick', channel)
+  kick(channelName: string) {
+    this.removeFromJoinedChannels(channelName)
+    this.activeChannelName = null
+    this.send('kick', { channelName })
   }
   removeChannel(channel: Channel) {
     this.removeFromJoinedChannels(channel.name)

@@ -42,6 +42,11 @@ export default class ChannelsController {
         return response.badRequest({ message: 'User already joined this channel' })
       }
       await existingChannel.related('members').attach([userId])
+      const socketSession = socketSessions.get(userId)
+      if (socketSession) {
+        socketSession.addToJoinedChannels(existingChannel.name)
+      }
+      socketSessions.updateChannelMembers(existingChannel.name)
       return existingChannel
     } else {
       const channel = await Channel.create({
@@ -52,6 +57,11 @@ export default class ChannelsController {
 
       // Auto-join the admin to the channel
       await channel.related('members').attach([userId])
+      const socketSession = socketSessions.get(userId)
+      if (socketSession) {
+        socketSession.addToJoinedChannels(channel.name)
+      }
+      socketSessions.updateChannelMembers(channel.name)
       return response.ok(channel)
     }
   }
@@ -90,6 +100,7 @@ export default class ChannelsController {
       if (socketSession) {
         socketSession.removeChannel(channel)
       }
+      socketSessions.updateChannelMembers(channel.name)
       return response.ok(`Successfully left the channel ${channel?.name}`)
     } catch (e) {
       return response.badRequest(e)
@@ -133,8 +144,9 @@ export default class ChannelsController {
         // TODO notify the user that got kicked
         const socketSession = socketSessions.get(kickedUser.id)
         if (socketSession) {
-          socketSession.kick(channel)
+          socketSession.kick(channel.name)
         }
+        socketSessions.updateChannelMembers(channel.name)
         return response.ok({ message: `${username} has been banned from the channel` })
       } else {
         await channel.related('members').sync(
@@ -193,6 +205,7 @@ export default class ChannelsController {
             socketSession.addChannel(channel)
           }
 
+          socketSessions.updateChannelMembers(channel.name)
           return response.ok({ message: `${username} has been unbanned from the channel` })
         }
         return response.badRequest({ message: 'User is already a member of the channel' })
@@ -211,6 +224,7 @@ export default class ChannelsController {
         socketSession.addChannel(channel)
       }
 
+      socketSessions.updateChannelMembers(channel.name)
       return response.ok({ message: `${username} has been invited to the channel` })
     } catch (e) {
       console.log(e)
