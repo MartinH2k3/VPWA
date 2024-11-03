@@ -12,7 +12,7 @@ export default class ChannelsController {
     }
     const channels = await Channel.query()
       .whereHas('members', (query) => {
-        query.where('user_id', userId)
+        query.where('user_id', userId).wherePivot('kicked', false)
       })
       .orderBy('created_at', 'desc')
 
@@ -231,7 +231,7 @@ export default class ChannelsController {
       return response.forbidden({ message: 'You are not a member of this channel' })
     }
 
-    const members = await channel.related('members').query()
+    const members = await channel.related('members').query().where('kicked', false)
     return members
   }
 
