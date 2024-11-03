@@ -105,6 +105,12 @@ export const useChannelStore = defineStore('channel', {
         console.error(e);
       }
     },
+    updateMembers(channelName: string, members: ChannelMember[]) {
+      const channel = this.channels.find(c => c.name === channelName)
+      if (channel) {
+        channel.members = members
+      }
+    },
     async fetchChannelMembers(channelName: string) {
       try {
         const members = (await api.get(`/c/${channelName}/members`)).data

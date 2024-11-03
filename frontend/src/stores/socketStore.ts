@@ -67,6 +67,22 @@ const useSocketStore = defineStore('socket', {
             let messageData = messageStore.makeMessage(socketMessage.data.username, socketMessage.data.messageContent, socketMessage.data.messageId);
             messageStore.addMessage(socketMessage.data.channelName, messageData, true);
             break;
+          case 'update_channel_members':
+            {
+              const channelName = socketMessage.data.channelName;
+              const members: ChannelMember[] = socketMessage.data.members.map((member: any) => {
+                return {
+                  id: member.id,
+                  username: member.username,
+                  firstName: member.firstName,
+                  lastName: member.lastName,
+                  status: 'offline'
+                  // status: member.status
+                };
+              });
+              channelStore.updateMembers(channelName, members);
+            }
+            break;
           case 'notification':
             // TODO implement
             break;
