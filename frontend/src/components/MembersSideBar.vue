@@ -12,8 +12,7 @@
         </q-item-label>
       </q-item-section>
     </q-item>
-    <q-item v-else clickable v-for="member in members" :key="member.id"
-      :class="{ active: userStore.user.id === member.id }">
+    <q-item v-else v-for="member in members" :key="member.id" :class="{ active: userStore.user.id === member.id }">
       <div class="row flex-row flex-nowrap" style="width: 100%;">
         <q-avatar :icon="member.id == activeChannel.adminId ? 'star' : 'person'" class="q-mr-sm" />
         <span class="q-mr-auto flex items-center">
