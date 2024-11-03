@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="lHr LpR lFf ">
     <q-header elevated>
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
@@ -34,7 +34,7 @@
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <SideBar />
     </q-drawer>
-    <q-drawer v-model="rightDrawerOpen" show-if-above bordered side="right">
+    <q-drawer show-if-above v-model="rightDrawerOpen" side="right" bordered>
       <MembersSideBar />
     </q-drawer>
     <q-page-container>
