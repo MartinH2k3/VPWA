@@ -12,15 +12,39 @@
         </q-item-label>
       </q-item-section>
     </q-item>
+
     <q-item v-else v-for="member in members" :key="member.id" :class="{ active: userStore.user.id === member.id }">
-      <div class="row flex-row flex-nowrap" style="width: 100%;">
+      <div v-if="isAdmin" class="row flex-row flex-nowrap" style="width: 100%;">
+        <q-avatar :icon="member.id == activeChannel.adminId ? 'star' : 'person'" class="q-mr-sm" />
+        <span class="q-mr-auto flex items-center">
+          {{ member.username }}
+        </span>
+        <q-btn v-if="userStore.user.id != member.id" flat round icon="more_vert">
+          <q-menu anchor="bottom right" self="top right">
+            <q-list>
+              <q-item clickable v-ripple @click="channelStore.kickUser(member.username)">
+                <q-item-section>
+                  <q-item-label>Kick</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-ripple>
+                <q-item-section>
+                  <q-item-label>Mention</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
+      </div>
+
+      <div v-else class="row flex-row flex-nowrap" style="width: 100%;">
         <q-avatar :icon="member.id == activeChannel.adminId ? 'star' : 'person'" class="q-mr-sm" />
         <span class="q-mr-auto flex items-center">
           {{ member.username }}
         </span>
       </div>
-    </q-item>
 
+    </q-item>
   </q-list>
 </template>
 
@@ -50,7 +74,10 @@ export default defineComponent({
     },
     activeChannel() {
       return this.channelStore.activeChannel;
-    }
+    },
+    isAdmin() {
+      return this.userStore.user.id === this.activeChannel.adminId;
+    },
   },
   methods: {
 
