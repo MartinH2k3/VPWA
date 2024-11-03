@@ -10,9 +10,11 @@ export default class ChannelsController {
     if (!userId) {
       return []
     }
-    const channels = await Channel.query().whereHas('members', (query) => {
-      query.where('user_id', userId)
-    }).orderBy('created_at', 'desc');
+    const channels = await Channel.query()
+      .whereHas('members', (query) => {
+        query.where('user_id', userId)
+      })
+      .orderBy('created_at', 'desc')
 
     return channels
   }
@@ -104,8 +106,7 @@ export default class ChannelsController {
     try {
       const kickedUser = await User.findBy('username', username)
       const channel = await Channel.findBy('name', channelName)
-      if (!kickedUser || !channel)
-        return response.notFound({ message: 'Invalid request' })
+      if (!kickedUser || !channel) return response.notFound({ message: 'Invalid request' })
 
       const pivotRow = await channel
         .related('members')
@@ -113,12 +114,10 @@ export default class ChannelsController {
         .where('user_id', kickedUser.id)
         .first()
 
-      if (!pivotRow)
-        return response.notFound({ message: 'User is not a member of the channel' })
+      if (!pivotRow) return response.notFound({ message: 'User is not a member of the channel' })
 
       if (channel.adminId === kickedUser.id)
         return response.badRequest({ message: 'Admin cannot be kicked' })
-
 
       const kickVotes = pivotRow.kick_votes
       if (kickVotes >= 2 || channel.adminId === userId) {
@@ -227,11 +226,7 @@ export default class ChannelsController {
     }
     // make sure the user is a member of the channel
     const userId = auth.user!.id
-    const isMember = await channel
-      .related('members')
-      .query()
-      .where('user_id', userId)
-      .first()
+    const isMember = await channel.related('members').query().where('user_id', userId).first()
     if (!isMember) {
       return response.forbidden({ message: 'You are not a member of this channel' })
     }
@@ -240,16 +235,18 @@ export default class ChannelsController {
     return members
   }
 
-
   async messages({ params, request, response }: HttpContext) {
-
     const { channelName } = params
     const { limit, cursor } = request.only(['limit', 'cursor'])
     const channel = await Channel.findBy('name', channelName)
     if (!channel) {
       return response.notFound({ message: 'Channel not found' })
     }
-    const messages = await Message.query().where('channel_id', channel.id).orderBy('created_at', 'desc').limit(limit).offset(cursor)
+    const messages = await Message.query()
+      .where('channel_id', channel.id)
+      .orderBy('created_at', 'desc')
+      .limit(limit)
+      .offset(cursor)
     return messages
   }
 

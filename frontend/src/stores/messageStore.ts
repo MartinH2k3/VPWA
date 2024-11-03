@@ -5,9 +5,6 @@ import { useChannelStore } from './channelStore';
 import { useUserStore, User } from './userStore';
 import { useSocketStore } from './socketStore';
 import { useQuasar } from 'quasar';
-const channelStore = useChannelStore();
-const userStore = useUserStore();
-const socketStore = useSocketStore();
 export interface Message {
   id: number;
   username: string;
@@ -27,13 +24,14 @@ export const useMessageStore = defineStore('message', {
       this.messages = {};
       this.channelMessagesInfo = {};
     },
-    makeMessage(user: User, message: string): Message {
+    makeMessage(username: string, messageContent: string, messageId: number): Message {
+      const userStore = useUserStore();
       return {
-        id: user.id,
-        username: user.username,
-        content: message,
-        byMe: user.id === userStore.user.id,
-        taggedMe: message.includes(`@${userStore.getUsername}`)
+        id: messageId,
+        username: username,
+        content: messageContent,
+        byMe: username === userStore.user.username,
+        taggedMe: messageContent.includes(`@${userStore.getUsername}`)
       }
     },
     addMessage(channelName: string, message: Message, toFront: boolean) {
@@ -55,6 +53,7 @@ export const useMessageStore = defineStore('message', {
       }
     },
     addMessageToActiveChannel(message: Message, toFront: boolean = false) {
+      const channelStore = useChannelStore();
       // Add message to active channel
       if (!channelStore.activeChannel.name) {
         useQuasar().notify({
@@ -70,10 +69,11 @@ export const useMessageStore = defineStore('message', {
       delete this.messages[channel];
     },
     clearActiveChannelMessages() {
-      this.clearMessages(channelStore.activeChannel.name);
+      this.clearMessages(useChannelStore().activeChannel.name);
     },
     sendMessage(channelName: string, message: string) {
-
+      const socketStore = useSocketStore();
+      const userStore = useUserStore();
       // Send message to server
       console.log('Sending message', message);
 
@@ -93,7 +93,7 @@ export const useMessageStore = defineStore('message', {
       }, true);
     },
     async fetchMessages(channelName: string, limit: number = 10, cursor: number = 0, toFront: boolean = false) {
-
+      const userStore = useUserStore();
       if (this.fetchingMessages || this.channelMessagesInfo[channelName]?.reachedTop)
         return
 
@@ -169,6 +169,7 @@ export const useMessageStore = defineStore('message', {
       // }
     },
     async fetchActiveChannelMessages(limit: number, cursor: (number | null)) {
+      const channelStore = useChannelStore();
       if (!channelStore?.activeChannel?.name) {
         return;
       }
@@ -188,9 +189,11 @@ export const useMessageStore = defineStore('message', {
     //   return state.messages[channel];
     // },
     activeChannelMessages: (state) => {
+      const channelStore = useChannelStore();
       return state.messages[channelStore.activeChannel.name] || [];
     },
     activeChannelMessagesInfo: (state) => {
+      const channelStore = useChannelStore();
       return state.channelMessagesInfo[channelStore.activeChannel.name] || { limit: 10, cursor: 0, reachedTop: false };
     }
   },

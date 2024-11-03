@@ -30,4 +30,5 @@ router.post('c/:channelName/cancel', [ChannelsController, 'cancel']).use(middlew
 router.post('/c/:channelName/kick', [ChannelsController, 'kick']).use(middleware.auth())
 router.post('/c/:channelName/invite', [ChannelsController, 'invite']).use(middleware.auth())
 router.get('c/:channelName/messages', [ChannelsController, 'messages']).use(middleware.auth())
+router.get('c/:channelName/members', [ChannelsController, 'members']).use(middleware.auth())
 router.post('/ws', [ChannelsController, 'test']).use(middleware.auth())
