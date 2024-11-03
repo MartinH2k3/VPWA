@@ -69,17 +69,16 @@ export default {
         switch (command) {
           case 'join':
             channelName = args[0];
-            // If the channel already exists, print an appropriate message
-            if (this.channelStore.channels.find(channel => channel.name === channelName)) {
-              this.$q.notify({
-                message: `You're already a member of ${channelName}`,
-                color: 'yellow',
-                textColor: 'black',
-                icon: 'warning'
-              });
-              return;
-            }
-            this.$q.notify(`You have joined ${channelName}`)
+            // // If the channel already exists, print an appropriate message
+            // if (this.channelStore.channels.find(channel => channel.name === channelName)) {
+            //   this.$q.notify({
+            //     message: `You're already a member of ${channelName}`,
+            //     color: 'yellow',
+            //     textColor: 'black',
+            //     icon: 'warning'
+            //   });
+            //   return;
+            // }
             let isPrivate = args.length > 1 && args[1] === 'private';
             await this.channelStore.joinChannel(channelName, isPrivate);
             break;
@@ -91,10 +90,7 @@ export default {
           case 'quit': //fallback for now, since for now they are the same
           case 'cancel':
           case 'leave':
-            this.$q.notify(`You have left ${this.channelStore.activeChannel.name}`)
-            this.messageStore.clearActiveChannelMessages();
             await this.channelStore.leaveActiveChannel(); //works for active channel so no params
-            await this.router.push('/');
             break;
 
           case 'kick':

@@ -1,7 +1,10 @@
 import { defineStore } from 'pinia';
 import { api } from 'boot/api';
-import { useChannelStore } from 'stores/channelStore';
+import { useChannelStore, ChannelMember } from 'stores/channelStore';
 import { useMessageStore } from 'stores/messageStore';
+import { useUserStore } from 'stores/userStore';
+import { useQuasar } from 'quasar';
+
 
 interface SocketState {
   socket: WebSocket | null;
@@ -91,11 +94,29 @@ const useSocketStore = defineStore('socket', {
           case 'message_draft':
             // TODO implement
             break;
+          case 'kick':
+            {
+              // Get the channel name and remove the channel
+              const channelName: string = socketMessage.data.channelName;
+              channelStore.removeChannel(channelName);
+              // Notify the user
+              $q.notify({
+                message: `You were kicked from ${channelName}`,
+                type: 'negative'
+              });
+            }
+            break;
           case 'add_channel':
             channelStore.addInvitedChannel(socketMessage.data);
+            // Notify the user
+            $q.notify({
+              message: `You were invited to ${socketMessage.data.name}`,
+              type: 'positive'
+            });
             break;
           case 'remove_channel':
             channelStore.removeChannel(socketMessage.data.name);
+
             break;
           case 'ack_auth':
             this.isAuthenticated = true;
@@ -123,15 +144,15 @@ const useSocketStore = defineStore('socket', {
       };
     },
 
+    updateStatus(status: string) {
+      this.sendMessage('update_status', { status });
+    },
+
     async waitTillConnected() {
       return new Promise((resolve) => {
         if (this.isConnected) {
           resolve(true);
         } else {
-    updateStatus(status: string) {
-      this.sendMessage('update_status', { status });
-    },
-
           const interval = setInterval(() => {
             if (this.isConnected) {
               clearInterval(interval);

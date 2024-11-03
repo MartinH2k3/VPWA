@@ -1,15 +1,18 @@
 import { defineStore } from 'pinia';
 import { api } from 'boot/api';
+import { useMessageStore } from './messageStore';
 import { useSocketStore } from './socketStore';
+import { useQuasar } from 'quasar';
 
-let socketStore = useSocketStore()
+const socketStore = useSocketStore();
+const $q = useQuasar()
 
-interface ChannelMember {
+export interface ChannelMember {
   id: number;
   username: string;
   firstName: string;
   lastName: string;
-  status: 'online' | 'offline' | 'do not disturb';
+  status: 'online' | 'offline' | 'away';
 }
 
 export interface Channel {
@@ -27,7 +30,7 @@ export const useChannelStore = defineStore('channel', {
     // list of joined channels
     channels: [] as Channel[],
     // channel user is currently viewing
-    activeChannel: {} as Channel
+    activeChannel: {} as Channel,
   }),
   getters: {
     getChannels: (state) => {
@@ -68,8 +71,9 @@ export const useChannelStore = defineStore('channel', {
           channelName,
           private: isPrivate
         })).data
-        this.activeChannel = channel
         this.channels.unshift(channel)
+        $q.notify(`You have joined ${channelName}`)
+        await this.setActiveChannel(channelName)
       } catch (e) {
         console.error(e);
       }
@@ -78,6 +82,7 @@ export const useChannelStore = defineStore('channel', {
       if (!this.activeChannel.name) {
         console.error('No active channel to leave');
       }
+      $q.notify(`You have left ${this.activeChannel.name}`)
       this.leaveChannel(this.activeChannel.name);
     },
 
@@ -86,7 +91,7 @@ export const useChannelStore = defineStore('channel', {
         await api.post(`/c/${this.activeChannel.name}/cancel`)
         // remove channel based on name from store
         this.removeChannel(channelName)
-        this.activeChannel = {} as Channel
+
       } catch (e) {
         console.error(e);
       }
@@ -151,10 +156,14 @@ export const useChannelStore = defineStore('channel', {
     },
     // better to remove the channel from the store, than to fetch all channels again
     removeChannel(channelName: string) {
+      const messageStore = useMessageStore();
       const index = this.channels.findIndex(c => c.name === channelName)
       if (index !== -1) {
         this.channels.splice(index, 1)
       }
+      this.activeChannel = {} as Channel
+      // Clear the messages of the channel
+      messageStore.clearMessages(channelName)
     }
   },
 });
