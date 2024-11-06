@@ -146,17 +146,16 @@ export const useChannelStore = defineStore('channel', {
           isPrivate
         })).data
         this.channels.unshift(channel)
-        $q?.notify(`You have joined ${channelName}`)
         await this.setActiveChannel(channelName)
       } catch (e) {
         console.error(e);
+        alert(e.response.data.message)
       }
     },
     async leaveActiveChannel() {
       if (!this.activeChannel.name) {
         console.error('No active channel to leave');
       }
-      $q?.notify(`You have left ${this.activeChannel.name}`)
       this.leaveChannel(this.activeChannel.name);
     },
 

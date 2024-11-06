@@ -30,7 +30,7 @@ export default class ChannelsController {
     // if channel exists, try to join
     if (existingChannel) {
       if (existingChannel.isPrivate) {
-        return response.forbidden({ message: 'This channel is private and cannot be joined.' })
+        return response.unauthorized({ message: 'This channel is private and cannot be joined.' })
       }
       const isAlreadyMember = await existingChannel
         .related('members')
@@ -39,7 +39,10 @@ export default class ChannelsController {
         .first()
       // can't be member twice, duh
       if (isAlreadyMember) {
-        return response.badRequest({ message: 'User already joined this channel' })
+        return response.badRequest({
+          message:
+            "You already joined this channel. If you don't see it in channel list, you have been banned.",
+        })
       }
       await existingChannel.related('members').attach([userId])
       const socketSession = socketSessions.get(userId)
