@@ -135,9 +135,26 @@ export default {
             },
               true);
             break;
+          case 'help':
+            this.messageStore.addMessageToActiveChannel({
+                id: 0,
+                username: 'system',
+                content: 'Available commands: /join, /invite, /quit, /kick, /revoke, /list, /help',
+                byMe: false,
+                taggedMe: false,
+              },
+              true);
+            break;
           default:
             // Inform user that command is unknown
-            console.log('Unknown command');
+            this.messageStore.addMessageToActiveChannel({
+                id: 0,
+                username: 'system',
+                content: 'Unknown command, type /help for a list of commands',
+                byMe: false,
+                taggedMe: false,
+              },
+              true);
             break;
         }
         this.$q.notify(response);
