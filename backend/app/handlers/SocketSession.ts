@@ -32,7 +32,7 @@ export default class SocketSession {
     return this.channels.includes(channelName)
   }
 
-  async receiveMessage(event: string, data: any) {
+  async receive(event: string, data: any) {
     switch (event) {
       case 'message':
         if (!this.isInChannel(data.channelName)) return
@@ -110,10 +110,6 @@ export default class SocketSession {
         })
         break;
 
-      case 'get_message':
-        if (!this.isInChannel(data.channel)) return
-        this.getMessage(data.message, data.channel)
-        break
       case 'add_channel':
         this.addChannel(data.channel)
         break
