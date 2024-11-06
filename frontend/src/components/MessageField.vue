@@ -76,6 +76,10 @@ export default {
       // Handle message when it's not a command (i.e., doesn't start with "/")
       if (this.message[0] !== '/' && this.channelStore.activeChannel) {
         // TODO: api call to send message
+        if (!this.channelStore.activeChannel.name) {
+          this.$q.notify('You are currently not in a channel');
+          return;
+        }
         this.messageStore.sendMessage(this.channelStore.activeChannel.name, this.message);
       }
 
@@ -95,16 +99,6 @@ export default {
         switch (command) {
           case 'join':
             channelName = args[0];
-            // // If the channel already exists, print an appropriate message
-            // if (this.channelStore.channels.find(channel => channel.name === channelName)) {
-            //   this.$q.notify({
-            //     message: `You're already a member of ${channelName}`,
-            //     color: 'yellow',
-            //     textColor: 'black',
-            //     icon: 'warning'
-            //   });
-            //   return;
-            // }
             let isPrivate = args.length > 1 && args[1] === 'private';
             response = await this.channelStore.joinChannel(channelName, isPrivate);
             break;
@@ -124,6 +118,10 @@ export default {
             response = await this.channelStore.kickUser(username); //works for active channel so no param for that
             break;
 
+          case 'revoke':
+            username = args[0];
+            response = await this.channelStore.revokeUser(username); //works for active channel so no param for that
+            break;
           case 'list':
             //TODO get all users in channel
             const users = this.channelStore.getActiveChannelMembers();
