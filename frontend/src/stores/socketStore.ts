@@ -117,8 +117,6 @@ const useSocketStore = defineStore('socket', {
 
               channelStore.removeCurrentlyTyping(channelName, userName);
 
-
-
             }
             break;
 
