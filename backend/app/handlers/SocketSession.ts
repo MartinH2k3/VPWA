@@ -15,7 +15,7 @@ export default class SocketSession {
   constructor(ws: WebSocket, user: User, channels: Channel[] = []) {
     this.ws = ws
     this.user = user
-    this.channels = channels.map(c => c.name)
+    this.channels = channels.map((c) => c.name)
     console.log('New socket session for', user.username, 'with', this.channels, 'channels')
   }
 
@@ -78,37 +78,37 @@ export default class SocketSession {
 
         break
       case 'typing':
-        console.log('User', this.user.username, 'is typing in', data.channelName);
+        console.log('User', this.user.username, 'is typing in', data.channelName)
 
         if (!this.isInChannel(data.channelName)) return
         // Send the draft content to all users in the channel
         console.log('Sending draft to all users in the channel')
 
         socketSessions.getWithActiveChannel(data.channelName).forEach((session) => {
-          if (session === this || session.status == 'offline') return
+          if (session === this || session.status === 'offline') return
           console.log('Sending draft to', session.user.username)
           session.send('message_draft', {
             username: this.user.username,
             content: data.content,
-            channelName: data.channelName
+            channelName: data.channelName,
           })
         })
 
-        break;
+        break
       case 'stop_typing':
         if (!this.isInChannel(data.channelName)) return
         // Remove the draft content from all users in the channel
         console.log('Removing draft from all users in the channel')
 
         socketSessions.getWithActiveChannel(data.channelName).forEach((session) => {
-          if (session === this || session.status == 'offline') return
+          if (session === this || session.status === 'offline') return
           console.log('Removing draft from', session.user.username)
           session.send('remove_message_draft', {
             username: this.user.username,
-            channelName: data.channelName
+            channelName: data.channelName,
           })
         })
-        break;
+        break
 
       case 'add_channel':
         this.addChannel(data.channel)
@@ -144,7 +144,7 @@ export default class SocketSession {
     })
   }
 
-  getMessage(message: any, channel: Channel) { }
+  getMessage(message: any, channel: Channel) {}
   addChannel(channel: Channel) {
     this.addToJoinedChannels(channel.name)
     this.send('add_channel', channel)
