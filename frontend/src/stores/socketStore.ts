@@ -67,6 +67,7 @@ const useSocketStore = defineStore('socket', {
             this.connect();
             break;
           case 'add_message':
+            // if offile: break
             console.log('Adding message to store', socketMessage.data);
             // Find the user
             let messageData = messageStore.makeMessage(socketMessage.data.username, socketMessage.data.messageContent, socketMessage.data.messageId);
@@ -89,11 +90,38 @@ const useSocketStore = defineStore('socket', {
             }
             break;
           case 'notification':
+            // If DND or offline: break
+            // If only mentions: check if mentioned
+            // for socc
             // TODO implement
             break;
           case 'message_draft':
-            // TODO implement
+            { // If offline: break
+              if (userStore.status == 'offline') break;
+              // Get the user name and the current content of the message
+              const userName = socketMessage.data.username;
+              const messageContent = socketMessage.data.content;
+              const channelName = socketMessage.data.channelName;
+
+              console.log('Received message draft', socketMessage.data);
+
+              channelStore.updateCurrentlyTyping(channelName, userName, messageContent);
+            } break;
+          case 'remove_message_draft':
+            {  // If offline: break
+              if (userStore.status == 'offline') break;
+              // Get the user name
+              const userName = socketMessage.data.username;
+              const channelName = socketMessage.data.channelName;
+              console.log('Removing message draft', socketMessage.data);
+
+              channelStore.removeCurrentlyTyping(channelName, userName);
+
+
+
+            }
             break;
+
           case 'kick':
             {
               // Get the channel name and remove the channel

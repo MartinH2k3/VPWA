@@ -6,8 +6,13 @@
           :name="message.byMe ? 'Me' : message.username" :text="[message.content]" :sent="message.byMe"
           :bg-color="message.byMe || message.taggedMe ? 'primary' : 'grey'"
           :text-color="message.byMe || message.taggedMe ? 'white' : ''" /><!--default color if not by me-->
-        <q-chat-message v-for="typingUser in currentlyTyping" :key="typingUser" :name="typingUser" bg-color="grey">
-          <q-spinner-dots size="2rem" @mouseover="inspectUser(typingUser, $event)" @mouseleave="stopInspecting" />
+        <q-chat-message v-for="typingUser in currentlyTyping" :key="typingUser.username + '-typing'"
+          :name="typingUser.username" bg-color="grey">
+          <span @mouseover="inspectUser(typingUser.username, $event)" @mouseleave="stopInspecting">
+
+            {{ typingUser.content }}
+            <q-spinner-dots size="1rem" />
+          </span>
         </q-chat-message>
       </q-list>
       <div v-if="inspectedMessage" class="floating-message" :style="{ top: `${cursorY}px`, left: `${cursorX}px` }">
@@ -58,17 +63,17 @@ export default defineComponent({
       return this.messageStore.activeChannelMessages;
     },
     currentlyTyping() {
-      if (!this.channelStore.activeChannel.currentlyTyping) {
-        return [];
-      }
-      return [] as string[]
+      return this.channelStore.activeChannel.currentlyTyping;
+
     },
   },
   watch: {
     messages() {
       console.log('messages updated');
-
     },
+    currentlyTyping() {
+      console.log('currentlyTyping updated');
+    }
   },
   methods: {
     async paginateMessages(index: number, done: () => void) {

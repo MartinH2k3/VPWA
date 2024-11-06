@@ -24,6 +24,7 @@ export default {
   data() {
     return {
       message: '', // Define message in data()
+      draftTimeout: null as NodeJS.Timeout | null,
     };
   },
 
@@ -40,6 +41,26 @@ export default {
         });
       },
       immediate: true,
+    },
+    message() {
+      if (this.draftTimeout != null) {
+        clearTimeout(this.draftTimeout);
+      }
+      console.log('Typing...');
+
+      // After 100 ms, send a 'draft' message to the server
+      const self = this;
+      this.draftTimeout = setTimeout(() => {
+        if (this.message.trim()) {
+          console.log('Sending typing notification');
+
+          this.channelStore.sendTyping(self.message);
+        } else {
+          this.channelStore.stopTyping();
+        }
+        self.draftTimeout = null;
+      }, 100);
+
     },
   },
   methods: {

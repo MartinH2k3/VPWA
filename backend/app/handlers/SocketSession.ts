@@ -77,6 +77,38 @@ export default class SocketSession {
         console.log('Updated active channel for', this.user.username, 'to', this.activeChannelName)
 
         break
+      case 'typing':
+        console.log('User', this.user.username, 'is typing in', data.channelName);
+
+        if (!this.isInChannel(data.channelName)) return
+        // Send the draft content to all users in the channel
+        console.log('Sending draft to all users in the channel')
+
+        socketSessions.getWithActiveChannel(data.channelName).forEach((session) => {
+          if (session === this || session.status == 'offline') return
+          console.log('Sending draft to', session.user.username)
+          session.send('message_draft', {
+            username: this.user.username,
+            content: data.content,
+            channelName: data.channelName
+          })
+        })
+
+        break;
+      case 'stop_typing':
+        if (!this.isInChannel(data.channelName)) return
+        // Remove the draft content from all users in the channel
+        console.log('Removing draft from all users in the channel')
+
+        socketSessions.getWithActiveChannel(data.channelName).forEach((session) => {
+          if (session === this || session.status == 'offline') return
+          console.log('Removing draft from', session.user.username)
+          session.send('remove_message_draft', {
+            username: this.user.username,
+            channelName: data.channelName
+          })
+        })
+        break;
 
       case 'get_message':
         if (!this.isInChannel(data.channel)) return

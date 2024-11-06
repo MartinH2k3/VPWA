@@ -4,7 +4,6 @@ import { useMessageStore } from './messageStore';
 import { useSocketStore } from './socketStore';
 import { useQuasar } from 'quasar';
 
-const socketStore = useSocketStore();
 const $q = useQuasar()
 
 export interface ChannelMember {
@@ -15,6 +14,12 @@ export interface ChannelMember {
   status: 'online' | 'offline' | 'away';
 }
 
+export interface CurrentyTyping {
+  username: string;
+  content: string;
+  timeoutId?: NodeJS.Timeout;
+}
+
 export interface Channel {
   id: number
   name: string
@@ -22,7 +27,7 @@ export interface Channel {
   private: boolean
   highlighted?: boolean,
   members: ChannelMember[],
-  currentlyTyping: string[]
+  currentlyTyping: CurrentyTyping[]
 }
 
 export const useChannelStore = defineStore('channel', {
@@ -50,9 +55,78 @@ export const useChannelStore = defineStore('channel', {
       }
       return channel.members.find(m => m.username === username)
     },
+    getChannelByName(channelName: string) {
+      return this.channels.find(c => c.name === channelName)
+    },
+
+    updateCurrentlyTyping(channelName: string, username: string, content: string) {
+      // Find the currentlyTyping entry in the active channel
+      const channel = this.getChannelByName(channelName);
+      if (!channel) return;
+      let currentlyTypingEntry = channel.currentlyTyping.find((entry) => entry.username === username);
+
+      // If the scroll is at the bottom, scroll to the bottom
+      const htmlEl = window.document.querySelector('html')
+      if (htmlEl && htmlEl.scrollTop + htmlEl.clientHeight >= htmlEl.scrollHeight - 10) {
+        setTimeout(() => {
+          htmlEl.scrollTop = htmlEl.scrollHeight
+        }, 0);
+      }
+
+      // Set up a 5 second timeout to remove the draft for the user in the channel
+      if (currentlyTypingEntry?.timeoutId) {
+        clearTimeout(currentlyTypingEntry.timeoutId);
+      }
+
+
+      if (currentlyTypingEntry)
+        // Update the content
+        currentlyTypingEntry.content = content;
+      else
+        // Add a new entry
+        channel.currentlyTyping.push({ username: username, content: content });
+
+      currentlyTypingEntry = channel.currentlyTyping[channel.currentlyTyping.length - 1];
+      currentlyTypingEntry.timeoutId = setTimeout(() => {
+        this.removeCurrentlyTyping(channelName, username);
+      }, 4000);
+
+    },
+
+    removeCurrentlyTyping(channelName: string, username: string) {
+      const channel = this.getChannelByName(channelName);
+      if (!channel) return;
+      const currentlyTypingEntryIndex = channel.currentlyTyping.findIndex((entry) => entry.username === username);
+      if (currentlyTypingEntryIndex !== -1) {
+        // Remove the entry
+        channel.currentlyTyping.splice(currentlyTypingEntryIndex, 1);
+      }
+    },
+
+    async sendTyping(content: string) {
+      const socketStore = useSocketStore();
+      if (!this.activeChannel.name) {
+        console.error('No active channel to start typing');
+        return
+      }
+      socketStore.sendMessage('typing', { channelName: this.activeChannel.name, content })
+    },
+
+    async stopTyping() {
+      const socketStore = useSocketStore();
+      if (!this.activeChannel.name) {
+        console.error('No active channel to stop typing');
+        return
+      }
+      socketStore.sendMessage('stop_typing', { channelName: this.activeChannel.name })
+    },
+
     async fetchChannels() {
       try {
         this.channels = (await api.get('/c')).data
+        for (const channel of this.channels) {
+          channel.currentlyTyping = []
+        }
       } catch (e) {
         console.error(e);
       }
@@ -72,7 +146,7 @@ export const useChannelStore = defineStore('channel', {
           private: isPrivate
         })).data
         this.channels.unshift(channel)
-        $q.notify(`You have joined ${channelName}`)
+        $q?.notify(`You have joined ${channelName}`)
         await this.setActiveChannel(channelName)
       } catch (e) {
         console.error(e);
@@ -82,7 +156,7 @@ export const useChannelStore = defineStore('channel', {
       if (!this.activeChannel.name) {
         console.error('No active channel to leave');
       }
-      $q.notify(`You have left ${this.activeChannel.name}`)
+      $q?.notify(`You have left ${this.activeChannel.name}`)
       this.leaveChannel(this.activeChannel.name);
     },
 
@@ -128,6 +202,7 @@ export const useChannelStore = defineStore('channel', {
       }
     },
     async setActiveChannel(chanelName: string) {
+      const socketStore = useSocketStore();
       const channel = this.channels.find(c => c.name === chanelName) || {} as Channel
 
       // Fetch members of the channel
@@ -152,6 +227,7 @@ export const useChannelStore = defineStore('channel', {
     },
     addInvitedChannel(channel: Channel) {
       channel.highlighted = true
+      channel.currentlyTyping = []
       this.channels.unshift(channel)
     },
     // better to remove the channel from the store, than to fetch all channels again
