@@ -3,6 +3,7 @@ import { api } from 'boot/api';
 import { useMessageStore } from './messageStore';
 import { useSocketStore } from './socketStore';
 import { useQuasar } from 'quasar';
+import { useUserStore } from 'stores/userStore';
 
 const $q = useQuasar()
 
@@ -25,8 +26,8 @@ export interface Channel {
   name: string
   adminId: number
   private: boolean
-  highlighted?: boolean,
-  members: ChannelMember[],
+  highlighted?: boolean
+  members: ChannelMember[]
   currentlyTyping: CurrentyTyping[]
 }
 
@@ -142,10 +143,12 @@ export const useChannelStore = defineStore('channel', {
       }
 
       try {
-        const channel = (await api.post('/c/join', {
+        const channel: Channel = (await api.post('/c/join', {
           channelName,
           isPrivate
         })).data
+        channel.currentlyTyping = channel.currentlyTyping || [];
+        channel.members = channel.members || [];
         this.channels.unshift(channel)
         await this.setActiveChannel(channelName)
         return 'Joined ' + channelName
@@ -181,6 +184,13 @@ export const useChannelStore = defineStore('channel', {
         console.error(e);
         return e?.response?.data?.message || 'An unexpected error occurred.'
       }
+    },
+    async revokeUser(username: string): Promise<string> {
+      // only works if the logged in user is admin
+      if (this.activeChannel.adminId !== useUserStore().user.id) {
+        return 'Only the admin can revoke a user membership'
+      }
+      return await this.kickUser(username)
     },
     async inviteUser(username: string): Promise<string> {
       try {
