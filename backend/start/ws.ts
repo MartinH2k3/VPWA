@@ -15,7 +15,6 @@ interface SocketData {
   data: any
 }
 
-
 wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
   console.log('A new connection')
   let socketSession: SocketSession
@@ -55,7 +54,7 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
       return
     }
 
-    socketSession.receive(event, data)
+    await socketSession.receive(event, data)
   })
 
   ws.on('close', () => {
@@ -78,5 +77,3 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
 server.listen(9594, () => {
   console.log('Server is listening on port 9594')
 })
-
-
