@@ -168,7 +168,9 @@ const useSocketStore = defineStore('socket', {
     updateStatus(status: string) {
       this.sendMessage('update_status', { status });
     },
-
+    updateOnlyMentions(onlyMentions: boolean) {
+      this.sendMessage('update_only_mentions', { onlyMentions });
+    },
     async waitTillConnected() {
       return new Promise((resolve) => {
         if (this.isConnected) {

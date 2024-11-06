@@ -54,7 +54,6 @@ import { useRouter } from 'vue-router';
 import { useUserStore } from 'stores/userStore';
 import { useSocketStore } from 'stores/socketStore';
 import MessagePage from 'pages/MessagePage.vue';
-// import NotificationWindow from 'components/NotificationWindow.vue';
 import { api } from 'boot/api';
 import { useChannelStore } from 'stores/channelStore';
 import { useMessageStore } from 'stores/messageStore';
@@ -67,7 +66,6 @@ export default {
     SideBar,
     MessagePage,
     MembersSideBar,
-    // NotificationWindow
   },
   data() {
     return {
@@ -100,7 +98,7 @@ export default {
       }
     },
     onlyMentions(newOnlyMentions) {
-      this.messageStore.setOnlyMentions(newOnlyMentions);
+      this.userStore.setOnlyMentions(newOnlyMentions);
     },
     'socketStore.notification'(newNotification) {
       if (newNotification) {

@@ -71,8 +71,9 @@ export default class SocketSession {
             session === this ||
             !session.isInChannel(data.channelName) ||
             session.status === 'offline' ||
+            session.status === 'away' ||
             session.activeChannelName === data.channelName ||
-            (session.status === 'away' && !this.checkMention(data.message, session.user.username!))
+            (session.onlyMentions && !this.checkMention(data.message, session.user.username!))
           ) {
             return
           }
@@ -92,6 +93,14 @@ export default class SocketSession {
         }
 
         this.status = data.status
+        break
+
+      case 'update_only_mentions':
+        if (typeof data.onlyMentions !== 'boolean') {
+          console.error('Invalid value for onlyMentions')
+          return
+        }
+        this.onlyMentions = data.onlyMentions
         break
 
       case 'update_active_channel':
