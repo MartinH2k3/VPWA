@@ -152,21 +152,6 @@ export const useMessageStore = defineStore('message', {
           taggedMe: message.content.includes(`@${userStore.getUsername}`)
         }, toFront);
       }
-
-
-
-
-      // for (let i = 0; i < limit; i++) {
-      //   const byMe = Math.random() > 0.8;
-      //   const taggedMe = Math.random() > 0.8 && !byMe;
-      //   this.addMessage(channelName, {
-      //     id: Math.floor(Math.random() * 1000),
-      //     username: 'user' + Math.floor(Math.random() * 10),
-      //     content: (taggedMe ? `@${userStore.getUsername}  ` : '') + generateMessage(),
-      //     byMe: byMe,
-      //     taggedMe: taggedMe
-      //   }, toFront);
-      // }
     },
     async fetchActiveChannelMessages(limit: number, cursor: (number | null)) {
       const channelStore = useChannelStore();
@@ -179,15 +164,6 @@ export const useMessageStore = defineStore('message', {
   },
 
   getters: {
-    // messages: (state) => (channel: string) => {
-    //   // If messages for channel don't exist, return empty array
-    //   if (!state.messages[channel]) {
-    //     state.messages[channel] = [];
-    //     // Fetch messages for channel
-    //     this.fetchMessages(channel, 10, null);
-    //   }
-    //   return state.messages[channel];
-    // },
     activeChannelMessages: (state) => {
       const channelStore = useChannelStore();
       return state.messages[channelStore.activeChannel.name] || [];
@@ -197,7 +173,4 @@ export const useMessageStore = defineStore('message', {
       return state.channelMessagesInfo[channelStore.activeChannel.name] || { limit: 10, cursor: 0, reachedTop: false };
     }
   },
-
-
-
 });
