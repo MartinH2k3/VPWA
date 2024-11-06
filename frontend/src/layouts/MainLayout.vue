@@ -101,6 +101,16 @@ export default {
     },
     onlyMentions(newOnlyMentions) {
       this.messageStore.setOnlyMentions(newOnlyMentions);
+    },
+    'socketStore.notification'(newNotification) {
+      if (newNotification) {
+        this.$q.notify({
+          message: `<strong>${newNotification.channelName}|${newNotification.username}</strong><br>${newNotification.messageContent}`,
+          html: true,
+          color: 'primary',
+          timeout: 2000,
+        });
+      }
     }
   },
   methods: {

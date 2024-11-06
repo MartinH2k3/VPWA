@@ -8,6 +8,7 @@ export default class SocketSession {
   ws: WebSocket
   activeChannelName: string | null = null
   status: 'online' | 'offline' | 'away' = 'offline'
+  onlyMentions: boolean = false
   // A variable to represent the channels the user is in
   channels: string[] = []
 
@@ -31,9 +32,10 @@ export default class SocketSession {
     return this.channels.includes(channelName)
   }
 
-  notify(event: string, data: any) {
-    this.send('notification', { event, data })
+  private checkMention(message: string, username: string) {
+    return message.includes(`@${username}`)
   }
+
   async receive(event: string, data: any) {
     switch (event) {
       case 'message':
@@ -61,6 +63,26 @@ export default class SocketSession {
             username: this.user.username,
           })
         })
+        // send notifications to all channel members
+        // Don't send to people with offline|away. Don't send to the sender or people with channel open
+        // if only mentions is on for user, only send if mentioned
+        socketSessions.forEach((session) => {
+          if (
+            session === this ||
+            !session.isInChannel(data.channelName) ||
+            session.status === 'offline' ||
+            session.activeChannelName === data.channelName ||
+            (session.status === 'away' && !this.checkMention(data.message, session.user.username!))
+          ) {
+            return
+          }
+          session.send('notification', {
+            messageId: message.id,
+            messageContent: message.content.slice(0, 50),
+            channelName: data.channelName,
+            username: this.user.username,
+          })
+        })
         break
 
       case 'update_status':
@@ -68,7 +90,6 @@ export default class SocketSession {
           console.error('Invalid status')
           return
         }
-        console.log('Updated status for', this.user.username, 'to', data.status)
 
         this.status = data.status
         break
@@ -76,17 +97,14 @@ export default class SocketSession {
       case 'update_active_channel':
         if (!this.isInChannel(data.channelName)) return
         this.activeChannelName = data.channelName
-        console.log('Updated active channel for', this.user.username, 'to', this.activeChannelName)
 
         break
       case 'typing':
-
         if (!this.isInChannel(data.channelName)) return
         // Send the draft content to all users in the channel
 
         socketSessions.getForActiveChannel(data.channelName).forEach((session) => {
           if (session === this || session.status === 'offline') return
-          //console.log('Sending draft to', session.user.username)
           session.send('message_draft', {
             username: this.user.username,
             content: data.content,
@@ -98,8 +116,6 @@ export default class SocketSession {
       case 'stop_typing':
         if (!this.isInChannel(data.channelName)) return
         // Remove the draft content from all users in the channel
-        console.log('Removing draft from all users in the channel')
-
         socketSessions.getForActiveChannel(data.channelName).forEach((session) => {
           if (session === this || session.status === 'offline') return
           console.log('Removing draft from', session.user.username)
@@ -116,16 +132,12 @@ export default class SocketSession {
       case 'remove_channel':
         this.removeChannel(data.channel)
         break
-      case 'send_notification':
-        this.sendNotification(data.notification)
-        break
       default:
         console.error('Invalid event')
     }
   }
 
   async createMessage(message: string, channelName: string) {
-    console.log('Received message', message)
 
     const user = this.user
     if (!user) {
@@ -144,7 +156,6 @@ export default class SocketSession {
     })
   }
 
-  getMessage(message: any, channel: Channel) {}
   addChannel(channel: Channel) {
     this.addToJoinedChannels(channel.name)
     this.send('add_channel', channel)
@@ -158,11 +169,8 @@ export default class SocketSession {
     this.removeFromJoinedChannels(channel.name)
     this.send('remove_channel', channel)
   }
-  sendNotification(notification: any) {
-    this.send('notification', notification)
-  }
 
-  send(event: string, data: any) {
-    this.ws.send(JSON.stringify({ event, data }))
+  send(eventName: string, data: any) {
+    this.ws.send(JSON.stringify({ event: eventName, data }))
   }
 }

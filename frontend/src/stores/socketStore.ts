@@ -6,12 +6,6 @@ import { useUserStore } from 'stores/userStore';
 import { useQuasar } from 'quasar';
 
 
-interface SocketState {
-  socket: WebSocket | null;
-  isConnected: boolean;
-  isAuthenticated: boolean;
-}
-
 interface SocketMessage {
   event: string;
   data: any;
@@ -20,10 +14,11 @@ interface SocketMessage {
 const URL = 'ws://127.0.0.1:9594';
 
 const useSocketStore = defineStore('socket', {
-  state: (): SocketState => ({
-    socket: null,
+  state: () => ({
+    socket: null as WebSocket | null,
     isConnected: false,
-    isAuthenticated: false
+    isAuthenticated: false,
+    notification: null as any
   }),
   actions: {
     async connect() {
@@ -92,8 +87,8 @@ const useSocketStore = defineStore('socket', {
           case 'notification':
             // If DND or offline: break
             // If only mentions: check if mentioned
-            // for socc
-            // TODO implement
+            console.log('Received notification', socketMessage.data);
+            this.notification = socketMessage.data;
             break;
           case 'message_draft':
             { // If offline: break
