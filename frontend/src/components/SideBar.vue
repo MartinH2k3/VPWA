@@ -12,27 +12,24 @@
         </q-item-label>
       </q-item-section>
     </q-item>
-    <q-item v-else
-      clickable
-      v-for="channel in channels"
-      :key="channel.id"
-      @click="goToChannel(channel)"
-      :class="{active: channel.id===activeChannel.id, highlighted: channel.highlighted}"
-    >
+    <q-item v-else clickable v-for="channel in channels" :key="channel.id" @click="goToChannel(channel)"
+      :class="{ active: channel.id === activeChannel.id, highlighted: channel.highlighted }">
       <div class="row flex-row flex-nowrap" style="width: 100%;">
         <span class="q-mr-auto flex items-center">
           {{ channel.name }}</span>
-          <q-btn
-        flat
-        round
-        dense
-        icon="close"
-        class="q-ml-sm"
-        @click="leaveChannel(channel.name )"
-        />
+        <q-btn flat round dense icon="close" class="q-ml-sm" @click="leaveChannel(channel.name)" />
 
       </div>
     </q-item>
+    <!-- Button with input that will create channel -->
+    <q-item>
+      <q-item-section>
+        <q-input v-model="newChannelName" label="Create/join channel" @keyup.enter="createChannel()" />
+        <q-toggle v-model="isPrivate" label="Private" />
+        <q-btn @click="createChannel()" label="Create" />
+      </q-item-section>
+    </q-item>
+
   </q-list>
 </template>
 
@@ -47,11 +44,13 @@ export default defineComponent({
   setup() {
     const router = useRouter();
     const $q = useQuasar();
-    return {router, $q};
+    return { router, $q };
   },
   data() {
     return {
       channelStore: useChannelStore(),
+      newChannelName: '',
+      isPrivate: false,
     };
   },
   computed: {
@@ -67,12 +66,25 @@ export default defineComponent({
       // this.router.push(`/c/${channel.name}`);
       this.channelStore.setActiveChannel(channel.name);
     },
+    createChannel() {
+      if (this.newChannelName.trim() === '') {
+        this.$q.notify({
+          message: 'Channel name cannot be empty',
+          color: 'negative',
+          position: 'bottom',
+          timeout: 2000
+        });
+        return;
+      }
+      this.channelStore.joinChannel(this.newChannelName, this.isPrivate);
+      this.newChannelName = '';
+    },
 
     async leaveChannel(channelName: string) {
 
       // Make a confirm alert
-      let confirm : boolean =  window.confirm('Do you really wanna leave ' + channelName + '?');
-      if(!confirm) return;
+      let confirm: boolean = window.confirm('Do you really wanna leave ' + channelName + '?');
+      if (!confirm) return;
 
       await this.channelStore.leaveChannel(channelName);
       // Notify
