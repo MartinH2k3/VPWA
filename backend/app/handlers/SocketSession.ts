@@ -16,7 +16,6 @@ export default class SocketSession {
     this.ws = ws
     this.user = user
     this.channels = channels.map((c) => c.name)
-    console.log('New socket session for', user.username, 'with', this.channels, 'channels')
   }
 
   addToJoinedChannels(channelName: string) {
@@ -78,15 +77,13 @@ export default class SocketSession {
 
         break
       case 'typing':
-        console.log('User', this.user.username, 'is typing in', data.channelName)
 
         if (!this.isInChannel(data.channelName)) return
         // Send the draft content to all users in the channel
-        console.log('Sending draft to all users in the channel')
 
         socketSessions.getWithActiveChannel(data.channelName).forEach((session) => {
           if (session === this || session.status === 'offline') return
-          console.log('Sending draft to', session.user.username)
+          //console.log('Sending draft to', session.user.username)
           session.send('message_draft', {
             username: this.user.username,
             content: data.content,
