@@ -56,7 +56,7 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
       return
     }
 
-    socketSession.receiveMessage(event, data)
+    socketSession.receive(event, data)
   })
 
   ws.on('close', () => {
