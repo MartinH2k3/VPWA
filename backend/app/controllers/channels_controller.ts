@@ -10,13 +10,11 @@ export default class ChannelsController {
     if (!userId) {
       return []
     }
-    const channels = await Channel.query()
+    return Channel.query()
       .whereHas('members', (query) => {
         query.where('user_id', userId).wherePivot('kicked', false)
       })
       .orderBy('created_at', 'desc')
-
-    return channels
   }
 
   async join({ request, auth, response }: HttpContext) {
@@ -49,7 +47,7 @@ export default class ChannelsController {
       if (socketSession) {
         socketSession.addToJoinedChannels(existingChannel.name)
       }
-      socketSessions.updateChannelMembers(existingChannel.name)
+      await socketSessions.updateChannelMembers(existingChannel.name)
       return existingChannel
     } else {
       const channel = await Channel.create({
@@ -103,7 +101,7 @@ export default class ChannelsController {
       if (socketSession) {
         socketSession.removeChannel(channel)
       }
-      socketSessions.updateChannelMembers(channel.name)
+      await socketSessions.updateChannelMembers(channel.name)
       return response.ok(`Successfully left the channel ${channel?.name}`)
     } catch (e) {
       return response.badRequest(e)
@@ -149,7 +147,7 @@ export default class ChannelsController {
         if (socketSession) {
           socketSession.kick(channel.name)
         }
-        socketSessions.updateChannelMembers(channel.name)
+        await socketSessions.updateChannelMembers(channel.name)
         return response.ok({ message: `${username} has been banned from the channel` })
       } else {
         await channel.related('members').sync(
@@ -208,7 +206,7 @@ export default class ChannelsController {
             socketSession.addChannel(channel)
           }
 
-          socketSessions.updateChannelMembers(channel.name)
+          await socketSessions.updateChannelMembers(channel.name)
           return response.ok({ message: `${username} has been unbanned from the channel` })
         }
         return response.badRequest({ message: 'User is already a member of the channel' })
@@ -227,7 +225,7 @@ export default class ChannelsController {
         socketSession.addChannel(channel)
       }
 
-      socketSessions.updateChannelMembers(channel.name)
+      await socketSessions.updateChannelMembers(channel.name)
       return response.ok({ message: `${username} has been invited to the channel` })
     } catch (e) {
       console.log(e)
@@ -248,8 +246,7 @@ export default class ChannelsController {
       return response.forbidden({ message: 'You are not a member of this channel' })
     }
 
-    const members = await channel.related('members').query().where('kicked', false)
-    return members
+    return await channel.related('members').query().where('kicked', false)
   }
 
   async messages({ params, request, response }: HttpContext) {
@@ -259,12 +256,10 @@ export default class ChannelsController {
     if (!channel) {
       return response.notFound({ message: 'Channel not found' })
     }
-    const messages = await Message.query()
+    return Message.query()
       .where('channel_id', channel.id)
       .orderBy('created_at', 'desc')
       .limit(limit)
       .offset(cursor)
-    return messages
   }
-
 }
