@@ -145,6 +145,46 @@ export default {
               },
               true);
             break;
+          case 'info':
+            let message: string;
+            const command = args[0] ? args[0] : '';
+            switch (command) {
+              case '':
+                message = '/info <command> for information on a specific command';
+                break;
+              case 'join':
+                message = 'Join a channel: /join <channel-name> [private]';
+                break;
+              case 'invite':
+                message = 'Invite a user to the channel: /invite <username>';
+                break;
+              case 'leave':
+              case 'cancel':
+              case 'quit':
+                message = 'Leave the channel: /quit, /leave or /cancel';
+                break;
+              case 'kick':
+                message = 'Kick a user from the channel: /kick <username>';
+                break;
+              case 'revoke':
+                message = 'Revoke a user from the channel: /revoke <username>';
+                break;
+              case 'list':
+                message = 'List all users in the channel: /list';
+                break;
+              case 'help':
+                message = 'List all available commands: /help';
+                break;
+            }
+            this.messageStore.addMessageToActiveChannel({
+                id: 0,
+                username: 'system',
+                content: message,
+                byMe: false,
+                taggedMe: false,
+              },
+              true);
+            break;
           default:
             // Inform user that command is unknown
             this.messageStore.addMessageToActiveChannel({
