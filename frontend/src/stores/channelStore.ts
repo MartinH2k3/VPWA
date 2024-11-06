@@ -131,13 +131,14 @@ export const useChannelStore = defineStore('channel', {
         console.error(e);
       }
     },
-    async joinChannel(channelName: string, isPrivate: boolean) {
+    // 4 following functions return strings to use with Quasar's notify
+    async joinChannel(channelName: string, isPrivate: boolean):Promise<string> {
 
       // If that channel is already in the list, set it as active channel
       const channel = this.channels.find(c => c.name === channelName)
       if (channel) {
         await this.setActiveChannel(channelName)
-        return
+        return 'Switching to ' + channelName
       }
 
       try {
@@ -147,40 +148,47 @@ export const useChannelStore = defineStore('channel', {
         })).data
         this.channels.unshift(channel)
         await this.setActiveChannel(channelName)
-      } catch (e) {
+        return 'Joined ' + channelName
+      } catch (e: any) {
         console.error(e);
-        alert(e.response.data.message)
+        return e?.response?.data?.message || 'An unexpected error occurred.'
       }
     },
-    async leaveActiveChannel() {
+    async leaveActiveChannel(): Promise<string> {
       if (!this.activeChannel.name) {
         console.error('No active channel to leave');
+        return 'No active channel to leave'
       }
-      this.leaveChannel(this.activeChannel.name);
+      return await this.leaveChannel(this.activeChannel.name);
     },
 
-    async leaveChannel(channelName: string) {
+    async leaveChannel(channelName: string): Promise<string>{
       try {
         await api.post(`/c/${this.activeChannel.name}/cancel`)
         // remove channel based on name from store
         this.removeChannel(channelName)
-
-      } catch (e) {
+        return 'Left ' + channelName
+      } catch (e:any) {
         console.error(e);
+        return e?.response?.data?.message || 'An unexpected error occurred.'
       }
     },
-    async kickUser(username: string) {
+    async kickUser(username: string): Promise<string> {
       try {
         await api.post(`/c/${this.activeChannel.name}/kick`, { username })
-      } catch (e) {
+        return 'Voted to kick ' + username
+      } catch (e: any) {
         console.error(e);
+        return e?.response?.data?.message || 'An unexpected error occurred.'
       }
     },
-    async inviteUser(username: string) {
+    async inviteUser(username: string): Promise<string> {
       try {
         await api.post(`/c/${this.activeChannel.name}/invite`, { username })
-      } catch (e) {
+        return 'Invited ' + username
+      } catch (e: any) {
         console.error(e);
+        return e?.response?.data?.message || 'An unexpected error occurred.'
       }
     },
     updateMembers(channelName: string, members: ChannelMember[]) {
@@ -199,6 +207,12 @@ export const useChannelStore = defineStore('channel', {
       } catch (e) {
         console.error(e);
       }
+    },
+    getActiveChannelMembers() {
+      if (!this.activeChannel.name) {
+        return 'No active channel'
+      }
+      return this.activeChannel.members
     },
     async setActiveChannel(chanelName: string) {
       const socketStore = useSocketStore();

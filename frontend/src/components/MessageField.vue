@@ -19,7 +19,7 @@ export default {
     const channelStore = useChannelStore();
     const userStore = useUserStore();
     const $q = useQuasar()
-    return { channelStore, router, messageStore, userStore };
+    return { channelStore, router, messageStore, userStore, $q};
   },
   data() {
     return {
@@ -27,7 +27,11 @@ export default {
       draftTimeout: null as NodeJS.Timeout | null,
     };
   },
-
+  computed: {
+    members() {
+      return this.channelStore?.activeChannel?.members;
+    },
+  },
   watch: {
     // Watch for changes in the active channel
     'channelStore.activeChannel': {
@@ -80,8 +84,9 @@ export default {
         const splitMessage = this.message.split(' ');
         const command = splitMessage[0].substring(1);
         const args = splitMessage.slice(1);
-        let username;
+        let username: string;
         let channelName: string;
+        let response: string;
         if (!this.channelStore.activeChannel.name && command !== 'join') {
           this.$q.notify('You are currently not in a channel');
           return;
@@ -101,39 +106,32 @@ export default {
             //   return;
             // }
             let isPrivate = args.length > 1 && args[1] === 'private';
-            await this.channelStore.joinChannel(channelName, isPrivate);
+            response = await this.channelStore.joinChannel(channelName, isPrivate);
             break;
 
           case 'invite':
             username = args[0];
-            await this.channelStore.inviteUser(username);
+            response = await this.channelStore.inviteUser(username);
             break;
           case 'quit': //fallback for now, since for now they are the same
           case 'cancel':
           case 'leave':
-            await this.channelStore.leaveActiveChannel(); //works for active channel so no params
+            response = await this.channelStore.leaveActiveChannel(); //works for active channel so no params
             break;
 
           case 'kick':
             username = args[0];
-            await this.channelStore.kickUser(username); //works for active channel so no param for that
+            response = await this.channelStore.kickUser(username); //works for active channel so no param for that
             break;
 
           case 'list':
             //TODO get all users in channel
-            const users = {
-              'user1': 'online',
-              'user2': 'away',
-              'user3': 'offline'
-            };
-            console.log('Adding users to message store');
+            const users = this.channelStore.getActiveChannelMembers();
 
             this.messageStore.addMessageToActiveChannel({
               id: 0,
               username: 'system',
-              content: 'Users in channel: ' + Object.entries(users)
-                .map(([username, status]) => `${username} (${status})`)
-                .join(', '), // display users and their status
+              content: 'Users in channel: ' + users,
               byMe: false,
               taggedMe: false,
             },
@@ -144,6 +142,7 @@ export default {
             console.log('Unknown command');
             break;
         }
+        this.$q.notify(response);
       }
       console.log('Message sent:', this.message);
       this.message = ''; // Clear the message
