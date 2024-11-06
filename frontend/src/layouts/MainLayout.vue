@@ -18,11 +18,9 @@
             </div>
             <q-separator vertical inset class="text-white" />
             <div class="column justify-around">
-              <q-radio v-model="status" val="online" label="online"
-                @update:model-value="userStore.setStatus('online')" />
-              <q-radio v-model="status" val="away" label="away" @update:model-value="userStore.setStatus('away')" />
-              <q-radio v-model="status" val="offline" label="offline"
-                @update:model-value="userStore.setStatus('offline')" />
+              <q-radio v-model="status" val="online" label="online"/>
+              <q-radio v-model="status" val="away" label="away"/>
+              <q-radio v-model="status" val="offline" label="offline"/>
             </div>
           </div>
         </q-btn-dropdown>
@@ -36,9 +34,11 @@
     <q-drawer show-if-above v-model="rightDrawerOpen" side="right" bordered>
       <MembersSideBar />
     </q-drawer>
+
     <q-page-container>
       <message-page />
     </q-page-container>
+
     <q-footer class="bg-white">
       <message-field />
     </q-footer>
@@ -91,6 +91,17 @@ export default {
     if (this.channelStore.channels.length > 0)
       this.channelStore.setActiveChannel(this.channelStore.channels[0].name)
 
+  },
+  watch: {
+    status(newStatus, oldStatus) {
+      this.userStore.setStatus(newStatus);
+      if (oldStatus === 'offline' && newStatus !== 'offline') {
+        window.location.reload()
+      }
+    },
+    onlyMentions(newOnlyMentions) {
+      this.messageStore.setOnlyMentions(newOnlyMentions);
+    }
   },
   methods: {
     toggleLeftDrawer() {
