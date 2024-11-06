@@ -143,7 +143,7 @@ export const useChannelStore = defineStore('channel', {
       try {
         const channel = (await api.post('/c/join', {
           channelName,
-          private: isPrivate
+          isPrivate
         })).data
         this.channels.unshift(channel)
         $q?.notify(`You have joined ${channelName}`)

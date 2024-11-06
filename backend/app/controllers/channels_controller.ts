@@ -61,7 +61,7 @@ export default class ChannelsController {
       if (socketSession) {
         socketSession.addToJoinedChannels(channel.name)
       }
-      socketSessions.updateChannelMembers(channel.name)
+      await socketSessions.updateChannelMembers(channel.name)
       return response.ok(channel)
     }
   }
@@ -264,16 +264,4 @@ export default class ChannelsController {
     return messages
   }
 
-  async test({ auth }: HttpContext) {
-    // const userId = 1
-    // const socketSession = socketSessions.get(userId)
-    // if (socketSession) {
-    //   socketSession.addChannel({
-    //     id: Math.random() * Number.MAX_SAFE_INTEGER,
-    //     name: 'test',
-    //     adminId: auth.user!.id,
-    //     private: false,
-    //   })
-    // }
-  }
 }
