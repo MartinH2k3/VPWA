@@ -31,6 +31,9 @@ export default class SocketSession {
     return this.channels.includes(channelName)
   }
 
+  notify(event: string, data: any) {
+    this.send('notification', { event, data })
+  }
   async receive(event: string, data: any) {
     switch (event) {
       case 'message':
@@ -48,7 +51,7 @@ export default class SocketSession {
         // Add message to all users in the channel
         console.log('Sending message to all users in the channel')
 
-        socketSessions.getWithActiveChannel(data.channelName).forEach((session) => {
+        socketSessions.getForActiveChannel(data.channelName).forEach((session) => {
           if (session === this) return
           console.log('Sending message to', session.user.username)
           session.send('add_message', {
@@ -81,7 +84,7 @@ export default class SocketSession {
         if (!this.isInChannel(data.channelName)) return
         // Send the draft content to all users in the channel
 
-        socketSessions.getWithActiveChannel(data.channelName).forEach((session) => {
+        socketSessions.getForActiveChannel(data.channelName).forEach((session) => {
           if (session === this || session.status === 'offline') return
           //console.log('Sending draft to', session.user.username)
           session.send('message_draft', {
@@ -97,7 +100,7 @@ export default class SocketSession {
         // Remove the draft content from all users in the channel
         console.log('Removing draft from all users in the channel')
 
-        socketSessions.getWithActiveChannel(data.channelName).forEach((session) => {
+        socketSessions.getForActiveChannel(data.channelName).forEach((session) => {
           if (session === this || session.status === 'offline') return
           console.log('Removing draft from', session.user.username)
           session.send('remove_message_draft', {

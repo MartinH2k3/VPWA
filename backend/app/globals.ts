@@ -8,15 +8,15 @@ interface PendingWebSocketAuthentificationRequest {
 }
 
 class SocketSessions extends Array<SocketSession> {
-  getWithActiveChannel(channelName: string) {
+  getForActiveChannel(channelName: string) {
     return this.filter((session) => session.activeChannelName === channelName)
   }
-  get(userId: number) {
+  getForUser(userId: number) {
     return this.find((session) => session.user.id === userId)
   }
 
   async updateChannelMembers(channelName: string) {
-    // Update everyones members list that has this channel as active
+    // Update everyone's members list that has this channel as active
     const channel = await Channel.query().where('name', channelName).first()
 
     if (!channel) return
@@ -34,7 +34,7 @@ class SocketSessions extends Array<SocketSession> {
       }
     )
 
-    this.getWithActiveChannel(channelName).forEach((session) => {
+    this.getForActiveChannel(channelName).forEach((session) => {
       session.send('update_channel_members', {
         channelName,
         members: members,
