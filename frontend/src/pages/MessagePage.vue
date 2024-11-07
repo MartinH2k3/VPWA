@@ -6,9 +6,8 @@
           :name="message.byMe ? 'Me' : message.username" :text="[message.content]" :sent="message.byMe"
           :bg-color="message.byMe || message.taggedMe ? 'primary' : 'grey'"
           :text-color="message.byMe || message.taggedMe ? 'white' : ''" /><!--default color if not by me-->
-        <div v-for="typingUser in currentlyTyping" :key="typingUser.username + '-typing'"
-             :name="typingUser.username">
-          <q-chat-message  bg-color="grey">
+        <div v-for="typingUser in currentlyTyping" :key="typingUser.username + '-typing'">
+          <q-chat-message  bg-color="grey" :name="typingUser.username">
           <span @mouseover="inspectUser(typingUser.username, $event)" @mouseleave="stopInspecting">
             <q-spinner-dots size="1rem" />
           </span>
