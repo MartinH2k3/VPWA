@@ -90,7 +90,7 @@ export default {
         const args = splitMessage.slice(1);
         let username: string;
         let channelName: string;
-        let response: string;
+        let response: string = '';
         if (!this.channelStore.activeChannel.name && command !== 'join') {
           this.$q.notify('You are currently not in a channel');
           return;
@@ -146,7 +146,7 @@ export default {
               true);
             break;
           case 'info':
-            let message: string;
+            let message: string = '';
             const command = args[0] ? args[0] : '';
             switch (command) {
               case '':
