@@ -18,15 +18,14 @@ export default class Message extends BaseModel {
   declare channel_id: number
 
   @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+  declare created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+  declare updated_at: DateTime
 
-  @belongsTo(() => User, { foreignKey: 'adminId' })
+  @belongsTo(() => User, { foreignKey: 'admin_id' })
   declare user: BelongsTo<typeof User>
 
   @belongsTo(() => Channel, { foreignKey: 'channel_id' })
   declare channel: BelongsTo<typeof Channel>
-
 }

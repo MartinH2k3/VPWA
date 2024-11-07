@@ -52,8 +52,8 @@ export default class ChannelsController {
     } else {
       const channel = await Channel.create({
         name: channelName,
-        adminId: userId, // The user who creates the channel becomes the admin
-        isPrivate: !!isPrivate, // You can set default visibility or get it from the request
+        admin_id: userId, // The user who creates the channel becomes the admin
+        is_private: !!isPrivate, // You can set default visibility or get it from the request
       })
 
       // Auto-join the admin to the channel
@@ -75,7 +75,7 @@ export default class ChannelsController {
       if (!channel) {
         return response.notFound({ message: 'No active channel' })
       }
-      if (channel?.adminId === userId) {
+      if (channel?.admin_id === userId) {
         // get all channel members
         const members = await channel.related('members').query()
         // for all sockets, remove the channel
@@ -128,11 +128,11 @@ export default class ChannelsController {
 
       if (!pivotRow) return response.notFound({ message: 'User is not a member of the channel' })
 
-      if (channel.adminId === kickedUser.id)
+      if (channel.admin_id === kickedUser.id)
         return response.badRequest({ message: 'Admin cannot be kicked' })
 
       const kickVotes = pivotRow.kick_votes
-      if (kickVotes >= 2 || channel.adminId === userId) {
+      if (kickVotes >= 2 || channel.admin_id === userId) {
         // Set the user as banned in the pivot table
         await channel.related('members').sync(
           {
@@ -189,7 +189,7 @@ export default class ChannelsController {
         .where('user_id', invitedUser.id)
         .first()
       if (pivotRow) {
-        if (pivotRow.kicked && channel.adminId === userId) {
+        if (pivotRow.kicked && channel.admin_id === userId) {
           // Unban the user
           await channel.related('members').sync(
             {
@@ -212,7 +212,7 @@ export default class ChannelsController {
         return response.badRequest({ message: 'User is already a member of the channel' })
       }
 
-      if (channel.isPrivate && channel.adminId !== userId) {
+      if (channel.is_private && channel.admin_id !== userId) {
         return response.forbidden({ message: 'You are not allowed to invite to this channel' })
       }
 
