@@ -23,7 +23,7 @@ export default class Channel extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 
-  @belongsTo(() => User, { foreignKey: 'adminId' })
+  @belongsTo(() => User, { foreignKey: 'admin_id' })
   declare admin: BelongsTo<typeof User>
 
   @hasMany(() => Message)
