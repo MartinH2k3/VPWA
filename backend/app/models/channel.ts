@@ -18,15 +18,15 @@ export default class Channel extends BaseModel {
   declare is_private: boolean
 
   @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+  declare created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+  declare updated_at: DateTime
 
   @belongsTo(() => User, { foreignKey: 'admin_id' })
   declare admin: BelongsTo<typeof User>
 
-  @hasMany(() => Message)
+  @hasMany(() => Message, { foreignKey: 'channel_id' })
   declare messages: HasMany<typeof Message>
 
   @manyToMany(() => User, {

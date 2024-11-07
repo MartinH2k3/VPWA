@@ -7,10 +7,23 @@
 | or the router.
 |
 */
-
 import router from '@adonisjs/core/services/router'
 import server from '@adonisjs/core/services/server'
+import schedule from 'node-schedule'
+import CleaningService from '#services/cleaning_service'
 
+schedule.scheduleJob('0 * * * * *', async function () {
+  await CleaningService.cleanUp()
+})
+schedule.scheduleJob('15 * * * * *', async function () {
+  await CleaningService.cleanUp()
+})
+schedule.scheduleJob('30 * * * * *', async function () {
+  await CleaningService.cleanUp()
+})
+schedule.scheduleJob('45 * * * * *', async function () {
+  await CleaningService.cleanUp()
+})
 /**
  * The error handler is used to convert an exception
  * to a HTTP response.

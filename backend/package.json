@@ -60,6 +60,7 @@
     "@adonisjs/lucid": "^21.2.0",
     "@adonisjs/session": "^7.4.2",
     "luxon": "^3.5.0",
+    "node-schedule": "^2.1.1",
     "pg": "^8.13.0",
     "reflect-metadata": "^0.2.2",
     "ws": "^8.18.0"

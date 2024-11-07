@@ -7,7 +7,7 @@
     - [x] v zozname môže cez používateľské rozhranie kanál vytvoriť, opustiť, a ak je správcom aj zrušiť
     - [x] dva typy kanálov - súkromný (private channel) a verejný kanál (public channel)
     - [x] správcom kanála je používateľ, ktorý kanál vytvoril
-    - [ ] ak nie je kanál aktívny (nie je pridaná nová správa) viac ako 30 dní, kanál prestáva existovať (následne je možné použiť channelName kanála pre "nový" kanál)
+    - [x] ak nie je kanál aktívny (nie je pridaná nová správa) viac ako 30 dní, kanál prestáva existovať (následne je možné použiť channelName kanála pre "nový" kanál)
 3. [x] používateľ odosiela správy a príkazy cez "príkazový riadok", ktorý je "fixným" prvkom aplikácie. používateľ môže odoslať správu v kanáli, ktorého je členom
 4. [x] vytvorenie komunikačného kanála (channel) cez príkazový riadok
     - [x] kanál môže vytvoriť ľubovolný používateľ cez príkaz /join channelName [private]
