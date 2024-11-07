@@ -55,7 +55,6 @@ export default class SocketSession {
 
         socketSessions.getForActiveChannel(data.channelName).forEach((session) => {
           if (session === this) return
-          console.log('Sending message to', session.user.username)
           session.send('add_message', {
             messageId: message.id,
             messageContent: message.content,
@@ -64,11 +63,13 @@ export default class SocketSession {
           })
         })
         // send notifications to all channel members
-        // Don't send to people with offline|away. Don't send to the sender or people with channel open
+        // Don't send to people with offline|away.
+        // Don't send to the sender, even if they have multiple sessions active
+        // Don't send to people with channel open
         // if only mentions is on for user, only send if mentioned
         socketSessions.forEach((session) => {
           if (
-            session === this ||
+            session.user.id === this.user.id ||
             !session.isInChannel(data.channelName) ||
             session.status === 'offline' ||
             session.status === 'away' ||
@@ -110,10 +111,9 @@ export default class SocketSession {
         break
       case 'typing':
         if (!this.isInChannel(data.channelName)) return
-        // Send the draft content to all users in the channel
-
+        // Send the draft content to all users in the channel, but not to the sender, not even if multiple active sessions
         socketSessions.getForActiveChannel(data.channelName).forEach((session) => {
-          if (session === this || session.status === 'offline') return
+          if (session.user.id === this.user.id || session.status === 'offline') return
           session.send('message_draft', {
             username: this.user.username,
             content: data.content,
@@ -126,7 +126,7 @@ export default class SocketSession {
         if (!this.isInChannel(data.channelName)) return
         // Remove the draft content from all users in the channel
         socketSessions.getForActiveChannel(data.channelName).forEach((session) => {
-          if (session === this || session.status === 'offline') return
+          if (session.user.id === this.user.id || session.status === 'offline') return
           console.log('Removing draft from', session.user.username)
           session.send('remove_message_draft', {
             username: this.user.username,
@@ -147,7 +147,6 @@ export default class SocketSession {
   }
 
   async createMessage(message: string, channelName: string) {
-
     const user = this.user
     if (!user) {
       console.error('User not authenticated')
