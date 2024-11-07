@@ -15,7 +15,7 @@ export interface ChannelMember {
   status: 'online' | 'offline' | 'away';
 }
 
-export interface CurrentyTyping {
+export interface CurrentlyTyping {
   username: string;
   content: string;
   timeoutId?: NodeJS.Timeout;
@@ -28,7 +28,7 @@ export interface Channel {
   private: boolean
   highlighted?: boolean
   members: ChannelMember[]
-  currentlyTyping: CurrentyTyping[]
+  currentlyTyping: CurrentlyTyping[]
 }
 
 export const useChannelStore = defineStore('channel', {
@@ -97,7 +97,7 @@ export const useChannelStore = defineStore('channel', {
     removeCurrentlyTyping(channelName: string, username: string) {
       const channel = this.getChannelByName(channelName);
       if (!channel) return;
-      const currentlyTypingEntryIndex = channel.currentlyTyping.findIndex((entry) => entry.username === username);
+      const currentlyTypingEntryIndex = channel.currentlyTyping.findIndex((entry: CurrentlyTyping) => entry.username === username);
       if (currentlyTypingEntryIndex !== -1) {
         // Remove the entry
         channel.currentlyTyping.splice(currentlyTypingEntryIndex, 1);
