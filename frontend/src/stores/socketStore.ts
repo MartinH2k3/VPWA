@@ -171,6 +171,7 @@ const useSocketStore = defineStore('socket', {
     updateOnlyMentions(onlyMentions: boolean) {
       this.sendMessage('update_only_mentions', { onlyMentions });
     },
+    //TODO remove if unused
     async waitTillConnected() {
       return new Promise((resolve) => {
         if (this.isConnected) {
@@ -196,12 +197,12 @@ const useSocketStore = defineStore('socket', {
     },
     sendMessage(event: string, data: any) {
       if (this.socket && this.isConnected) {
-        const cookies = document.cookie;
+        const cookies = document.cookie; // TODO remove if unused
         const payload: SocketMessage = { event, data };
         this.socket.send(JSON.stringify(payload));
       }
     },
-    //TODO add comments
+    //TODO remove if unused
     onMessage(callback: (message: any) => void) {
       if (this.socket) {
         this.socket.onmessage = (event) => {
