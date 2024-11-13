@@ -10,13 +10,11 @@ export default class ChannelsController {
     if (!userId) {
       return []
     }
-    const channels = await Channel.query()
+    return Channel.query()
       .whereHas('members', (query) => {
         query.where('user_id', userId).wherePivot('kicked', false)
       })
       .orderBy('created_at', 'desc')
-
-    return channels
   }
 
   async join({ request, auth, response }: HttpContext) {
@@ -30,7 +28,7 @@ export default class ChannelsController {
     // if channel exists, try to join
     if (existingChannel) {
       if (existingChannel.isPrivate) {
-        return response.forbidden({ message: 'This channel is private and cannot be joined.' })
+        return response.unauthorized({ message: 'This channel is private and cannot be joined.' })
       }
       const isAlreadyMember = await existingChannel
         .related('members')
@@ -39,29 +37,32 @@ export default class ChannelsController {
         .first()
       // can't be member twice, duh
       if (isAlreadyMember) {
-        return response.badRequest({ message: 'User already joined this channel' })
+        return response.badRequest({
+          message:
+            "You already joined this channel. If you don't see it in channel list, you have been banned.",
+        })
       }
       await existingChannel.related('members').attach([userId])
-      const socketSession = socketSessions.get(userId)
+      const socketSession = socketSessions.getForUser(userId)
       if (socketSession) {
         socketSession.addToJoinedChannels(existingChannel.name)
       }
-      socketSessions.updateChannelMembers(existingChannel.name)
+      await socketSessions.updateChannelMembers(existingChannel.name)
       return existingChannel
     } else {
       const channel = await Channel.create({
         name: channelName,
-        adminId: userId, // The user who creates the channel becomes the admin
-        isPrivate: !!isPrivate, // You can set default visibility or get it from the request
+        admin_id: userId, // The user who creates the channel becomes the admin
+        is_private: !!isPrivate, // You can set default visibility or get it from the request
       })
 
       // Auto-join the admin to the channel
       await channel.related('members').attach([userId])
-      const socketSession = socketSessions.get(userId)
+      const socketSession = socketSessions.getForUser(userId)
       if (socketSession) {
         socketSession.addToJoinedChannels(channel.name)
       }
-      socketSessions.updateChannelMembers(channel.name)
+      await socketSessions.updateChannelMembers(channel.name)
       return response.ok(channel)
     }
   }
@@ -74,12 +75,12 @@ export default class ChannelsController {
       if (!channel) {
         return response.notFound({ message: 'No active channel' })
       }
-      if (channel?.adminId === userId) {
+      if (channel?.admin_id === userId) {
         // get all channel members
         const members = await channel.related('members').query()
         // for all sockets, remove the channel
         for (const member of members) {
-          const socketSession = socketSessions.get(member.id)
+          const socketSession = socketSessions.getForUser(member.id)
           if (socketSession) {
             socketSession.removeChannel(channel)
           }
@@ -96,11 +97,11 @@ export default class ChannelsController {
         return response.badRequest({ message: 'You are banned from the channel' })
       }
       await channel?.related('members').detach([userId])
-      const socketSession = socketSessions.get(userId)
+      const socketSession = socketSessions.getForUser(userId)
       if (socketSession) {
         socketSession.removeChannel(channel)
       }
-      socketSessions.updateChannelMembers(channel.name)
+      await socketSessions.updateChannelMembers(channel.name)
       return response.ok(`Successfully left the channel ${channel?.name}`)
     } catch (e) {
       return response.badRequest(e)
@@ -127,11 +128,11 @@ export default class ChannelsController {
 
       if (!pivotRow) return response.notFound({ message: 'User is not a member of the channel' })
 
-      if (channel.adminId === kickedUser.id)
+      if (channel.admin_id === kickedUser.id)
         return response.badRequest({ message: 'Admin cannot be kicked' })
 
       const kickVotes = pivotRow.kick_votes
-      if (kickVotes >= 2 || channel.adminId === userId) {
+      if (kickVotes >= 2 || channel.admin_id === userId) {
         // Set the user as banned in the pivot table
         await channel.related('members').sync(
           {
@@ -142,11 +143,11 @@ export default class ChannelsController {
           false // true means rewriting pivot table, false means updating
         )
         // TODO notify the user that got kicked
-        const socketSession = socketSessions.get(kickedUser.id)
+        const socketSession = socketSessions.getForUser(kickedUser.id)
         if (socketSession) {
           socketSession.kick(channel.name)
         }
-        socketSessions.updateChannelMembers(channel.name)
+        await socketSessions.updateChannelMembers(channel.name)
         return response.ok({ message: `${username} has been banned from the channel` })
       } else {
         await channel.related('members').sync(
@@ -188,7 +189,7 @@ export default class ChannelsController {
         .where('user_id', invitedUser.id)
         .first()
       if (pivotRow) {
-        if (pivotRow.kicked && channel.adminId === userId) {
+        if (pivotRow.kicked && channel.admin_id === userId) {
           // Unban the user
           await channel.related('members').sync(
             {
@@ -200,18 +201,18 @@ export default class ChannelsController {
           )
 
           // adding channel to user's channels
-          const socketSession = socketSessions.get(invitedUser.id)
+          const socketSession = socketSessions.getForUser(invitedUser.id)
           if (socketSession) {
             socketSession.addChannel(channel)
           }
 
-          socketSessions.updateChannelMembers(channel.name)
+          await socketSessions.updateChannelMembers(channel.name)
           return response.ok({ message: `${username} has been unbanned from the channel` })
         }
         return response.badRequest({ message: 'User is already a member of the channel' })
       }
 
-      if (channel.isPrivate && channel.adminId !== userId) {
+      if (channel.is_private && channel.admin_id !== userId) {
         return response.forbidden({ message: 'You are not allowed to invite to this channel' })
       }
 
@@ -219,12 +220,12 @@ export default class ChannelsController {
       await channel.related('members').attach([invitedUser.id])
 
       // adding channel to user's active channels
-      const socketSession = socketSessions.get(invitedUser.id)
+      const socketSession = socketSessions.getForUser(invitedUser.id)
       if (socketSession) {
         socketSession.addChannel(channel)
       }
 
-      socketSessions.updateChannelMembers(channel.name)
+      await socketSessions.updateChannelMembers(channel.name)
       return response.ok({ message: `${username} has been invited to the channel` })
     } catch (e) {
       console.log(e)
@@ -245,8 +246,7 @@ export default class ChannelsController {
       return response.forbidden({ message: 'You are not a member of this channel' })
     }
 
-    const members = await channel.related('members').query().where('kicked', false)
-    return members
+    return await channel.related('members').query().where('kicked', false)
   }
 
   async messages({ params, request, response }: HttpContext) {
@@ -256,24 +256,10 @@ export default class ChannelsController {
     if (!channel) {
       return response.notFound({ message: 'Channel not found' })
     }
-    const messages = await Message.query()
+    return Message.query()
       .where('channel_id', channel.id)
       .orderBy('created_at', 'desc')
       .limit(limit)
       .offset(cursor)
-    return messages
-  }
-
-  async test({ auth }: HttpContext) {
-    // const userId = 1
-    // const socketSession = socketSessions.get(userId)
-    // if (socketSession) {
-    //   socketSession.addChannel({
-    //     id: Math.random() * Number.MAX_SAFE_INTEGER,
-    //     name: 'test',
-    //     adminId: auth.user!.id,
-    //     private: false,
-    //   })
-    // }
   }
 }

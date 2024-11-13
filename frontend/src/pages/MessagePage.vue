@@ -6,18 +6,19 @@
           :name="message.byMe ? 'Me' : message.username" :text="[message.content]" :sent="message.byMe"
           :bg-color="message.byMe || message.taggedMe ? 'primary' : 'grey'"
           :text-color="message.byMe || message.taggedMe ? 'white' : ''" /><!--default color if not by me-->
-        <q-chat-message v-for="typingUser in currentlyTyping" :key="typingUser.username + '-typing'"
-          :name="typingUser.username" bg-color="grey">
+        <div v-for="typingUser in currentlyTyping" :key="typingUser.username + '-typing'">
+          <q-chat-message  bg-color="grey" :name="typingUser.username">
           <span @mouseover="inspectUser(typingUser.username, $event)" @mouseleave="stopInspecting">
-
-            {{ typingUser.content }}
             <q-spinner-dots size="1rem" />
           </span>
-        </q-chat-message>
+          </q-chat-message>
+          <div v-if="inspecting" class="floating-message" :style="{ top: `${cursorY}px`, left: `${cursorX}px` }">
+            {{ typingUser.content}}
+          </div>
+        </div>
+
       </q-list>
-      <div v-if="inspectedMessage" class="floating-message" :style="{ top: `${cursorY}px`, left: `${cursorX}px` }">
-        {{ inspectedMessage }}
-      </div>
+
       <template #loading>
         <q-spinner class="row justify-center" />
       </template>
@@ -53,7 +54,7 @@ export default defineComponent({
     return {
       limit: 10,
       cursor: null as (number | null), // cursor for pagination
-      inspectedMessage: null as string | null,
+      inspecting: false,
       cursorX: 0, // cursor as in mouse cursor
       cursorY: 0,
     };
@@ -69,36 +70,39 @@ export default defineComponent({
   },
   watch: {
     messages() {
-      console.log('messages updated');
+      console.log('messages updated')
     },
     currentlyTyping() {
-      console.log('currentlyTyping updated');
+      console.log('currentlyTyping updated')
     }
   },
   methods: {
     async paginateMessages(index: number, done: () => void) {
-      if (this.messageStore.fetchingMessages || this.messageStore.activeChannelMessagesInfo?.reachedTop) {
-        setTimeout(() => done(), 1000);
+      if ( this.messageStore.activeChannelMessagesInfo?.reachedTop) {
+        done()
+      }
+      if (this.messageStore.fetchingMessages) {
+        setTimeout(() => done(), 1000)
         return;
       }
-      await this.messageStore.fetchActiveChannelMessages(this.limit, this.cursor);
+      await this.messageStore.fetchActiveChannelMessages(this.limit, this.cursor)
       done()
       // setTimeout(() => done(), 1000);
     },
 
     async inspectUser(username: string, event: MouseEvent) {
       try { //TODO actually get the message dude is writing from websocket on every update
-        this.cursorX = event.clientX + 10;
-        this.cursorY = event.clientY + 10;
-        this.inspectedMessage = "I'm currently typing. This is a thing I am currently typing. Never gonna giv";
+        this.cursorX = event.clientX + 10
+        this.cursorY = event.clientY + 10
+        this.inspecting = true
       }
       catch (e) {
-        console.error(e);
+        console.error(e)
       }
     },
     stopInspecting() {
       // Clear the message when the mouse leaves the element
-      this.inspectedMessage = null;
+      this.inspecting = false;
     },
   }
 });

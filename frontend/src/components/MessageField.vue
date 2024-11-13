@@ -19,7 +19,7 @@ export default {
     const channelStore = useChannelStore();
     const userStore = useUserStore();
     const $q = useQuasar()
-    return { channelStore, router, messageStore, userStore };
+    return { channelStore, router, messageStore, userStore, $q};
   },
   data() {
     return {
@@ -27,7 +27,11 @@ export default {
       draftTimeout: null as NodeJS.Timeout | null,
     };
   },
-
+  computed: {
+    members() {
+      return this.channelStore?.activeChannel?.members;
+    },
+  },
   watch: {
     // Watch for changes in the active channel
     'channelStore.activeChannel': {
@@ -72,6 +76,10 @@ export default {
       // Handle message when it's not a command (i.e., doesn't start with "/")
       if (this.message[0] !== '/' && this.channelStore.activeChannel) {
         // TODO: api call to send message
+        if (!this.channelStore.activeChannel.name) {
+          this.$q.notify('You are currently not in a channel');
+          return;
+        }
         this.messageStore.sendMessage(this.channelStore.activeChannel.name, this.message);
       }
 
@@ -80,8 +88,9 @@ export default {
         const splitMessage = this.message.split(' ');
         const command = splitMessage[0].substring(1);
         const args = splitMessage.slice(1);
-        let username;
+        let username: string;
         let channelName: string;
+        let response: string = '';
         if (!this.channelStore.activeChannel.name && command !== 'join') {
           this.$q.notify('You are currently not in a channel');
           return;
@@ -90,60 +99,105 @@ export default {
         switch (command) {
           case 'join':
             channelName = args[0];
-            // // If the channel already exists, print an appropriate message
-            // if (this.channelStore.channels.find(channel => channel.name === channelName)) {
-            //   this.$q.notify({
-            //     message: `You're already a member of ${channelName}`,
-            //     color: 'yellow',
-            //     textColor: 'black',
-            //     icon: 'warning'
-            //   });
-            //   return;
-            // }
             let isPrivate = args.length > 1 && args[1] === 'private';
-            await this.channelStore.joinChannel(channelName, isPrivate);
+            response = await this.channelStore.joinChannel(channelName, isPrivate);
             break;
 
           case 'invite':
             username = args[0];
-            await this.channelStore.inviteUser(username);
+            response = await this.channelStore.inviteUser(username);
             break;
           case 'quit': //fallback for now, since for now they are the same
           case 'cancel':
           case 'leave':
-            await this.channelStore.leaveActiveChannel(); //works for active channel so no params
+            response = await this.channelStore.leaveActiveChannel(); //works for active channel so no params
             break;
 
           case 'kick':
             username = args[0];
-            await this.channelStore.kickUser(username); //works for active channel so no param for that
+            response = await this.channelStore.kickUser(username); //works for active channel so no param for that
             break;
 
+          case 'revoke':
+            username = args[0];
+            response = await this.channelStore.revokeUser(username); //works for active channel so no param for that
+            break;
           case 'list':
             //TODO get all users in channel
-            const users = {
-              'user1': 'online',
-              'user2': 'away',
-              'user3': 'offline'
-            };
-            console.log('Adding users to message store');
+            const users = this.channelStore.getActiveChannelMembers();
 
             this.messageStore.addMessageToActiveChannel({
               id: 0,
               username: 'system',
-              content: 'Users in channel: ' + Object.entries(users)
-                .map(([username, status]) => `${username} (${status})`)
-                .join(', '), // display users and their status
+              content: 'Users in channel: ' + users,
               byMe: false,
               taggedMe: false,
             },
               true);
             break;
+          case 'help':
+            this.messageStore.addMessageToActiveChannel({
+                id: 0,
+                username: 'system',
+                content: 'Available commands: /join, /invite, /quit, /kick, /revoke, /list, /help',
+                byMe: false,
+                taggedMe: false,
+              },
+              true);
+            break;
+          case 'info':
+            let message: string = '';
+            const command = args[0] ? args[0] : '';
+            switch (command) {
+              case '':
+                message = '/info <command> for information on a specific command';
+                break;
+              case 'join':
+                message = 'Join a channel: /join <channel-name> [private]';
+                break;
+              case 'invite':
+                message = 'Invite a user to the channel: /invite <username>';
+                break;
+              case 'leave':
+              case 'cancel':
+              case 'quit':
+                message = 'Leave the channel: /quit, /leave or /cancel';
+                break;
+              case 'kick':
+                message = 'Kick a user from the channel: /kick <username>';
+                break;
+              case 'revoke':
+                message = 'Revoke a user from the channel: /revoke <username>';
+                break;
+              case 'list':
+                message = 'List all users in the channel: /list';
+                break;
+              case 'help':
+                message = 'List all available commands: /help';
+                break;
+            }
+            this.messageStore.addMessageToActiveChannel({
+                id: 0,
+                username: 'system',
+                content: message,
+                byMe: false,
+                taggedMe: false,
+              },
+              true);
+            break;
           default:
             // Inform user that command is unknown
-            console.log('Unknown command');
+            this.messageStore.addMessageToActiveChannel({
+                id: 0,
+                username: 'system',
+                content: 'Unknown command, type /help for a list of commands',
+                byMe: false,
+                taggedMe: false,
+              },
+              true);
             break;
         }
+        this.$q.notify(response);
       }
       console.log('Message sent:', this.message);
       this.message = ''; // Clear the message

@@ -15,7 +15,6 @@ interface SocketData {
   data: any
 }
 
-
 wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
   console.log('A new connection')
   let socketSession: SocketSession
@@ -25,19 +24,18 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
     const event = parsedMessage.event
     const data = parsedMessage.data
 
-    if (event == 'auth') {
+    if (event === 'auth') {
       // Find token in activeSockets
       let authRequest = pendingAuthentificationRequests.find(
-        (request) => request.token === request.token
+        (request) => data.token === request.token
       )
       if (!authRequest) {
         console.error('Invalid token')
         return
       }
-      const userChannels = await Channel.query()
-        .whereHas('members', (query) => {
-          query.where('user_id', authRequest.user.id).where('kicked', false)
-        })
+      const userChannels = await Channel.query().whereHas('members', (query) => {
+        query.where('user_id', authRequest.user.id).where('kicked', false)
+      })
 
       socketSession = new SocketSession(ws, authRequest.user, userChannels)
       console.log('Authenticated', socketSession.user.username)
@@ -56,7 +54,7 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
       return
     }
 
-    socketSession.receive(event, data)
+    await socketSession.receive(event, data)
   })
 
   ws.on('close', () => {
@@ -68,8 +66,7 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
     const index = pendingAuthentificationRequests.findIndex(
       (request) => request.user.id === socketSession?.user?.id
     )
-    if (index !== -1)
-      pendingAuthentificationRequests.splice(index, 1)
+    if (index !== -1) pendingAuthentificationRequests.splice(index, 1)
 
     socketSessions.splice(socketSessions.indexOf(socketSession), 1)
 
@@ -80,6 +77,3 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
 server.listen(9594, () => {
   console.log('Server is listening on port 9594')
 })
-
-
-

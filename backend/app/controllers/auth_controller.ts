@@ -3,8 +3,6 @@ import { HttpContext } from '@adonisjs/core/http'
 import { pendingAuthentificationRequests } from '../globals.js'
 //import { ActiveSocket } from '#start/ws'
 
-
-
 export default class AuthController {
   async register({ request, auth, response }: HttpContext) {
     const data = request.only(['username', 'email', 'password', 'first_name', 'last_name'])

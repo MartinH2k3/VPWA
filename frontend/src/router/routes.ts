@@ -9,7 +9,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     beforeEnter: async () => {
       try {
-        await api.get('/auth');
+        await api.get('/auth', { withCredentials: true });
       } catch { return '/login' }
     },
   },

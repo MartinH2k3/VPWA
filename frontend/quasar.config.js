@@ -149,6 +149,12 @@ module.exports = configure(function (/* ctx */) {
       extendGenerateSWOptions (cfg) {
         cfg.skipWaiting = false
         cfg.clientsClaim = false
+        cfg.runtimeCaching = [
+          {
+            urlPattern:  new RegExp('/login'),
+            handler: 'NetworkFirst',
+          },
+        ]
       },
       // extendInjectManifestOptions (cfg) {},
       // extendManifestJson (json) {}

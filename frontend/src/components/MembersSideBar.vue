@@ -27,11 +27,6 @@
                   <q-item-label>Kick</q-item-label>
                 </q-item-section>
               </q-item>
-              <q-item clickable v-ripple>
-                <q-item-section>
-                  <q-item-label>Mention</q-item-label>
-                </q-item-section>
-              </q-item>
             </q-list>
           </q-menu>
         </q-btn>

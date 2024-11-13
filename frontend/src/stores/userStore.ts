@@ -33,10 +33,12 @@ export const useUserStore = defineStore('user', {
       this.user = {} as User
     },
     setStatus(status: 'online' | 'offline' | 'away') {
-
       this.socketStore.updateStatus(status);
       this.status = status
     },
+    setOnlyMentions(onlyMentions: boolean) {
+      this.socketStore.updateOnlyMentions(onlyMentions);
+    }
   },
   getters: {
     getUsername: (state) => {

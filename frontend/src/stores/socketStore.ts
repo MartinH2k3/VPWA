@@ -6,12 +6,6 @@ import { useUserStore } from 'stores/userStore';
 import { useQuasar } from 'quasar';
 
 
-interface SocketState {
-  socket: WebSocket | null;
-  isConnected: boolean;
-  isAuthenticated: boolean;
-}
-
 interface SocketMessage {
   event: string;
   data: any;
@@ -20,10 +14,11 @@ interface SocketMessage {
 const URL = 'ws://127.0.0.1:9594';
 
 const useSocketStore = defineStore('socket', {
-  state: (): SocketState => ({
-    socket: null,
+  state: () => ({
+    socket: null as WebSocket | null,
     isConnected: false,
-    isAuthenticated: false
+    isAuthenticated: false,
+    notification: null as any
   }),
   actions: {
     async connect() {
@@ -92,8 +87,8 @@ const useSocketStore = defineStore('socket', {
           case 'notification':
             // If DND or offline: break
             // If only mentions: check if mentioned
-            // for socc
-            // TODO implement
+            console.log('Received notification', socketMessage.data);
+            this.notification = socketMessage.data;
             break;
           case 'message_draft':
             { // If offline: break
@@ -116,8 +111,6 @@ const useSocketStore = defineStore('socket', {
               console.log('Removing message draft', socketMessage.data);
 
               channelStore.removeCurrentlyTyping(channelName, userName);
-
-
 
             }
             break;
@@ -175,7 +168,10 @@ const useSocketStore = defineStore('socket', {
     updateStatus(status: string) {
       this.sendMessage('update_status', { status });
     },
-
+    updateOnlyMentions(onlyMentions: boolean) {
+      this.sendMessage('update_only_mentions', { onlyMentions });
+    },
+    //TODO remove if unused
     async waitTillConnected() {
       return new Promise((resolve) => {
         if (this.isConnected) {
@@ -201,12 +197,12 @@ const useSocketStore = defineStore('socket', {
     },
     sendMessage(event: string, data: any) {
       if (this.socket && this.isConnected) {
-        const cookies = document.cookie;
+        const cookies = document.cookie; // TODO remove if unused
         const payload: SocketMessage = { event, data };
         this.socket.send(JSON.stringify(payload));
       }
     },
-    //TODO add comments
+    //TODO remove if unused
     onMessage(callback: (message: any) => void) {
       if (this.socket) {
         this.socket.onmessage = (event) => {
