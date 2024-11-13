@@ -91,7 +91,7 @@ export default {
         let username: string;
         let channelName: string;
         let response: string = '';
-        if (!this.channelStore.activeChannel.name && command !== 'join') {
+        if (!this.channelStore.activeChannel.name && command !== 'join' && command != 'help' && command != 'info') {
           this.$q.notify('You are currently not in a channel');
           return;
         }
