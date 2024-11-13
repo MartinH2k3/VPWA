@@ -27,7 +27,7 @@ export default class ChannelsController {
 
     // if channel exists, try to join
     if (existingChannel) {
-      if (existingChannel.isPrivate) {
+      if (existingChannel.is_private) {
         return response.unauthorized({ message: 'This channel is private and cannot be joined.' })
       }
       const isAlreadyMember = await existingChannel
