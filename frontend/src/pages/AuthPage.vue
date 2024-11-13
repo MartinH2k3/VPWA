@@ -156,12 +156,16 @@ export default {
         await this.router.push('/');
       } catch (e: any) {
         try {
-          const errors = e.response.data.errors
+          const errors = [e.response.data.message]
+          console.log(e.response.data.message);
+
           this.warning = '';
           for (const error of errors) {
-            this.warning += error.message + '\n'
+            this.warning += error + '\n'
           }
         } catch (e) { // If there is no response
+          console.log(e);
+
           this.warning = 'Couldn\'t connect to the server.\nTry checking your internet connection.';
         }
         console.error(e);
