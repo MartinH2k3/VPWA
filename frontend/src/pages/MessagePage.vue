@@ -2,18 +2,19 @@
   <q-page padding>
     <q-infinite-scroll :offset="40" @load="paginateMessages" :initial-index="0" reverse>
       <q-list>
-        <q-chat-message v-for="message in messages.toReversed()" :key="message.id"
-          :name="message.byMe ? 'Me' : message.username" :text="[message.content]" :sent="message.byMe"
+        <q-chat-message v-for="(message, index) in messages" :key="message.id"
+          :name="(index > 0 && messages[index - 1].username === message.username) ? '' : message.byMe ? 'Me' : message.username"
+          :text="[message.content]" :sent="message.byMe"
           :bg-color="message.byMe || message.taggedMe ? 'primary' : 'grey'"
           :text-color="message.byMe || message.taggedMe ? 'white' : ''" /><!--default color if not by me-->
         <div v-for="typingUser in currentlyTyping" :key="typingUser.username + '-typing'">
-          <q-chat-message  bg-color="grey" :name="typingUser.username">
-          <span @mouseover="inspectUser(typingUser.username, $event)" @mouseleave="stopInspecting">
-            <q-spinner-dots size="1rem" />
-          </span>
+          <q-chat-message bg-color="grey" :name="typingUser.username">
+            <span @mouseover="inspectUser(typingUser.username, $event)" @mouseleave="stopInspecting">
+              <q-spinner-dots size="1rem" />
+            </span>
           </q-chat-message>
           <div v-if="inspecting" class="floating-message" :style="{ top: `${cursorY}px`, left: `${cursorX}px` }">
-            {{ typingUser.content}}
+            {{ typingUser.content }}
           </div>
         </div>
 
@@ -61,7 +62,7 @@ export default defineComponent({
   },
   computed: {
     messages(): Message[] {
-      return this.messageStore.activeChannelMessages;
+      return this.messageStore.activeChannelMessages.toReversed()
     },
     currentlyTyping() {
       return this.channelStore.activeChannel.currentlyTyping;
@@ -78,7 +79,7 @@ export default defineComponent({
   },
   methods: {
     async paginateMessages(index: number, done: () => void) {
-      if ( this.messageStore.activeChannelMessagesInfo?.reachedTop) {
+      if (this.messageStore.activeChannelMessagesInfo?.reachedTop) {
         done()
       }
       if (this.messageStore.fetchingMessages) {
