@@ -261,5 +261,8 @@ export default class ChannelsController {
       .orderBy('created_at', 'desc')
       .limit(limit)
       .offset(cursor)
+      .preload('user', (query) => {
+        query.select('username')
+      })
   }
 }

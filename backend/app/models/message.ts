@@ -23,7 +23,7 @@ export default class Message extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updated_at: DateTime
 
-  @belongsTo(() => User, { foreignKey: 'admin_id' })
+  @belongsTo(() => User, { foreignKey: 'user_id' })
   declare user: BelongsTo<typeof User>
 
   @belongsTo(() => Channel, { foreignKey: 'channel_id' })

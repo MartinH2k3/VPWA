@@ -142,11 +142,10 @@ export const useMessageStore = defineStore('message', {
 
       // Add messages to local store
       for (const message of messages) {
-        console.log('Adding message', message);
 
         this.addMessage(channelName, {
           id: message.id,
-          username: message.username,
+          username: message.user.username,
           content: message.content,
           byMe: message.userId === userStore.user.id,
           taggedMe: message.content.includes(`@${userStore.getUsername}`)
