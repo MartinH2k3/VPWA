@@ -4,6 +4,7 @@ import { useChannelStore, ChannelMember } from 'stores/channelStore';
 import { useMessageStore } from 'stores/messageStore';
 import { useUserStore } from 'stores/userStore';
 import { notify } from 'src/notifications';
+import { useQuasar } from 'quasar';
 
 
 interface SocketMessage {
@@ -28,6 +29,7 @@ const useSocketStore = defineStore('socket', {
       const channelStore = useChannelStore();
       const messageStore = useMessageStore();
       const userStore = useUserStore();
+      const $q = useQuasar();
       try {
         const response = await api.get('/authWS');
         token = response.data;
@@ -90,6 +92,8 @@ const useSocketStore = defineStore('socket', {
             console.log('Received notification', socketMessage.data);
             this.notification = socketMessage.data;
             console.log('Notification', this.notification);
+
+            if ($q.appVisible && this.notification.channelName === channelStore.activeChannel.name) break;
 
             notify(`New message in channel ${socketMessage.data.channelName}`, {
               detail: socketMessage.data.detail,

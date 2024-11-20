@@ -73,7 +73,7 @@ export default class SocketSession {
             !session.isInChannel(data.channelName) ||
             session.status === 'offline' ||
             session.status === 'away' ||
-            session.activeChannelName === data.channelName ||
+            // session.activeChannelName === data.channelName ||
             (session.onlyMentions && !this.checkMention(data.message, session.user.username!))
           ) {
             return
