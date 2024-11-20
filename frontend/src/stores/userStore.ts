@@ -21,6 +21,7 @@ export const useUserStore = defineStore('user', {
       firstName: 'Bob',
       lastName: 'Bobson',
     } as User,
+    onlyMentions: false,
     status: 'online' as ('online' | 'offline' | 'away'),
     socketStore: useSocketStore(),
 
@@ -38,6 +39,7 @@ export const useUserStore = defineStore('user', {
     },
     setOnlyMentions(onlyMentions: boolean) {
       this.socketStore.updateOnlyMentions(onlyMentions);
+      this.onlyMentions = onlyMentions
     }
   },
   getters: {
