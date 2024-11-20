@@ -67,6 +67,7 @@ export const useMessageStore = defineStore('message', {
     clearMessages(channel: string) {
       this.messages[channel] = [];
       delete this.messages[channel];
+      this.channelMessagesInfo[channel] = { limit: 10, cursor: 0, reachedTop: false };
     },
     clearActiveChannelMessages() {
       this.clearMessages(useChannelStore().activeChannel.name);

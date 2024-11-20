@@ -133,7 +133,7 @@ export const useChannelStore = defineStore('channel', {
       }
     },
     // 4 following functions return strings to use with Quasar's notify
-    async joinChannel(channelName: string, isPrivate: boolean):Promise<string> {
+    async joinChannel(channelName: string, isPrivate: boolean): Promise<string> {
 
       // If that channel is already in the list, set it as active channel
       const channel = this.channels.find(c => c.name === channelName)
@@ -165,13 +165,13 @@ export const useChannelStore = defineStore('channel', {
       return await this.leaveChannel(this.activeChannel.name);
     },
 
-    async leaveChannel(channelName: string): Promise<string>{
+    async leaveChannel(channelName: string): Promise<string> {
       try {
         await api.post(`/c/${this.activeChannel.name}/cancel`)
         // remove channel based on name from store
         this.removeChannel(channelName)
         return 'Left ' + channelName
-      } catch (e:any) {
+      } catch (e: any) {
         console.error(e);
         return e?.response?.data?.message || 'An unexpected error occurred.'
       }
@@ -226,6 +226,7 @@ export const useChannelStore = defineStore('channel', {
     },
     async setActiveChannel(chanelName: string) {
       const socketStore = useSocketStore();
+      const messageStore = useMessageStore();
       const channel = this.channels.find(c => c.name === chanelName) || {} as Channel
 
       // Fetch members of the channel
@@ -238,6 +239,9 @@ export const useChannelStore = defineStore('channel', {
 
       this.activeChannel = channel
 
+      messageStore.clearActiveChannelMessages();
+      // Fetch messages of the channel
+      await messageStore.fetchActiveChannelMessages(10, 0);
 
       // if the the channel has highlighted property, remove it
       if (channel.highlighted) {

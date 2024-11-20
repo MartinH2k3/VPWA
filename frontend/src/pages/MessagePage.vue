@@ -68,6 +68,9 @@ export default defineComponent({
       return this.channelStore.activeChannel.currentlyTyping;
 
     },
+    activeChannel() {
+      return this.channelStore.activeChannel;
+    }
   },
   watch: {
     messages() {
@@ -75,7 +78,13 @@ export default defineComponent({
     },
     currentlyTyping() {
       console.log('currentlyTyping updated')
+    },
+    activeChannel() {
+      this.cursor = null;
+      this.messageStore.fetchActiveChannelMessages(this.limit, this.cursor)
+      console.log('activeChannel updated')
     }
+
   },
   methods: {
     async paginateMessages(index: number, done: () => void) {
