@@ -18,9 +18,9 @@
             </div>
             <q-separator vertical inset class="text-white" />
             <div class="column justify-around">
-              <q-radio v-model="status" val="online" label="online"/>
-              <q-radio v-model="status" val="away" label="away"/>
-              <q-radio v-model="status" val="offline" label="offline"/>
+              <q-radio v-model="status" val="online" label="online" />
+              <q-radio v-model="status" val="away" label="away" />
+              <q-radio v-model="status" val="offline" label="offline" />
             </div>
           </div>
         </q-btn-dropdown>
@@ -100,16 +100,6 @@ export default {
     onlyMentions(newOnlyMentions) {
       this.userStore.setOnlyMentions(newOnlyMentions);
     },
-    'socketStore.notification'(newNotification) {
-      if (newNotification) {
-        this.$q.notify({
-          message: `<strong>${newNotification.channelName}|${newNotification.username}</strong><br>${newNotification.messageContent}`,
-          html: true,
-          color: 'primary',
-          timeout: 2000,
-        });
-      }
-    }
   },
   methods: {
     toggleLeftDrawer() {

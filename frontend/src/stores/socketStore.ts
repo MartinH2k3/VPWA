@@ -3,7 +3,7 @@ import { api } from 'boot/api';
 import { useChannelStore, ChannelMember } from 'stores/channelStore';
 import { useMessageStore } from 'stores/messageStore';
 import { useUserStore } from 'stores/userStore';
-import { useQuasar } from 'quasar';
+import { notify } from 'src/notifications';
 
 
 interface SocketMessage {
@@ -28,7 +28,6 @@ const useSocketStore = defineStore('socket', {
       const channelStore = useChannelStore();
       const messageStore = useMessageStore();
       const userStore = useUserStore();
-      const $q = useQuasar();
       try {
         const response = await api.get('/authWS');
         token = response.data;
@@ -63,7 +62,6 @@ const useSocketStore = defineStore('socket', {
             break;
           case 'add_message':
             // if offile: break
-            console.log('Adding message to store', socketMessage.data);
             // Find the user
             let messageData = messageStore.makeMessage(socketMessage.data.username, socketMessage.data.messageContent, socketMessage.data.messageId);
             messageStore.addMessage(socketMessage.data.channelName, messageData, true);
@@ -86,9 +84,22 @@ const useSocketStore = defineStore('socket', {
             break;
           case 'notification':
             // If DND or offline: break
+            if (userStore.status == 'offline') break;
             // If only mentions: check if mentioned
+            if (userStore.onlyMentions && !socketMessage.data.messageContent.includes(`@${userStore.user.username}`)) break;
             console.log('Received notification', socketMessage.data);
             this.notification = socketMessage.data;
+            console.log('Notification', this.notification);
+
+            notify(`New message in channel ${socketMessage.data.channelName}`, {
+              detail: socketMessage.data.detail,
+              type: 'positive',
+              action: () => {
+                channelStore.setActiveChannel(socketMessage.data.channelName);
+              },
+              timeout: 5000,
+            });
+
             break;
           case 'message_draft':
             { // If offline: break
@@ -121,8 +132,7 @@ const useSocketStore = defineStore('socket', {
               const channelName: string = socketMessage.data.channelName;
               channelStore.removeChannel(channelName);
               // Notify the user
-              $q.notify({
-                message: `You were kicked from ${channelName}`,
+              notify(`You were kicked from ${channelName}`, {
                 type: 'negative'
               });
             }
@@ -130,8 +140,7 @@ const useSocketStore = defineStore('socket', {
           case 'add_channel':
             channelStore.addInvitedChannel(socketMessage.data);
             // Notify the user
-            $q.notify({
-              message: `You were invited to ${socketMessage.data.name}`,
+            notify(`You were invited to ${socketMessage.data.name}`, {
               type: 'positive'
             });
             break;
