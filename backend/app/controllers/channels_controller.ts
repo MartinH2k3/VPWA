@@ -43,7 +43,7 @@ export default class ChannelsController {
         })
       }
       await existingChannel.related('members').attach([userId])
-      const socketSession = socketSessions.getForUser(userId)
+      const socketSession = socketSessions.getUserSession(userId)
       if (socketSession) {
         socketSession.addToJoinedChannels(existingChannel.name)
       }
@@ -58,7 +58,7 @@ export default class ChannelsController {
 
       // Auto-join the admin to the channel
       await channel.related('members').attach([userId])
-      const socketSession = socketSessions.getForUser(userId)
+      const socketSession = socketSessions.getUserSession(userId)
       if (socketSession) {
         socketSession.addToJoinedChannels(channel.name)
       }
@@ -80,7 +80,7 @@ export default class ChannelsController {
         const members = await channel.related('members').query()
         // for all sockets, remove the channel
         for (const member of members) {
-          const socketSession = socketSessions.getForUser(member.id)
+          const socketSession = socketSessions.getUserSession(member.id)
           if (socketSession) {
             socketSession.removeChannel(channel)
           }
@@ -97,7 +97,7 @@ export default class ChannelsController {
         return response.badRequest({ message: 'You are banned from the channel' })
       }
       await channel?.related('members').detach([userId])
-      const socketSession = socketSessions.getForUser(userId)
+      const socketSession = socketSessions.getUserSession(userId)
       if (socketSession) {
         socketSession.removeChannel(channel)
       }
@@ -143,7 +143,7 @@ export default class ChannelsController {
           false // true means rewriting pivot table, false means updating
         )
         // TODO notify the user that got kicked
-        const socketSession = socketSessions.getForUser(kickedUser.id)
+        const socketSession = socketSessions.getUserSession(kickedUser.id)
         if (socketSession) {
           socketSession.kick(channel.name)
         }
@@ -201,7 +201,7 @@ export default class ChannelsController {
           )
 
           // adding channel to user's channels
-          const socketSession = socketSessions.getForUser(invitedUser.id)
+          const socketSession = socketSessions.getUserSession(invitedUser.id)
           if (socketSession) {
             socketSession.addChannel(channel)
           }
@@ -220,7 +220,7 @@ export default class ChannelsController {
       await channel.related('members').attach([invitedUser.id])
 
       // adding channel to user's active channels
-      const socketSession = socketSessions.getForUser(invitedUser.id)
+      const socketSession = socketSessions.getUserSession(invitedUser.id)
       if (socketSession) {
         socketSession.addChannel(channel)
       }
@@ -245,7 +245,9 @@ export default class ChannelsController {
     if (!isMember) {
       return response.forbidden({ message: 'You are not a member of this channel' })
     }
-
+    setTimeout(() => {
+      socketSessions.updateChannelMembers(channelName)
+    }, 100);
     return await channel.related('members').query().where('kicked', false)
   }
 

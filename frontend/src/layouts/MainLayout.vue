@@ -3,7 +3,7 @@
     <q-header elevated>
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
-
+  
         <q-toolbar-title>
           Frens
         </q-toolbar-title>
@@ -27,23 +27,23 @@
         <q-btn flat dense round icon="group" aria-label="Members" @click="toggleRightDrawer" />
       </q-toolbar>
     </q-header>
-
+  
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <SideBar />
     </q-drawer>
     <q-drawer show-if-above v-model="rightDrawerOpen" side="right" bordered>
       <MembersSideBar />
     </q-drawer>
-
+  
     <q-page-container>
       <message-page />
     </q-page-container>
-
+  
     <q-footer class="bg-white">
       <message-field />
     </q-footer>
-
-
+  
+  
   </q-layout>
 </template>
 
@@ -60,65 +60,66 @@ import { useMessageStore } from 'stores/messageStore';
 import MembersSideBar from 'src/components/MembersSideBar.vue';
 
 export default {
-  name: 'MainLayout',
-  components: {
-    MessageField,
-    SideBar,
-    MessagePage,
-    MembersSideBar,
-  },
-  data() {
-    return {
-      leftDrawerOpen: false,
-      rightDrawerOpen: false,
-      status: 'online',
-      onlyMentions: false,
-    };
-  },
-  setup() {
-    const router = useRouter();
-    const userStore = useUserStore();
-    const socketStore = useSocketStore();
-    const channelStore = useChannelStore();
-    const messageStore = useMessageStore();
-    return { router, userStore, socketStore, channelStore, messageStore };
-  },
-  mounted() {
-    // connect through socket store
-    this.socketStore.connect()
-    if (this.channelStore.channels.length > 0)
-      this.channelStore.setActiveChannel(this.channelStore.channels[0].name)
-
-  },
-  watch: {
-    status(newStatus, oldStatus) {
-      this.userStore.setStatus(newStatus);
-      if (oldStatus === 'offline' && newStatus !== 'offline') {
-        window.location.reload()
-      }
-    },
-    onlyMentions(newOnlyMentions) {
-      this.userStore.setOnlyMentions(newOnlyMentions);
-    },
-  },
-  methods: {
-    toggleLeftDrawer() {
-      this.leftDrawerOpen = !this.leftDrawerOpen;
-    },
-    toggleRightDrawer() {
-      this.rightDrawerOpen = !this.rightDrawerOpen;
-    },
-    async logout() {
-      try {
-        await api.post('/logout');
-        this.channelStore.clear();
-        this.messageStore.clear();
-        await this.router.push('/login');
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  }
+	name: 'MainLayout',
+	components: {
+		MessageField,
+		SideBar,
+		MessagePage,
+		MembersSideBar,
+	},
+	data() {
+		return {
+			leftDrawerOpen: false,
+			rightDrawerOpen: false,
+			status: 'online',
+			onlyMentions: false,
+		};
+	},
+	setup() {
+		const router = useRouter();
+		const userStore = useUserStore();
+		const socketStore = useSocketStore();
+		const channelStore = useChannelStore();
+		const messageStore = useMessageStore();
+		return { router, userStore, socketStore, channelStore, messageStore };
+	},
+	mounted() {
+		// connect through socket store
+		this.socketStore.connect()
+		if (this.channelStore.channels.length > 0)
+			this.channelStore.setActiveChannel(this.channelStore.channels[0].name)
+		this.status = this.userStore.status;
+		this.onlyMentions = this.userStore.onlyMentions;
+	},
+	watch: {
+		status(newStatus, oldStatus) {
+			this.userStore.setStatus(newStatus);
+			if (oldStatus === 'offline' && newStatus !== 'offline') {
+				window.location.reload()
+			}
+		},
+		onlyMentions(newOnlyMentions) {
+			this.userStore.setOnlyMentions(newOnlyMentions);
+		},
+	},
+	methods: {
+		toggleLeftDrawer() {
+			this.leftDrawerOpen = !this.leftDrawerOpen;
+		},
+		toggleRightDrawer() {
+			this.rightDrawerOpen = !this.rightDrawerOpen;
+		},
+		async logout() {
+			try {
+				await api.post('/logout');
+				this.channelStore.clear();
+				this.messageStore.clear();
+				await this.router.push('/login');
+			} catch (e) {
+				console.error(e);
+			}
+		}
+	}
 };
 </script>
 
@@ -127,9 +128,7 @@ export default {
   position: fixed
   padding: 0 3rem 1rem 3rem
 
-
 @media (max-width: 600px)
   .q-footer
     padding: 0 0.5rem 1rem 0.5rem
-
 </style>

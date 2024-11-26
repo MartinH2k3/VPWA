@@ -11,7 +11,7 @@ class SocketSessions extends Array<SocketSession> {
   getForActiveChannel(channelName: string) {
     return this.filter((session) => session.activeChannelName === channelName)
   }
-  getForUser(userId: number) {
+  getUserSession(userId: number) {
     return this.find((session) => session.user.id === userId)
   }
 
@@ -24,12 +24,14 @@ class SocketSessions extends Array<SocketSession> {
     // Update status for all users in the channel
     const members = (await channel.related('members').query().where('kicked', false)).map(
       (member) => {
+        console.log(this.getUserSession(member.id)?.status);
+
         return {
           id: member.id,
           username: member.username,
           firstName: member.first_name,
           lastName: member.last_name,
-          // status: this.get(member.id)?.status ?? 'offline'
+          status: this.getUserSession(member.id)?.status ?? 'offline',
         }
       }
     )

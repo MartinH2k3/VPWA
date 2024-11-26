@@ -23,11 +23,10 @@
 7. [x] používateľ si môže pozrieť kompletnú históriu správ
     - [x] efektívny inifinite scroll
 8. [ ] používateľ je informovaný o každej novej správe prostredníctvom notifikácie
-    - [ ] notifikácia sa vystavuje iba ak aplikácia nie je v stave "visible" (pozrite quasar docu App Visibility)
-      - [ ] zatiaľ sa notifikácia nezobrazuje pre aktívny kanál, pretože q.notify používame len pri otvorenom okne. Keď sa dorobia systémové notifikácie, bude túto podmienku treba vymazať.
+    - [x] notifikácia sa vystavuje iba ak aplikácia nie je v stave "visible" (pozrite quasar docu App Visibility)
     - [x] notifikácia obsahuje časť zo správy a odosielateľa
     - [x] používateľ si môže nastaviť, aby mu chodili notifikácie iba pre správy, ktoré sú mu adresované
-9. [ ] používateľ si môže nastaviť stav (online, DND, offline)
+9. [x] používateľ si môže nastaviť stav (online, DND, offline)
     - [ ] stav sa zobrazuje používateľom
     - [x] ak je nastavený DND stav, neprichádzajú notifikácie
     - [x] ak je nastavený offline stav, neprichádzajú používateľovi správy, po prepnutí do online sú kanály automaticky aktualizované

@@ -77,8 +77,7 @@ const useSocketStore = defineStore('socket', {
                   username: member.username,
                   firstName: member.firstName,
                   lastName: member.lastName,
-                  status: 'offline'
-                  // status: member.status
+                  status: member.status
                 };
               });
               channelStore.updateMembers(channelName, members);

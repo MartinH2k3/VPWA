@@ -94,6 +94,12 @@ export default class SocketSession {
         }
 
         this.status = data.status
+
+
+        // Update status for all users in the channel
+        if (this.activeChannelName)
+          socketSessions.updateChannelMembers(this.activeChannelName)
+
         break
 
       case 'update_only_mentions':
