@@ -94,8 +94,8 @@ const useSocketStore = defineStore('socket', {
 
             if ($q.appVisible && this.notification.channelName === channelStore.activeChannel.name) break;
 
-            notify(`New message in channel ${socketMessage.data.channelName}`, {
-              detail: socketMessage.data.detail,
+            notify(`New message in channel ${socketMessage.data.channelName} from ${socketMessage.data.username}`, {
+              detail: socketMessage.data.messageContent,
               type: 'positive',
               action: () => {
                 channelStore.setActiveChannel(socketMessage.data.channelName);
