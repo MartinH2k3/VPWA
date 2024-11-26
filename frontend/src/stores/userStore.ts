@@ -23,7 +23,6 @@ export const useUserStore = defineStore('user', {
     } as User,
     onlyMentions: false,
     status: 'online' as ('online' | 'offline' | 'away'),
-    socketStore: useSocketStore(),
 
   }),
   actions: {
@@ -34,11 +33,13 @@ export const useUserStore = defineStore('user', {
       this.user = {} as User
     },
     setStatus(status: 'online' | 'offline' | 'away') {
-      this.socketStore.updateStatus(status);
+      const socketStore = useSocketStore();
+      socketStore.updateStatus(status);
       this.status = status
     },
     setOnlyMentions(onlyMentions: boolean) {
-      this.socketStore.updateOnlyMentions(onlyMentions);
+      const socketStore = useSocketStore();
+      socketStore.updateOnlyMentions(onlyMentions);
       this.onlyMentions = onlyMentions
     }
   },
