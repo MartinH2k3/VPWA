@@ -85,7 +85,7 @@ const useSocketStore = defineStore('socket', {
             break;
           case 'notification':
             // If DND or offline: break
-            if (userStore.status == 'offline') break;
+            if (userStore.status == 'offline' || userStore.status == 'away') break;
             // If only mentions: check if mentioned
             if (userStore.onlyMentions && !socketMessage.data.messageContent.includes(`@${userStore.user.username}`)) break;
             console.log('Received notification', socketMessage.data);
