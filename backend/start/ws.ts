@@ -58,6 +58,7 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
   })
 
   ws.on('close', () => {
+    socketSession.destroy()
     socketSessions.splice(socketSessions.indexOf(socketSession), 1)
     console.log('Disconnected', socketSession?.user?.username)
   })

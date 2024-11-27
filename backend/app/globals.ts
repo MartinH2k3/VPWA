@@ -24,8 +24,6 @@ class SocketSessions extends Array<SocketSession> {
     // Update status for all users in the channel
     const members = (await channel.related('members').query().where('kicked', false)).map(
       (member) => {
-        console.log(this.getUserSession(member.id)?.status);
-
         return {
           id: member.id,
           username: member.username,

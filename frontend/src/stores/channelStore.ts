@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { api } from 'boot/api';
 import { useMessageStore } from './messageStore';
 import { useSocketStore } from './socketStore';
-import { useQuasar } from 'quasar';
+import { useQuasar, Notify } from 'quasar';
 import { useUserStore } from 'stores/userStore';
 
 const $q = useQuasar()
@@ -90,7 +90,7 @@ export const useChannelStore = defineStore('channel', {
       currentlyTypingEntry = channel.currentlyTyping[channel.currentlyTyping.length - 1];
       currentlyTypingEntry.timeoutId = setTimeout(() => {
         this.removeCurrentlyTyping(channelName, username);
-      }, 4000);
+      }, 7000);
 
     },
 
@@ -154,6 +154,10 @@ export const useChannelStore = defineStore('channel', {
         return 'Joined ' + channelName
       } catch (e: any) {
         console.error(e);
+        Notify.create({
+          message: e?.response?.data?.message ?? 'An unexpected error occurred.',
+          type: 'negative'
+        })
         return e?.response?.data?.message || 'An unexpected error occurred.'
       }
     },

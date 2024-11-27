@@ -187,4 +187,15 @@ export default class SocketSession {
   send(eventName: string, data: any) {
     this.ws.send(JSON.stringify({ event: eventName, data }))
   }
+
+  // Destructor
+  destroy() {
+    this.status = 'offline'
+    if (this.activeChannelName)
+      socketSessions.updateChannelMembers(this.activeChannelName)
+    console.log('Destroying session for', this.user.username)
+
+    // Update status for all users in the channel
+
+  }
 }
