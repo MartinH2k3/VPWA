@@ -96,11 +96,36 @@ export default class SocketSession {
         this.status = data.status
 
 
-        // Update status for all users in the channel
-        if (this.activeChannelName)
-          socketSessions.updateChannelMembers(this.activeChannelName)
+        // // Update status for all users in the channel
+        // if (this.activeChannelName)
+        //   socketSessions.updateChannelMembers(this.activeChannelName)
 
-        break
+        // Collect all users that share a channel with the user and send them a user status update
+        // Don't send to the user itself
+        // Don't send to people with offline status
+
+        let sessions: SocketSession[] = [];
+        this.channels.forEach((channelName) => {
+          sessions = sessions.concat(socketSessions.getForActiveChannel(channelName))
+        })
+
+        // remove duplicates
+        sessions = sessions.filter((session, index, self) =>
+          index === self.findIndex((t) => (
+            t.user.id === session.user.id
+          ))
+        )
+
+        sessions.forEach((session) => {
+          if (session.user.id === this.user.id || session.status === 'offline') return
+          session.send('update_status', {
+            username: this.user.username,
+            status: data.status,
+          })
+        })
+
+
+        break;
 
       case 'update_only_mentions':
         if (typeof data.onlyMentions !== 'boolean') {

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { useSocketStore } from './socketStore'
+import { useChannelStore } from './channelStore'
 
 
 export interface User {
@@ -35,6 +36,9 @@ export const useUserStore = defineStore('user', {
     setStatus(status: 'online' | 'offline' | 'away') {
       const socketStore = useSocketStore();
       socketStore.updateStatus(status);
+      // Update the status in the active channel
+      const userInChannel = useChannelStore().findUserInChannel(useChannelStore().activeChannel.name, this.user.username);
+      userInChannel && (userInChannel.status = status);
       this.status = status
     },
     setOnlyMentions(onlyMentions: boolean) {
