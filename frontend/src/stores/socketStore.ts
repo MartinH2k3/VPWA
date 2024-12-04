@@ -188,6 +188,12 @@ const useSocketStore = defineStore('socket', {
         console.error('WebSocket error:', error);
         this.isConnected = false;
       };
+
+
+      window.addEventListener('offline', () => {
+        this.disconnect();
+      });
+
     },
 
     updateStatus(status: string) {

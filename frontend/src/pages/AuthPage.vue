@@ -10,7 +10,7 @@
             :rules="[val => !!val || 'Password is required']" />
           <q-btn label="Login" type="submit" />
           <pre v-if="warning" class="text-negative">{{ warning }}</pre>
-
+  
           <div class="text-center q-pt-md">
             New to the website? <router-link to="/register">Register</router-link>
           </div>
@@ -26,7 +26,7 @@
             :rules="[val => val.length >= 8 || 'Password must be at least 8 characters']" />
           <q-btn label="Register" type="submit" />
           <pre v-if="warning" class=" text-negative">{{ warning }}</pre>
-
+  
           <div class="text-center">
             Already a user? <router-link to="/login">Log In</router-link>
           </div>
@@ -34,7 +34,6 @@
       </q-page>
     </q-page-container>
   </q-layout>
-
 </template>
 
 <style scoped lang="sass">
@@ -57,121 +56,129 @@ import { useMessageStore } from 'stores/messageStore';
 import { api } from 'boot/api';
 
 export default {
-  data() {
-    return {
-      isLogin: true,
-      email: '',
-      password: '',
-      warning: '',
-      firstName: '',
-      username: '',
-      lastName: '',
-    }
-  },
+	data() {
+		return {
+			isLogin: true,
+			email: '',
+			password: '',
+			warning: '',
+			firstName: '',
+			username: '',
+			lastName: '',
+		}
+	},
 
-  setup() {
-    const router = useRouter();
-    const userStore = useUserStore();
-    const channelStore = useChannelStore();
-    const messageStore = useMessageStore();
-    return { router, userStore, channelStore, messageStore };
-  },
+	setup() {
+		const router = useRouter();
+		const userStore = useUserStore();
+		const channelStore = useChannelStore();
+		const messageStore = useMessageStore();
+		return { router, userStore, channelStore, messageStore };
+	},
 
-  props: {
-    type: String
-  },
+	props: {
+		type: String
+	},
 
-  watch: {
-    type(newType) {
-      this.isLogin = newType == 'login';
+	watch: {
+		type(newType) {
+			this.isLogin = newType == 'login';
 
-    }
-  },
+		}
+	},
 
-  mounted() {
-    this.isLogin = this.type == 'login';
-  },
+	async mounted() {
+		this.isLogin = this.type == 'login';
 
-  methods: {
 
-    clearStore() {
-      this.channelStore.clear();
-      this.messageStore.clear();
-    },
+		// if navigator status if offline return
+		if (navigator.onLine === false) {
+			this.warning = 'You are offline. Please check your internet connection.';
+			return;
+		}
+		// Check if the user is already logged in
+		try {
+			const sessionResponse = await api.get('/auth');
+			console.log(sessionResponse);
 
-    async login() {
+			if (sessionResponse.data.authenticated) {
+				console.warn('User is already logged in');
 
-      // can't login if already logged in
-      try {
-        const sessionResponse = await api.get('/auth');
-        console.log(sessionResponse);
+				await this.router.push('/');
+				return;
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	},
 
-        if (sessionResponse.data.authenticated) {
-          console.warn('User is already logged in');
+	methods: {
 
-          await this.router.push('/');
-          return;
-        }
-      } catch (e) {
-        console.error(e);
-      }
+		clearStore() {
+			this.channelStore.clear();
+			this.messageStore.clear();
+		},
 
-      try {
-        const response = await api.post('/login', {
-          email: this.email,
-          password: this.password
-        });
-        this.warning = '';
+		async login() {
 
-        const userData = response.data;
-        this.userStore.setActiveUser(userData); // Set the active user in the store
-        await this.router.push('/');
-      } catch (e: any) {
-        try {
-          const errors = e.response.data.errors
-          this.warning = '';
-          for (const error of errors) {
-            this.warning += error.message + '\n'
-          }
-        } catch (e) { // If there is no response
-          this.warning = 'Couldn\'t connect to the server.\nTry checking your internet connection.';
-        }
-        console.error(e);
-      }
-    },
-    async register() {
-      try {
-        const response = await api.post('/register', {
-          username: this.username,
-          email: this.email,
-          password: this.password,
-          first_name: this.firstName,
-          last_name: this.lastName
-        });
-        console.log(response);
 
-        this.warning = '';
-        const userData = response.data;
-        this.userStore.setActiveUser(userData); // Set the active user in the store
-        await this.router.push('/');
-      } catch (e: any) {
-        try {
-          const errors = [e.response.data.message]
-          console.log(e.response.data.message);
 
-          this.warning = '';
-          for (const error of errors) {
-            this.warning += error + '\n'
-          }
-        } catch (e) { // If there is no response
-          console.log(e);
+			try {
+				const response = await api.post('/login', {
+					email: this.email,
+					password: this.password
+				});
+				this.warning = '';
 
-          this.warning = 'Couldn\'t connect to the server.\nTry checking your internet connection.';
-        }
-        console.error(e);
-      }
-    }
-  }
+				const userData = response.data;
+				this.userStore.setActiveUser(userData); // Set the active user in the store
+				await this.router.push('/');
+			} catch (e: any) {
+				try {
+					const errors = e.response.data.errors
+					this.warning = '';
+					for (const error of errors) {
+						this.warning += error.message + '\n'
+					}
+				} catch (e) { // If there is no response
+					this.warning = 'Couldn\'t connect to the server.\nTry checking your internet connection.';
+				}
+				console.error(e);
+			}
+		},
+		async register() {
+			try {
+				const response = await api.post('/register', {
+					username: this.username,
+					email: this.email,
+					password: this.password,
+					first_name: this.firstName,
+					last_name: this.lastName
+				});
+				console.log(response);
+
+				this.warning = '';
+				const userData = response.data;
+				this.userStore.setActiveUser(userData); // Set the active user in the store
+				await this.router.push('/');
+			} catch (e: any) {
+				try {
+					const errors = [e.response.data.message]
+					console.log(e.response.data.message);
+
+					this.warning = '';
+					for (const error of errors) {
+						this.warning += error + '\n'
+					}
+				} catch (e) { // If there is no response
+					console.log(e);
+
+					this.warning = 'Couldn\'t connect to the server.\nTry checking your internet connection.';
+				}
+				console.error(e);
+			}
+		}
+	}
 };
 
 </script>
