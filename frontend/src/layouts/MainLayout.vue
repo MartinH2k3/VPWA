@@ -23,6 +23,10 @@
               <q-radio v-model="status" val="offline" label="offline" />
             </div>
           </div>
+          <!-- Button to enable notifications -->
+          <q-btn v-if="Notification.permission !== 'granted'" flat round dense icon="notifications"
+            aria-label="Notifications" @click="requestNotificationPermission" />
+  
         </q-btn-dropdown>
         <q-btn flat dense round icon="group" aria-label="Members" @click="toggleRightDrawer" />
       </q-toolbar>
@@ -91,6 +95,11 @@ export default {
 		this.status = this.userStore.status;
 		this.onlyMentions = this.userStore.onlyMentions;
 	},
+	computed: {
+		Notification() {
+			return window.Notification;
+		},
+	},
 	watch: {
 		status(newStatus, oldStatus) {
 			this.userStore.setStatus(newStatus);
@@ -108,6 +117,11 @@ export default {
 		},
 		toggleRightDrawer() {
 			this.rightDrawerOpen = !this.rightDrawerOpen;
+		},
+		requestNotificationPermission() {
+			if (this.Notification.permission !== 'granted') {
+				this.Notification.requestPermission();
+			}
 		},
 		async logout() {
 			try {
