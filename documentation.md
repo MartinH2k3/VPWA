@@ -2,6 +2,8 @@
 Vytvorte progresívnu webovú aplikáciu na textovú komunikáciu v štýle IRC (Slack), ktorá komplexne rieši nižšie definované prípady použitia.
 # Diagram fyzického dátového modelu
 ![Diagram fyzického dátového modelu](/final_uml.png)
+# Diagram architektúry
+![Diagram architektúry](/archictecture_diagram.png)
 # Návrhové rozhodnutia
 ## Odporúčané knižnice
 ### Quasar
