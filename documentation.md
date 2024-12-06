@@ -20,7 +20,10 @@ Z Adonis.js sme v projekte využili:
 ### PostgreSQL
 * relačná databáza využivaná cez Lucid ORM
 ## Externé knižnice
+### Pinia
+Na spravovanie stavov sme zvolili Piniu namiesto Vuex, nakoľko Vuex je deprecated a nebude podporovaný v budúcnosti.
 ### Vymazávanie neaktívnych kanálov
+```npm install node-schedule```  
 Použitá knižnica node-schedule, kvôli jednoduchej implementácii.  
 Stačí zavolať schedule.scheduleJob('sek min hod deň_v_mesiaci mesiac_v_roku deň_v_týždni', funkcia()), kde nepoužité hodnoty nahradíme *.
 # Snímky obrazoviek
@@ -32,3 +35,5 @@ Stačí zavolať schedule.scheduleJob('sek min hod deň_v_mesiaci mesiac_v_roku 
 ![Login](/screenshots/invite.png)
 ## Zoznam členov kanála
 ![Login](/screenshots/members.png)
+## Nastavenia
+![Login](/screenshots/settings.png)
