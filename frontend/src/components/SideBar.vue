@@ -4,7 +4,7 @@
       Channels
     </q-item-label>
     <hr style="width:90%; opacity:0.5">
-  
+
     <q-item v-if="channels.length === 0">
       <q-item-section>
         <q-item-label>
@@ -18,8 +18,8 @@
         <q-icon class="q-my-auto q-mr-sm" :name="channel.isPrivate ? 'lock' : 'public'"></q-icon>
         <span class="q-mr-auto flex items-center">
           {{ channel.name }}</span>
-        <q-btn flat round dense icon="close" class="q-ml-sm" @click="leaveChannel(channel.name)" />
-  
+        <q-btn v-if="activeChannel.id == channel.id" flat round dense icon="close" class="q-ml-sm" @click="leaveChannel(channel.name)" />
+
       </div>
     </q-item>
     <!-- Button with input that will create channel -->
@@ -30,7 +30,7 @@
         <q-btn @click="createChannel()" label="Create" />
       </q-item-section>
     </q-item>
-  
+
   </q-list>
 </template>
 
