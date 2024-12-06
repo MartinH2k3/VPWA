@@ -3,7 +3,7 @@
     <q-header elevated>
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
-  
+
         <q-toolbar-title>
           Frens
         </q-toolbar-title>
@@ -26,28 +26,28 @@
           <!-- Button to enable notifications -->
           <q-btn v-if="Notification.permission !== 'granted'" flat round dense icon="notifications"
             aria-label="Notifications" @click="requestNotificationPermission" />
-  
+
         </q-btn-dropdown>
         <q-btn flat dense round icon="group" aria-label="Members" @click="toggleRightDrawer" />
       </q-toolbar>
     </q-header>
-  
+
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <SideBar />
     </q-drawer>
     <q-drawer show-if-above v-model="rightDrawerOpen" side="right" bordered>
       <MembersSideBar />
     </q-drawer>
-  
+
     <q-page-container>
       <message-page />
     </q-page-container>
-  
+
     <q-footer class="bg-white">
       <message-field />
     </q-footer>
-  
-  
+
+
   </q-layout>
 </template>
 
@@ -126,6 +126,7 @@ export default {
 		async logout() {
 			try {
 				await api.post('/logout');
+        this.socketStore.disconnect();
 				this.channelStore.clear();
 				this.messageStore.clear();
 				await this.router.push('/login');
