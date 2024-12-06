@@ -2,7 +2,7 @@
   <q-layout>
     <q-page-container>
       <q-page class="column flex-center text-center">
-        <img alt="logo" width="86px" class='q-mb-sm' src="logo.svg">
+        <img alt="logo" width="86px" class='q-mb-sm' src="public/logo.svg">
         <q-form v-if="isLogin" @submit.prevent="login" class="custom-form">
           <q-input v-model="email" label="Email"
             :rules="[val => /.+@.+\..+/.test(val) || 'Please enter a valid email address']" />
@@ -10,7 +10,7 @@
             :rules="[val => !!val || 'Password is required']" />
           <q-btn label="Login" type="submit" />
           <pre v-if="warning" class="text-negative">{{ warning }}</pre>
-  
+
           <div class="text-center q-pt-md">
             New to the website? <router-link to="/register">Register</router-link>
           </div>
@@ -26,7 +26,7 @@
             :rules="[val => val.length >= 8 || 'Password must be at least 8 characters']" />
           <q-btn label="Register" type="submit" />
           <pre v-if="warning" class=" text-negative">{{ warning }}</pre>
-  
+
           <div class="text-center">
             Already a user? <router-link to="/login">Log In</router-link>
           </div>
