@@ -15,6 +15,10 @@ class SocketSessions extends Array<SocketSession> {
     return this.find((session) => session.user.id === userId)
   }
 
+  getChannelSessions(channelName: string) {
+    return this.filter((session) => session.isInChannel(channelName))
+  }
+
   async updateChannelMembers(channelName: string) {
     // Update everyone's members list that has this channel as active
     const channel = await Channel.query().where('name', channelName).first()

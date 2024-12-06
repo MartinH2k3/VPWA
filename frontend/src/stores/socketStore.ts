@@ -128,6 +128,19 @@ const useSocketStore = defineStore('socket', {
 
             }
             break;
+          case 'update_status':
+            {
+              const userName = socketMessage.data.username;
+              const status = socketMessage.data.status;
+              // Chec k if the user is in the active channel.
+              const channelName = channelStore.activeChannel.name;
+              const member = channelStore.findUserInChannel(channelName, userName);
+              if (member) {
+                member.status = status;
+              }
+            }
+            break;
+
 
           case 'kick':
             {
@@ -175,6 +188,12 @@ const useSocketStore = defineStore('socket', {
         console.error('WebSocket error:', error);
         this.isConnected = false;
       };
+
+
+      window.addEventListener('offline', () => {
+        this.disconnect();
+      });
+
     },
 
     updateStatus(status: string) {

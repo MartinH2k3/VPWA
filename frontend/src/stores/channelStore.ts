@@ -25,7 +25,7 @@ export interface Channel {
   id: number
   name: string
   adminId: number
-  private: boolean
+  isPrivate: boolean
   highlighted?: boolean
   members: ChannelMember[]
   currentlyTyping: CurrentlyTyping[]

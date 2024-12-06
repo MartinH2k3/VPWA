@@ -1,12 +1,6 @@
 import { AppVisibility, Notify } from 'quasar';
 
 
-Notification.requestPermission().then((result) => {
-  if (result === 'granted') {
-    console.log('Notification permission granted');
-  }
-});
-
 
 interface NotifyOptions {
   type?: 'positive' | 'negative' | 'warning' | 'info' | 'ongoing',
