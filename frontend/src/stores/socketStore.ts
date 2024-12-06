@@ -218,7 +218,6 @@ const useSocketStore = defineStore('socket', {
       });
     },
 
-    //TODO add comments
     disconnect() {
       if (this.socket) {
         this.socket.close();
@@ -228,20 +227,10 @@ const useSocketStore = defineStore('socket', {
     },
     sendMessage(event: string, data: any) {
       if (this.socket && this.isConnected) {
-        const cookies = document.cookie; // TODO remove if unused
         const payload: SocketMessage = { event, data };
         this.socket.send(JSON.stringify(payload));
       }
     },
-    //TODO remove if unused
-    onMessage(callback: (message: any) => void) {
-      if (this.socket) {
-        this.socket.onmessage = (event) => {
-          const message = JSON.parse(event.data);
-          callback(message);
-        };
-      }
-    }
   }
 });
 
