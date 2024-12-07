@@ -1,9 +1,9 @@
 # Zadanie
 Vytvorte progresívnu webovú aplikáciu na textovú komunikáciu v štýle IRC (Slack), ktorá komplexne rieši nižšie definované prípady použitia.
 # Diagram fyzického dátového modelu
-![Diagram fyzického dátového modelu](/final_uml.png)
+![Diagram fyzického dátového modelu](./final_uml.png)
 # Diagram architektúry
-![Diagram architektúry](/archictecture_diagram.png)
+![Diagram architektúry](./archictecture_diagram.png)
 # Návrhové rozhodnutia
 ## Odporúčané knižnice
 ### Quasar
@@ -54,13 +54,13 @@ Push notifikácie sme riešili pomocou už existujúceho Notification API, ktor�
  
 # Snímky obrazoviek
 ## Prihlasovacia obrazovka
-![Login](/screenshots/login.png)
+![Login](./screenshots/login.png)
 ## Konverzácia v kanáli
-![Login](/screenshots/chatting.png)
+![Login](./screenshots/chatting.png)
 ## Pozvánka do kanála
-![Login](/screenshots/invite.png)
+![Login](./screenshots/invite.png)
 ## Zoznam členov kanála
-![Login](/screenshots/members.png)
+![Login](./screenshots/members.png)
 ## Nastavenia
-![Login](/screenshots/settings.png)
+![Login](./screenshots/settings.png)
 
