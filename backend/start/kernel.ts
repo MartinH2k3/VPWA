@@ -12,16 +12,7 @@ import server from '@adonisjs/core/services/server'
 import schedule from 'node-schedule'
 import CleaningService from '#services/cleaning_service'
 
-schedule.scheduleJob('0 * * * * *', async function () {
-  await CleaningService.cleanUp()
-})
-schedule.scheduleJob('15 * * * * *', async function () {
-  await CleaningService.cleanUp()
-})
-schedule.scheduleJob('30 * * * * *', async function () {
-  await CleaningService.cleanUp()
-})
-schedule.scheduleJob('45 * * * * *', async function () {
+schedule.scheduleJob('* * 0 * * *', async function () {
   await CleaningService.cleanUp()
 })
 /**
